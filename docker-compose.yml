@@ -1,0 +1,52 @@
+name: oaas
+
+services:
+  frontend-dev:
+    image: node:20-alpine
+    container_name: front_dev
+    working_dir: /app
+    command: sleep infinity
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    volumes:
+      # 소스 전체 마운트 → 호스트에서 수정하면 컨테이너에 즉시 반영
+      - .:/app
+      # node_modules는 컨테이너 내부 것 사용 (호스트 OS와 충돌 방지)
+      - /app/node_modules
+      # Next.js 빌드 캐시 영속화 (컨테이너 재시작해도 캐시 유지)
+      - nextjs_cache:/app/.next
+    networks:
+      - oaas-net
+
+  frontend-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runner
+    container_name: front_prod
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_TELEMETRY_DISABLED=1
+      - NEXT_PUBLIC_API_URL=http://api:8000
+    volumes:
+      - ./public:/app/public
+      - nextjs_static:/app/.next/static
+      - ./logs/frontend:/app/logs
+    restart: unless-stopped
+    networks:
+      - oaas-net
+
+volumes:
+  nextjs_cache:
+  nextjs_static:
+
+
+networks:
+  oaas-net:
+    external: true
