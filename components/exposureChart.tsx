@@ -9,37 +9,101 @@ import {
   ResponsiveContainer,
   Legend,
 } from "recharts";
+import { DateRange } from "react-day-picker";
+import { differenceInDays, addDays, format } from "date-fns";
+import { ko } from "date-fns/locale";
 
-const data = [
-  { time: "00:00", exposed: 120, interested: 25 },
-  { time: "03:00", exposed: 80, interested: 30 },
-  { time: "06:00", exposed: 250, interested: 55 },
-  { time: "09:00", exposed: 680, interested: 195 },
-  { time: "12:00", exposed: 920, interested: 345 },
-  { time: "15:00", exposed: 750, interested: 195 },
-  { time: "18:00", exposed: 1100, interested: 475 },
-  { time: "21:00", exposed: 850, interested: 435 },
-];
+interface Props {
+  dateRange?: DateRange;
+}
 
-export default function ExposureChart() {
+// TODO: Replace with API call when backend is ready
+// Deterministic mock — no Math.random() to avoid hydration mismatch
+function generateChartData(dateRange?: DateRange) {
+  const from = dateRange?.from;
+  const to = dateRange?.to ?? from;
+
+  if (!from || !to) {
+    // Default: single day, hourly
+    return {
+      data: [
+        { time: "00:00", exposed: 120,  interested: 25  },
+        { time: "03:00", exposed: 80,   interested: 30  },
+        { time: "06:00", exposed: 250,  interested: 55  },
+        { time: "09:00", exposed: 680,  interested: 195 },
+        { time: "12:00", exposed: 920,  interested: 345 },
+        { time: "15:00", exposed: 750,  interested: 195 },
+        { time: "18:00", exposed: 1100, interested: 475 },
+        { time: "21:00", exposed: 850,  interested: 435 },
+      ],
+      unit: "시간",
+    };
+  }
+
+  const days = differenceInDays(to, from) + 1;
+
+  if (days === 1) {
+    // Single day → hourly
+    return {
+      data: [
+        { time: "00:00", exposed: 120,  interested: 25  },
+        { time: "03:00", exposed: 80,   interested: 30  },
+        { time: "06:00", exposed: 250,  interested: 55  },
+        { time: "09:00", exposed: 680,  interested: 195 },
+        { time: "12:00", exposed: 920,  interested: 345 },
+        { time: "15:00", exposed: 750,  interested: 195 },
+        { time: "18:00", exposed: 1100, interested: 475 },
+        { time: "21:00", exposed: 850,  interested: 435 },
+      ],
+      unit: "시간",
+    };
+  }
+
+  if (days <= 31) {
+    // Up to a month → daily
+    const bases = [520, 680, 430, 790, 610, 740, 560, 820, 470, 650];
+    const data = Array.from({ length: days }, (_, i) => {
+      const date = addDays(from, i);
+      const label =
+        days <= 7
+          ? format(date, "EEE", { locale: ko })   // 월, 화, 수 …
+          : format(date, "M/d");                   // 4/1, 4/2 …
+      const exposed = bases[i % bases.length] + (i % 4) * 60;
+      return { time: label, exposed, interested: Math.floor(exposed * 0.22) };
+    });
+    return { data, unit: days <= 7 ? "요일" : "날짜" };
+  }
+
+  // More than a month → weekly
+  const weeks = Math.ceil(days / 7);
+  const bases = [3200, 4100, 3700, 4600, 3900, 4300, 3500];
+  const data = Array.from({ length: weeks }, (_, i) => {
+    const weekStart = addDays(from, i * 7);
+    const label = format(weekStart, "M/d") + "주~";
+    const exposed = bases[i % bases.length] + (i % 3) * 400;
+    return { time: label, exposed, interested: Math.floor(exposed * 0.22) };
+  });
+  return { data, unit: "주" };
+}
+
+export default function ExposureChart({ dateRange }: Props) {
+  const { data, unit } = generateChartData(dateRange);
+
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
-        시간대별 노출 추이
+        {unit === "시간" ? "시간대별" : unit === "주" ? "주별" : "일별"} 노출 추이
       </h3>
 
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>
-          <XAxis dataKey="time" stroke="#6b7280" />
-          <YAxis stroke="#6b7280" label={{
-            value: "(명)",
-            angle: 0,
-            position: "insideLeft",
-            dx: -11,
-            dy: 0}}/>
-
+          <XAxis dataKey="time" stroke="#6b7280" tick={{ fontSize: 12 }} />
+          <YAxis
+            stroke="#6b7280"
+            label={{ value: "(명)", angle: 0, position: "insideLeft", dx: -11, dy: 0 }}
+          />
           <Tooltip
-            formatter={(value) => `${value}명`}
+            formatter={(value) => `${Number(value).toLocaleString()}명`}
             contentStyle={{
               backgroundColor: "#fff",
               border: "1px solid #e5e7eb",
@@ -47,7 +111,6 @@ export default function ExposureChart() {
             }}
           />
           <Legend />
-
           <Line
             type="monotone"
             dataKey="interested"
@@ -57,7 +120,6 @@ export default function ExposureChart() {
             dot={{ fill: "#F59E0B", r: 4 }}
             activeDot={{ r: 6 }}
           />
-
           <Line
             type="monotone"
             dataKey="exposed"
