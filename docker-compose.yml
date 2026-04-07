@@ -12,6 +12,7 @@ services:
       - NODE_ENV=development
       - NEXT_TELEMETRY_DISABLED=1
       - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - API_URL=http://back_dev:8000
     volumes:
       # 소스 전체 마운트 → 호스트에서 수정하면 컨테이너에 즉시 반영
       - .:/app
