@@ -16,21 +16,15 @@ const NOISE_COLOR = "#9CA3AF";
 
 // ── 골든존 API 응답 → ScatterChart 형식 변환 ───────────────────────────────────
 
-function toChartClusters(goldenZone: GoldenZoneResponse) {
-  // 전체 포인트에서 정규화 기준(max_x, max_y) 계산
-  let maxX = 1, maxY = 1;
-  for (const cluster of goldenZone.clusters) {
-    for (const [x, y] of cluster.points ?? []) {
-      if (x > maxX) maxX = x;
-      if (y > maxY) maxY = y;
-    }
-  }
+const SCREEN_W = 1280;
+const SCREEN_H = 720;
 
+function toChartClusters(goldenZone: GoldenZoneResponse) {
   return goldenZone.clusters.map((cluster, idx) => ({
     name: cluster.label === -1 ? "노이즈" : `클러스터 ${idx + 1}`,
     data: (cluster.points ?? []).map(([x, y]: [number, number]) => ({
-      x: Math.round((x / maxX) * 100),
-      y: Math.round((y / maxY) * 100),
+      x: Math.round((x / SCREEN_W) * 100),
+      y: Math.round((y / SCREEN_H) * 100),
     })),
     isNoise: cluster.label === -1,
   }));
@@ -87,7 +81,7 @@ export default function DbscanChart({ goldenZone }: { goldenZone?: GoldenZoneRes
       </p>
 
       <ResponsiveContainer width="100%" height={400}>
-        <ScatterChart margin={{ top: 10, right: 30, bottom: 10, left: 0 }}>
+        <ScatterChart margin={{ top: 30, right: 30, bottom: 10, left: 0 }}>
           <XAxis
             type="number"
             dataKey="x"
@@ -96,6 +90,7 @@ export default function DbscanChart({ goldenZone }: { goldenZone?: GoldenZoneRes
             unit="%"
             stroke="#6b7280"
             tick={{ fontSize: 12 }}
+            orientation="top"
           />
           <YAxis
             type="number"

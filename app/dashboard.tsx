@@ -65,19 +65,19 @@ export default async function Dashboard() {
   // 시간(0~23)별로 exposure_count, interested_count 합산
   const hourlyMap = new Map<number, { exposed: number; interested: number }>();
   for (const r of hourlyResults) {
-    const h = new Date(r.hour).getUTCHours();
+    const h = (new Date(r.hour).getUTCHours() + 9) % 24;
     const cur = hourlyMap.get(h) ?? { exposed: 0, interested: 0 };
     hourlyMap.set(h, {
-      exposed:    cur.exposed    + r.exposure_count,
+      exposed: cur.exposed + r.exposure_count,
       interested: cur.interested + r.interested_count,
     });
   }
   const hourlyTrendData = hourlyMap.size > 0
     ? Array.from({ length: 24 }, (_, h) => {
-        const label = `${String(h).padStart(2, "0")}:00`;
-        const { exposed = 0, interested = 0 } = hourlyMap.get(h) ?? {};
-        return { label, exposed, interested };
-      })
+      const label = `${String(h).padStart(2, "0")}:00`;
+      const { exposed = 0, interested = 0 } = hourlyMap.get(h) ?? {};
+      return { label, exposed, interested };
+    })
     : undefined;
 
   // ── 골든존 데이터 (첫 번째 캠페인 기준) ──────────────────────────────────────
