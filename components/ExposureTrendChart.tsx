@@ -13,8 +13,15 @@ import { DateRange } from "react-day-picker";
 import { differenceInDays, addDays, format } from "date-fns";
 import { ko } from "date-fns/locale";
 
+interface TrendPoint {
+  label: string;
+  exposed: number;
+  interested: number;
+}
+
 interface Props {
   dateRange?: DateRange;
+  trendData?: TrendPoint[];
 }
 
 function generateTrendChartData(dateRange?: DateRange) {
@@ -82,8 +89,9 @@ function generateTrendChartData(dateRange?: DateRange) {
   return { data, unit: "주" };
 }
 
-export default function ExposureTrendChart({ dateRange }: Props) {
-  const { data, unit } = generateTrendChartData(dateRange);
+export default function ExposureTrendChart({ dateRange, trendData }: Props) {
+  const { data: fallbackData, unit } = generateTrendChartData(dateRange);
+  const data = trendData ?? fallbackData;
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">

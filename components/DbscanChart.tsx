@@ -33,7 +33,6 @@ function toChartClusters(goldenZone: GoldenZoneResponse) {
       y: Math.round((y / maxY) * 100),
     })),
     isNoise: cluster.label === -1,
-    isMain: cluster.is_main,
   }));
 }
 
@@ -121,7 +120,7 @@ export default function DbscanChart({ goldenZone }: { goldenZone?: GoldenZoneRes
           {clusters.map((cluster, idx) => (
             <Scatter
               key={cluster.name}
-              name={cluster.isMain ? `${cluster.name} (주요)` : cluster.name}
+              name={cluster.name}
               data={cluster.data}
               fill={cluster.isNoise ? NOISE_COLOR : CLUSTER_COLORS[idx % CLUSTER_COLORS.length]}
               opacity={cluster.isNoise ? 0.4 : 0.85}

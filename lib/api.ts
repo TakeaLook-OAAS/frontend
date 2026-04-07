@@ -31,18 +31,29 @@ export interface CampaignAggListResponse {
   total: number;
 }
 
+export interface HourlyAggResult extends AggResult {
+  hour: string;
+}
+
+export interface HourlyAggListResponse {
+  results: HourlyAggResult[];
+  total: number;
+}
+
+export interface DailyAggResult extends AggResult {
+  date: string;
+}
+
+export interface DailyAggListResponse {
+  results: DailyAggResult[];
+  total: number;
+}
+
 // ── 골든존 타입 ───────────────────────────────────────────────────────────────
 
 export interface GoldenZoneCluster {
   label: number;
   point_count: number;
-  is_main: boolean;
-  convex_hull: { vertices: [number, number][]; area_px2: number } | null;
-  ellipse: {
-    center: [number, number];
-    semi_axes: [number, number];
-    angle_deg: number;
-  } | null;
   points: [number, number][] | null;
 }
 
@@ -62,6 +73,44 @@ export interface GoldenZoneResponse {
 }
 
 // ── fetch 함수 ────────────────────────────────────────────────────────────────
+
+export async function getHourlyAggs(params?: {
+  device_id?: string;
+  campaign_id?: string;
+  start_date?: string;
+  end_date?: string;
+  target_date?: string;
+  limit?: number;
+}): Promise<HourlyAggListResponse> {
+  const url = new URL(`${BASE}/stats/hourly/`);
+  if (params?.device_id)    url.searchParams.set("device_id",    params.device_id);
+  if (params?.campaign_id)  url.searchParams.set("campaign_id",  params.campaign_id);
+  if (params?.start_date)   url.searchParams.set("start_date",   params.start_date);
+  if (params?.end_date)     url.searchParams.set("end_date",     params.end_date);
+  if (params?.target_date)  url.searchParams.set("target_date",  params.target_date);
+  if (params?.limit)        url.searchParams.set("limit",        String(params.limit));
+  const res = await fetch(url.toString(), { cache: "no-store" });
+  if (!res.ok) throw new Error(`/stats/hourly/ 오류: ${res.status}`);
+  return res.json();
+}
+
+export async function getDailyAggs(params?: {
+  device_id?: string;
+  campaign_id?: string;
+  start_date?: string;
+  end_date?: string;
+  limit?: number;
+}): Promise<DailyAggListResponse> {
+  const url = new URL(`${BASE}/stats/daily/`);
+  if (params?.device_id)   url.searchParams.set("device_id",   params.device_id);
+  if (params?.campaign_id) url.searchParams.set("campaign_id", params.campaign_id);
+  if (params?.start_date)  url.searchParams.set("start_date",  params.start_date);
+  if (params?.end_date)    url.searchParams.set("end_date",     params.end_date);
+  if (params?.limit)       url.searchParams.set("limit",        String(params.limit));
+  const res = await fetch(url.toString(), { cache: "no-store" });
+  if (!res.ok) throw new Error(`/stats/daily/ 오류: ${res.status}`);
+  return res.json();
+}
 
 export async function getCampaignAggs(params?: {
   device_id?: string;
