@@ -10,7 +10,12 @@ import {
   Legend,
 } from "recharts";
 
-const data = [
+interface AgeData {
+  age: string;
+  value: number;
+}
+
+const FALLBACK: AgeData[] = [
   { age: "10대", value: 12 },
   { age: "20대", value: 28 },
   { age: "30대", value: 32 },
@@ -19,7 +24,9 @@ const data = [
   { age: "60대+", value: 3 },
 ];
 
-export default function AgeChart() {
+export default function AgeChart({ data }: { data?: AgeData[] }) {
+  const chartData = data ?? FALLBACK;
+
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -27,7 +34,7 @@ export default function AgeChart() {
       </h3>
 
       <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
+        <BarChart data={chartData}>
 
           <XAxis dataKey="age" stroke="#6b7280" />
 

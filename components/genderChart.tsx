@@ -9,12 +9,20 @@ import {
   Tooltip,
 } from "recharts";
 
-const data = [
+interface GenderData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+const FALLBACK: GenderData[] = [
   { name: "남성", value: 58, color: "#3B82F6" },
   { name: "여성", value: 42, color: "#EC4899" },
 ];
 
-export default function GenderChart() {
+export default function GenderChart({ data }: { data?: GenderData[] }) {
+  const chartData = data ?? FALLBACK;
+
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
@@ -24,7 +32,7 @@ export default function GenderChart() {
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
-            data={data}
+            data={chartData}
             cx="50%"
             cy="50%"
             labelLine={false}
@@ -36,7 +44,7 @@ export default function GenderChart() {
             startAngle={90}
             endAngle={-270}
           >
-            {data.map((entry, index) => (
+            {chartData.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>

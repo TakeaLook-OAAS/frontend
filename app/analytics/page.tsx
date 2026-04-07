@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import GenderChart from "@/components/genderChart";
 import AgeChart from "@/components/ageChart";
 import { DateRange } from "react-day-picker";
@@ -10,6 +10,7 @@ import { Users, Clock, Eye, TrendingUp, Target, Download } from "lucide-react";
 import SimpleCard from "@/components/Simplecard";
 import DbscanChart from "@/components/DbscanChart";
 import { differenceInDays, addDays, format } from "date-fns";
+import { getCampaignAggs, getGoldenZone, GoldenZoneResponse } from "@/lib/api";
 
 // TODO: Replace with API call — GET /api/stats?from=...&to=...
 const mockStats = {
@@ -70,6 +71,17 @@ export default function AnalyticsPage() {
     from: undefined,
     to: undefined,
   });
+  const [goldenZone, setGoldenZone] = useState<GoldenZoneResponse | undefined>();
+
+  useEffect(() => {
+    getCampaignAggs()
+      .then(({ results }) => {
+        if (results.length === 0) return;
+        return getGoldenZone(results[0].campaign_id, results[0].device_id);
+      })
+      .then((data) => { if (data) setGoldenZone(data); })
+      .catch(() => {});
+  }, []);
 
   function handleDownload() {
     const csv = buildCsvRows(dateRange);
@@ -143,7 +155,7 @@ export default function AnalyticsPage() {
       </section>
 
       <section>
-        <DbscanChart />
+        <DbscanChart goldenZone={goldenZone} />
       </section>
 
       {/* Exposure Chart — x-axis changes with date range */}
