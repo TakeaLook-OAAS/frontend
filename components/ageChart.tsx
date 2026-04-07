@@ -15,17 +15,17 @@ interface AgeData {
   value: number;
 }
 
-const FALLBACK: AgeData[] = [
-  { age: "10대", value: 12 },
-  { age: "20대", value: 28 },
-  { age: "30대", value: 32 },
-  { age: "40대", value: 18 },
-  { age: "50대", value: 7 },
-  { age: "60대+", value: 3 },
+const EMPTY: AgeData[] = [
+  { age: "10대", value: 0 },
+  { age: "20대", value: 0 },
+  { age: "30대", value: 0 },
+  { age: "40대", value: 0 },
+  { age: "50대", value: 0 },
+  { age: "60대+", value: 0 },
 ];
 
 export default function AgeChart({ data }: { data?: AgeData[] }) {
-  const chartData = data ?? FALLBACK;
+  const chartData = data ?? EMPTY;
 
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">

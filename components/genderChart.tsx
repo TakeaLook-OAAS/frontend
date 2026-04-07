@@ -15,24 +15,22 @@ interface GenderData {
   color: string;
 }
 
-const FALLBACK: GenderData[] = [
-  { name: "남성", value: 58, color: "#3B82F6" },
-  { name: "여성", value: 42, color: "#EC4899" },
-];
-
 export default function GenderChart({ data }: { data?: GenderData[] }) {
-  const chartData = data ?? FALLBACK;
-
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">
         노출 인구 성별 분포
       </h3>
 
+      {!data || data.every((d) => d.value === 0) ? (
+        <div className="flex items-center justify-center h-[300px] text-gray-400 text-sm">
+          기간을 선택하면 데이터가 표시됩니다
+        </div>
+      ) : (
       <ResponsiveContainer width="100%" height={300}>
         <PieChart>
           <Pie
-            data={chartData}
+            data={data}
             cx="50%"
             cy="50%"
             labelLine={false}
@@ -44,7 +42,7 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
             startAngle={90}
             endAngle={-270}
           >
-            {chartData.map((entry, index) => (
+            {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
             ))}
           </Pie>
@@ -53,6 +51,7 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
           <Legend />
         </PieChart>
       </ResponsiveContainer>
+      )}
     </div>
   );
 }
