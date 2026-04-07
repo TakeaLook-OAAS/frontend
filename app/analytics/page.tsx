@@ -6,6 +6,8 @@ import AgeChart from "@/components/ageChart";
 import { DateRange } from "react-day-picker";
 import DateRangePicker from "@/components/dateRangePicker";
 import ExposureChart from "@/components/exposureChart";
+import ExposureTrendChart from "@/components/ExposureTrendChart";
+import ExposureTimeAverageChart from "@/components/ExposureTimeAverageChart";
 import { Users, Clock, Eye, TrendingUp, Target, Download } from "lucide-react";
 import SimpleCard from "@/components/Simplecard";
 import DbscanChart from "@/components/DbscanChart";
@@ -70,6 +72,11 @@ export default function AnalyticsPage() {
     from: undefined,
     to: undefined,
   });
+
+  const from = dateRange?.from;
+  const to = dateRange?.to ?? from;
+  const days = from && to ? differenceInDays(to, from) + 1 : 1;
+  const showTimeAverageChart = days > 1;
 
   function handleDownload() {
     const csv = buildCsvRows(dateRange);
@@ -147,8 +154,9 @@ export default function AnalyticsPage() {
       </section>
 
       {/* Exposure Chart — x-axis changes with date range */}
-      <section>
-        <ExposureChart dateRange={dateRange} />
+      <section className="space-y-6">
+        <ExposureTrendChart dateRange={dateRange} />
+        {showTimeAverageChart && <ExposureTimeAverageChart dateRange={dateRange} />}
       </section>
     </div>
   );

@@ -1,6 +1,8 @@
 import GenderChart from "@/components/genderChart";
 import AgeChart from "@/components/ageChart";
 import DbscanChart from "@/components/DbscanChart";
+import ExposureChart from "@/components/exposureChart";
+import ExposureTrendChart from "@/components/ExposureTrendChart";
 import { Users, Clock, Eye, TrendingUp, Target } from "lucide-react";
 import SimpleCard from "@/components/Simplecard";
 
@@ -76,6 +78,11 @@ export default function Dashboard() {
       {/* DBSCAN Chart */}
       <section>
         <DbscanChart />
+      </section>
+
+      {/* Exposure Chart */}
+      <section>
+        <ExposureTrendChart />
       </section>
     </div>
   );
