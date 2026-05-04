@@ -22,6 +22,7 @@ import {
   HourlyAggResult,
   DailyAggResult,
 } from "@/lib/api";
+import DashboardLayout from "../dashboard/layout";
 
 type TrendPoint = { label: string; exposed: number; interested: number };
 
@@ -153,6 +154,7 @@ export default function AnalyticsPage() {
   }
 
   return (
+    <DashboardLayout>
     <div className="space-y-5">
       {/* Date Range Picker + CSV Download */}
       <div className="flex items-center justify-between">
@@ -220,5 +222,6 @@ export default function AnalyticsPage() {
         <ExposureTimeAverageChart dailyData={dailyTrend} />
       </section>
     </div>
+    </DashboardLayout>
   );
 }
