@@ -11,13 +11,14 @@ import DateRangePicker from "@/components/dateRangePicker";
 import ExposureTrendChart from "@/components/ExposureTrendChart";
 import ExposureTimeAverageChart from "@/components/ExposureTimeAverageChart";
 import SimpleCard from "@/components/Simplecard";
-import DbscanChart from "@/components/DbscanChart";
+import DbscanChartWithBox from "@/components/DbscanChartWithBox";
 
 import {
   getCampaignAggs,
   getGoldenZone,
   getHourlyAggs,
   getDailyAggs,
+  buildExportUrl,
   GoldenZoneResponse,
   HourlyAggResult,
   DailyAggResult,
@@ -46,18 +47,12 @@ function buildDailyTrend(rows: DailyAggResult[]): TrendPoint[] {
   return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
 }
 
-function buildCsv(hourly: TrendPoint[], daily: TrendPoint[]): string {
-  return [
-    "[시간별]", "시간,노출인구,관심인구",
-    ...hourly.map((r) => `${r.label},${r.exposed},${r.interested}`),
-    "", "[일별]", "날짜,노출인구,관심인구",
-    ...daily.map((r) => `${r.label},${r.exposed},${r.interested}`),
-  ].join("\n");
-}
 
 export default function AnalyticsPage() {
   const [dateRange, setDateRange]     = useState<DateRange | undefined>();
   const [goldenZone, setGoldenZone]   = useState<GoldenZoneResponse | undefined>();
+  const [campaignId, setCampaignId]   = useState<string | undefined>();
+  const [deviceId, setDeviceId]       = useState<string | undefined>();
   const [dailyResults, setDailyResults] = useState<DailyAggResult[]>([]);
   const [hourlyTrend, setHourlyTrend] = useState<TrendPoint[]>([]);
   const [dailyTrend, setDailyTrend]   = useState<TrendPoint[]>([]);
@@ -66,14 +61,13 @@ export default function AnalyticsPage() {
   const endDate   = dateRange?.to   ? format(dateRange.to,   "yyyy-MM-dd") : startDate;
   const hasRange  = !!startDate;
 
-  // ── 골든존은 기간과 무관하게 최초 1회 로드 ───────────────────────────────────────
+  // ── campaignId / deviceId 최초 1회 로드 ──────────────────────────────────────
   useEffect(() => {
     getCampaignAggs()
       .then(({ results }) => {
         if (results.length === 0) return;
-        getGoldenZone(results[0].campaign_id, results[0].device_id)
-          .then(setGoldenZone)
-          .catch(() => {});
+        setCampaignId(results[0].campaign_id);
+        setDeviceId(results[0].device_id);
       })
       .catch(() => {});
   }, []);
@@ -84,6 +78,7 @@ export default function AnalyticsPage() {
       setDailyResults([]);
       setHourlyTrend([]);
       setDailyTrend([]);
+      setGoldenZone(undefined);
       return;
     }
 
@@ -97,7 +92,13 @@ export default function AnalyticsPage() {
         setDailyTrend(buildDailyTrend(results));
       })
       .catch(() => { setDailyResults([]); setDailyTrend([]); });
-  }, [startDate, endDate, hasRange]);
+
+    if (campaignId && deviceId) {
+      getGoldenZone(campaignId, deviceId, undefined, startDate, endDate)
+        .then(setGoldenZone)
+        .catch(() => setGoldenZone(undefined));
+    }
+  }, [startDate, endDate, hasRange, campaignId, deviceId]);
 
   // ── stats 카드: daily aggs 합산 (날짜 선택 전엔 0) ────────────────────────────
   const totalExposure    = dailyResults.reduce((s, r) => s + r.exposure_count, 0);
@@ -140,16 +141,11 @@ export default function AnalyticsPage() {
 
   // ── CSV 다운로드 ───────────────────────────────────────────────────────────────
   function handleDownload() {
-    const csv  = buildCsv(hourlyTrend, dailyTrend);
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    const from = dateRange?.from ? format(dateRange.from, "yyyyMMdd") : "all";
-    const to   = dateRange?.to   ? format(dateRange.to,   "yyyyMMdd") : from;
+    if (!campaignId || !startDate || !endDate) return;
+    const url = buildExportUrl({ campaign_id: campaignId, start_date: startDate, end_date: endDate, device_id: deviceId });
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `analytics_${from}_${to}.csv`;
     a.click();
-    URL.revokeObjectURL(url);
   }
 
   return (
@@ -211,7 +207,13 @@ export default function AnalyticsPage() {
       </section>
 
       <section>
-        <DbscanChart goldenZone={goldenZone} />
+        <DbscanChartWithBox
+          goldenZone={goldenZone}
+          campaignId={campaignId}
+          deviceId={deviceId}
+          startDate={startDate}
+          endDate={endDate}
+        />
       </section>
 
       {/* Trend Charts */}
