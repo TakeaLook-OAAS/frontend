@@ -54,12 +54,12 @@ export default function AnalyticsPage() {
       return;
     }
 
-    getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId })
-      .then(setRangeStats)
-      .catch(() => setRangeStats(null));
-
     if (campaignId && deviceId) {
-      getGoldenZone(campaignId, deviceId, undefined, startDate, endDate)
+      getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId })
+        .then(setRangeStats)
+        .catch(() => setRangeStats(null));
+
+      getGoldenZone(campaignId, deviceId, startDate, endDate)
         .then(setGoldenZone)
         .catch(() => setGoldenZone(undefined));
     }
@@ -175,13 +175,7 @@ export default function AnalyticsPage() {
       </section>
 
       <section>
-        <DbscanChartWithBox
-          goldenZone={goldenZone}
-          campaignId={campaignId}
-          deviceId={deviceId}
-          startDate={startDate}
-          endDate={endDate}
-        />
+        <DbscanChartWithBox goldenZone={goldenZone} />
       </section>
 
       {/* Trend Charts */}

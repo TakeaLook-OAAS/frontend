@@ -96,14 +96,14 @@ export interface GoldenZoneResponse {
 export async function getRangeStats(params: {
   start_date: string;
   end_date: string;
-  device_id?: string;
-  campaign_id?: string;
+  device_id: string;
+  campaign_id: string;
 }): Promise<RangeStatsResponse> {
   const url = new URL(`${BASE}/stats/range/`);
   url.searchParams.set("start_date", params.start_date);
   url.searchParams.set("end_date",   params.end_date);
-  if (params.device_id)   url.searchParams.set("device_id",   params.device_id);
-  if (params.campaign_id) url.searchParams.set("campaign_id", params.campaign_id);
+  url.searchParams.set("device_id",   params.device_id);
+  url.searchParams.set("campaign_id", params.campaign_id);
   const res = await fetch(url.toString(), { cache: "no-store" });
   if (!res.ok) throw new Error(`/stats/range/ 오류: ${res.status}`);
   return res.json();
@@ -124,68 +124,16 @@ export async function getCampaignAggs(params?: {
 export async function getGoldenZone(
   campaign_id: string,
   device_id: string,
-  box?: BoxRect,
   start_date?: string,
   end_date?: string,
 ): Promise<GoldenZoneResponse> {
   const url = new URL(`${BASE}/stats/golden-zone/`);
   url.searchParams.set("campaign_id", campaign_id);
   url.searchParams.set("device_id", device_id);
-  if (box) {
-    url.searchParams.set("x_min", String(box.xMin));
-    url.searchParams.set("y_min", String(box.yMin));
-    url.searchParams.set("x_max", String(box.xMax));
-    url.searchParams.set("y_max", String(box.yMax));
-  }
   if (start_date) url.searchParams.set("start_date", start_date);
   if (end_date)   url.searchParams.set("end_date",   end_date);
   const res = await fetch(url.toString(), { cache: "no-store" });
   if (!res.ok) throw new Error(`/stats/golden-zone/ 오류: ${res.status}`);
-  return res.json();
-}
-
-// ── 박스 필터 ─────────────────────────────────────────────────────────────────
-
-export interface BoxRect {
-  xMin: number;
-  yMin: number;
-  xMax: number;
-  yMax: number;
-}
-
-export interface BoxStatsResponse {
-  campaign_id:             string;
-  device_id:               string;
-  matched_tracks:          number;
-  exposure_count:          number;
-  avg_dwell_time_ms:       number;
-  interested_count:        number;
-  attention_rate_tracks:   number;
-  total_attention_time_ms: number;
-  attention_rate_times:    number;
-  count_10s:               number;
-  count_20s:               number;
-  count_30s:               number;
-  count_40s:               number;
-  count_50s_plus:          number;
-  count_60s_plus:          number;
-  count_male:              number;
-  count_female:            number;
-}
-
-export async function getBoxStats(params: {
-  campaign_id: string;
-  device_id:   string;
-} & BoxRect): Promise<BoxStatsResponse> {
-  const url = new URL(`${BASE}/stats/box/`);
-  url.searchParams.set("campaign_id", params.campaign_id);
-  url.searchParams.set("device_id",   params.device_id);
-  url.searchParams.set("x_min", String(params.xMin));
-  url.searchParams.set("y_min", String(params.yMin));
-  url.searchParams.set("x_max", String(params.xMax));
-  url.searchParams.set("y_max", String(params.yMax));
-  const res = await fetch(url.toString(), { cache: "no-store" });
-  if (!res.ok) throw new Error(`/stats/box/ 오류: ${res.status}`);
   return res.json();
 }
 
