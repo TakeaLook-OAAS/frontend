@@ -11,70 +11,38 @@ import DateRangePicker from "@/components/dateRangePicker";
 import ExposureTrendChart from "@/components/ExposureTrendChart";
 import ExposureTimeAverageChart from "@/components/ExposureTimeAverageChart";
 import SimpleCard from "@/components/Simplecard";
-import DbscanChart from "@/components/DbscanChart";
+import DbscanChartWithBox from "@/components/DbscanChartWithBox";
 
 import {
   getCampaignAggs,
   getGoldenZone,
-  getHourlyAggs,
-  getDailyAggs,
+  getRangeStats,
+  buildExportUrl,
   GoldenZoneResponse,
-  HourlyAggResult,
-  DailyAggResult,
+  RangeStatsResponse,
 } from "@/lib/api";
 import DashboardLayout from "../dashboard/layout";
 
 type TrendPoint = { label: string; exposed: number; interested: number };
 
-function buildHourlyTrend(rows: HourlyAggResult[]): TrendPoint[] {
-  const map = new Map<number, TrendPoint>();
-  for (const r of rows) {
-    const h = (new Date(r.hour).getUTCHours() + 9) % 24;
-    const cur = map.get(h) ?? { label: `${String(h).padStart(2, "0")}:00`, exposed: 0, interested: 0 };
-    map.set(h, { ...cur, exposed: cur.exposed + r.exposure_count, interested: cur.interested + r.interested_count });
-  }
-  return Array.from({ length: 24 }, (_, h) =>
-    map.get(h) ?? { label: `${String(h).padStart(2, "0")}:00`, exposed: 0, interested: 0 }
-  );
-}
-
-function buildDailyTrend(rows: DailyAggResult[]): TrendPoint[] {
-  const map = new Map<string, TrendPoint>();
-  for (const r of rows) {
-    const cur = map.get(r.date) ?? { label: r.date, exposed: 0, interested: 0 };
-    map.set(r.date, { ...cur, exposed: cur.exposed + r.exposure_count, interested: cur.interested + r.interested_count });
-  }
-  return Array.from(map.values()).sort((a, b) => a.label.localeCompare(b.label));
-}
-
-function buildCsv(hourly: TrendPoint[], daily: TrendPoint[]): string {
-  return [
-    "[시간별]", "시간,노출인구,관심인구",
-    ...hourly.map((r) => `${r.label},${r.exposed},${r.interested}`),
-    "", "[일별]", "날짜,노출인구,관심인구",
-    ...daily.map((r) => `${r.label},${r.exposed},${r.interested}`),
-  ].join("\n");
-}
-
 export default function AnalyticsPage() {
-  const [dateRange, setDateRange]     = useState<DateRange | undefined>();
-  const [goldenZone, setGoldenZone]   = useState<GoldenZoneResponse | undefined>();
-  const [dailyResults, setDailyResults] = useState<DailyAggResult[]>([]);
-  const [hourlyTrend, setHourlyTrend] = useState<TrendPoint[]>([]);
-  const [dailyTrend, setDailyTrend]   = useState<TrendPoint[]>([]);
+  const [dateRange, setDateRange]   = useState<DateRange | undefined>();
+  const [goldenZone, setGoldenZone] = useState<GoldenZoneResponse | undefined>();
+  const [campaignId, setCampaignId] = useState<string | undefined>();
+  const [deviceId, setDeviceId]     = useState<string | undefined>();
+  const [rangeStats, setRangeStats] = useState<RangeStatsResponse | null>(null);
 
   const startDate = dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined;
   const endDate   = dateRange?.to   ? format(dateRange.to,   "yyyy-MM-dd") : startDate;
   const hasRange  = !!startDate;
 
-  // ── 골든존은 기간과 무관하게 최초 1회 로드 ───────────────────────────────────────
+  // ── campaignId / deviceId 최초 1회 로드 ──────────────────────────────────────
   useEffect(() => {
     getCampaignAggs()
       .then(({ results }) => {
         if (results.length === 0) return;
-        getGoldenZone(results[0].campaign_id, results[0].device_id)
-          .then(setGoldenZone)
-          .catch(() => {});
+        setCampaignId(results[0].campaign_id);
+        setDeviceId(results[0].device_id);
       })
       .catch(() => {});
   }, []);
@@ -82,55 +50,47 @@ export default function AnalyticsPage() {
   // ── 날짜 선택 시에만 데이터 fetch ─────────────────────────────────────────────
   useEffect(() => {
     if (!hasRange) {
-      setDailyResults([]);
-      setHourlyTrend([]);
-      setDailyTrend([]);
+      setRangeStats(null);
+      setGoldenZone(undefined);
       return;
     }
 
-    getHourlyAggs({ start_date: startDate, end_date: endDate, limit: 1000 })
-      .then(({ results }) => setHourlyTrend(buildHourlyTrend(results)))
-      .catch(() => setHourlyTrend([]));
+    if (campaignId && deviceId) {
+      getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId })
+        .then(setRangeStats)
+        .catch(() => setRangeStats(null));
 
-    getDailyAggs({ start_date: startDate, end_date: endDate, limit: 1000 })
-      .then(({ results }) => {
-        setDailyResults(results);
-        setDailyTrend(buildDailyTrend(results));
-      })
-      .catch(() => { setDailyResults([]); setDailyTrend([]); });
-  }, [startDate, endDate, hasRange]);
+      getGoldenZone(campaignId, deviceId, startDate, endDate)
+        .then(setGoldenZone)
+        .catch(() => setGoldenZone(undefined));
+    }
+  }, [startDate, endDate, hasRange, campaignId, deviceId]);
 
-  // ── stats 카드: daily aggs 합산 (날짜 선택 전엔 0) ────────────────────────────
-  const totalExposure    = dailyResults.reduce((s, r) => s + r.exposure_count, 0);
-  const totalInterested  = dailyResults.reduce((s, r) => s + r.interested_count, 0);
-  const totalAttentionMs = dailyResults.reduce((s, r) => s + r.total_attention_time_ms, 0);
-  const weightedDwellMs  = dailyResults.reduce((s, r) => s + r.avg_dwell_time_ms * r.exposure_count, 0);
-  const totalExposureMs  = dailyResults.reduce((s, r) =>
-    r.attention_rate_times > 0 ? s + r.total_attention_time_ms / r.attention_rate_times : s, 0);
-
-  const avgDwellTimeSec     = totalExposure > 0 ? (weightedDwellMs / totalExposure / 1000).toFixed(1) : "0.0";
-  const attentionTimeSec    = Math.round(totalAttentionMs / 1000);
-  const attentionRateTimes  = totalExposureMs > 0 ? ((totalAttentionMs / totalExposureMs) * 100).toFixed(1) : "0.0";
-  const attentionRateTracks = totalExposure > 0 ? (totalInterested / totalExposure).toFixed(2) : "0.00";
+  // ── stats 카드 ────────────────────────────────────────────────────────────────
+  const totalExposure       = rangeStats?.exposure_count ?? 0;
+  const avgDwellTimeSec     = rangeStats ? (rangeStats.avg_dwell_time_ms / 1000).toFixed(1) : "0.0";
+  const attentionTimeSec    = Math.round((rangeStats?.total_attention_time_ms ?? 0) / 1000);
+  const attentionRateTimes  = rangeStats ? (rangeStats.attention_rate_times * 100).toFixed(1) : "0.0";
+  const attentionRateTracks = rangeStats ? rangeStats.attention_rate_tracks.toFixed(2) : "0.00";
 
   // ── 성별 데이터 ──────────────────────────────────────────────────────────────
-  const totalMale   = dailyResults.reduce((s, r) => s + r.count_male, 0);
-  const totalFemale = dailyResults.reduce((s, r) => s + r.count_female, 0);
+  const totalMale   = rangeStats?.count_male   ?? 0;
+  const totalFemale = rangeStats?.count_female ?? 0;
   const totalGender = totalMale + totalFemale;
-  const genderData = hasRange ? [
+  const genderData = hasRange && rangeStats ? [
     { name: "남성", value: totalGender > 0 ? Math.round((totalMale   / totalGender) * 100) : 0, color: "#3B82F6" },
     { name: "여성", value: totalGender > 0 ? Math.round((totalFemale / totalGender) * 100) : 0, color: "#EC4899" },
   ] : undefined;
 
   // ── 연령대 데이터 ─────────────────────────────────────────────────────────────
-  const count10  = dailyResults.reduce((s, r) => s + r.count_10s, 0);
-  const count20  = dailyResults.reduce((s, r) => s + r.count_20s, 0);
-  const count30  = dailyResults.reduce((s, r) => s + r.count_30s, 0);
-  const count40  = dailyResults.reduce((s, r) => s + r.count_40s, 0);
-  const count50  = dailyResults.reduce((s, r) => s + r.count_50s_plus, 0);
-  const count60  = dailyResults.reduce((s, r) => s + r.count_60s_plus, 0);
+  const count10  = rangeStats?.count_10s      ?? 0;
+  const count20  = rangeStats?.count_20s      ?? 0;
+  const count30  = rangeStats?.count_30s      ?? 0;
+  const count40  = rangeStats?.count_40s      ?? 0;
+  const count50  = rangeStats?.count_50s_plus ?? 0;
+  const count60  = rangeStats?.count_60s_plus ?? 0;
   const totalAge = count10 + count20 + count30 + count40 + count50 + count60;
-  const ageData = hasRange ? [
+  const ageData = hasRange && rangeStats ? [
     { age: "10대",  value: totalAge > 0 ? Math.round((count10 / totalAge) * 100) : 0 },
     { age: "20대",  value: totalAge > 0 ? Math.round((count20 / totalAge) * 100) : 0 },
     { age: "30대",  value: totalAge > 0 ? Math.round((count30 / totalAge) * 100) : 0 },
@@ -139,18 +99,22 @@ export default function AnalyticsPage() {
     { age: "60대+", value: totalAge > 0 ? Math.round((count60 / totalAge) * 100) : 0 },
   ] : undefined;
 
+  // ── 트렌드 차트 데이터 ────────────────────────────────────────────────────────
+  const hourlyTrend: TrendPoint[] = rangeStats
+    ? rangeStats.hourly_trend.map(h => ({ label: `${h.hour}:00`, exposed: h.exposure_count, interested: h.interested_count }))
+    : [];
+
+  const dailyTrend: TrendPoint[] = rangeStats
+    ? rangeStats.daily_trend.map(d => ({ label: d.date, exposed: d.exposure_count, interested: d.interested_count }))
+    : [];
+
   // ── CSV 다운로드 ───────────────────────────────────────────────────────────────
   function handleDownload() {
-    const csv  = buildCsv(hourlyTrend, dailyTrend);
-    const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8;" });
-    const url  = URL.createObjectURL(blob);
-    const a    = document.createElement("a");
-    const from = dateRange?.from ? format(dateRange.from, "yyyyMMdd") : "all";
-    const to   = dateRange?.to   ? format(dateRange.to,   "yyyyMMdd") : from;
+    if (!campaignId || !startDate || !endDate) return;
+    const url = buildExportUrl({ campaign_id: campaignId, start_date: startDate, end_date: endDate, device_id: deviceId });
+    const a = document.createElement("a");
     a.href = url;
-    a.download = `analytics_${from}_${to}.csv`;
     a.click();
-    URL.revokeObjectURL(url);
   }
 
   return (
@@ -213,7 +177,7 @@ export default function AnalyticsPage() {
       </section>
 
       <section>
-        <DbscanChart goldenZone={goldenZone} />
+        <DbscanChartWithBox goldenZone={goldenZone} />
       </section>
 
       {/* Trend Charts */}

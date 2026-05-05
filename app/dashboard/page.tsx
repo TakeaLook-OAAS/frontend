@@ -1,11 +1,10 @@
 import GenderChart from "@/components/genderChart";
 import AgeChart from "@/components/ageChart";
-import DbscanChart from "@/components/DbscanChart";
 import ExposureChart from "@/components/exposureChart";
 import ExposureTrendChart from "@/components/ExposureTrendChart";
 import { Users, Clock, Eye, TrendingUp, Target } from "lucide-react";
 import SimpleCard from "@/components/Simplecard";
-import { getCampaignAggs, getGoldenZone, getHourlyAggs } from "@/lib/api";
+import { getCampaignAggs, getHourlyAggs } from "@/lib/api";
 
 export default async function Dashboard() {
   // ── 캠페인 집계 데이터 fetch ─────────────────────────────────────────────────
@@ -80,11 +79,6 @@ export default async function Dashboard() {
     })
     : undefined;
 
-  // ── 골든존 데이터 (첫 번째 캠페인 기준) ──────────────────────────────────────
-  const goldenZoneData = results.length > 0
-    ? await getGoldenZone(results[0].campaign_id, results[0].device_id).catch(() => undefined)
-    : undefined;
-
   return (
     <div className="space-y-8">
       {/* Stats Row 1 */}
@@ -129,11 +123,6 @@ export default async function Dashboard() {
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <GenderChart data={genderData} />
         <AgeChart data={ageData} />
-      </section>
-
-      {/* DBSCAN Chart */}
-      <section>
-        <DbscanChart goldenZone={goldenZoneData} />
       </section>
 
       {/* Exposure Chart */}
