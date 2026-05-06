@@ -137,6 +137,41 @@ export async function getGoldenZone(
   return res.json();
 }
 
+// ── 인증 ──────────────────────────────────────────────────────────────────────
+
+const AUTH_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+export async function apiLogin(email: string, password: string): Promise<string> {
+  const res = await fetch(`${AUTH_BASE}/auth/login`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "로그인 실패");
+  return data.access_token;
+}
+
+export async function apiSendCode(email: string): Promise<void> {
+  const res = await fetch(`${AUTH_BASE}/auth/send-code`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "인증 코드 발송 실패");
+}
+
+export async function apiRegister(email: string, password: string, code: string): Promise<void> {
+  const res = await fetch(`${AUTH_BASE}/auth/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, code }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "회원가입 실패");
+}
+
 // ── Events CSV 다운로드 URL 생성 ──────────────────────────────────────────────
 
 export function buildExportUrl(params: {

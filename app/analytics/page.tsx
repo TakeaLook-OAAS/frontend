@@ -18,9 +18,11 @@ import {
   getGoldenZone,
   getRangeStats,
   buildExportUrl,
+  AggResult,
   GoldenZoneResponse,
   RangeStatsResponse,
 } from "@/lib/api";
+import CampaignSelector from "@/components/CampaignSelector";
 import DashboardLayout from "../dashboard/layout";
 
 type TrendPoint = { label: string; exposed: number; interested: number };
@@ -28,21 +30,23 @@ type TrendPoint = { label: string; exposed: number; interested: number };
 export default function AnalyticsPage() {
   const [dateRange, setDateRange]   = useState<DateRange | undefined>();
   const [goldenZone, setGoldenZone] = useState<GoldenZoneResponse | undefined>();
-  const [campaignId, setCampaignId] = useState<string | undefined>();
-  const [deviceId, setDeviceId]     = useState<string | undefined>();
+  const [options, setOptions]       = useState<AggResult[]>([]);
+  const [selected, setSelected]     = useState<AggResult | null>(null);
   const [rangeStats, setRangeStats] = useState<RangeStatsResponse | null>(null);
+
+  const campaignId = selected?.campaign_id;
+  const deviceId   = selected?.device_id;
 
   const startDate = dateRange?.from ? format(dateRange.from, "yyyy-MM-dd") : undefined;
   const endDate   = dateRange?.to   ? format(dateRange.to,   "yyyy-MM-dd") : startDate;
   const hasRange  = !!startDate;
 
-  // ── campaignId / deviceId 최초 1회 로드 ──────────────────────────────────────
+  // ── 캠페인 목록 최초 1회 로드 ─────────────────────────────────────────────────
   useEffect(() => {
     getCampaignAggs()
       .then(({ results }) => {
-        if (results.length === 0) return;
-        setCampaignId(results[0].campaign_id);
-        setDeviceId(results[0].device_id);
+        setOptions(results);
+        if (results.length > 0) setSelected(results[0]);
       })
       .catch(() => {});
   }, []);
@@ -120,9 +124,12 @@ export default function AnalyticsPage() {
   return (
     <DashboardLayout>
     <div className="space-y-5">
-      {/* Date Range Picker + CSV Download */}
+      {/* 캠페인 선택 + Date Range Picker + CSV Download */}
       <div className="flex items-center justify-between">
-        <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+        <div className="flex items-center gap-3">
+          <CampaignSelector options={options} selected={selected} onChange={(agg) => { setSelected(agg); setRangeStats(null); setGoldenZone(undefined); }} />
+          <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+        </div>
         <button
           onClick={handleDownload}
           className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
