@@ -1,10 +1,8 @@
 import GenderChart from "@/components/genderChart";
 import AgeChart from "@/components/ageChart";
-import ExposureChart from "@/components/exposureChart";
-import ExposureTrendChart from "@/components/ExposureTrendChart";
 import { Users, Clock, Eye, TrendingUp, Target } from "lucide-react";
 import SimpleCard from "@/components/Simplecard";
-import { getCampaignAggs, getHourlyAggs } from "@/lib/api";
+import { getCampaignAggs } from "@/lib/api";
 
 export default async function Dashboard() {
   // ── 캠페인 집계 데이터 fetch ─────────────────────────────────────────────────
@@ -59,26 +57,6 @@ export default async function Dashboard() {
     { age: "60대+", value: Math.round((count60 / totalAge) * 100) },
   ] : undefined;
 
-  // ── 시간대별 노출 추이 데이터 ─────────────────────────────────────────────────
-  const { results: hourlyResults } = await getHourlyAggs({ limit: 1000 }).catch(() => ({ results: [] }));
-  // 시간(0~23)별로 exposure_count, interested_count 합산
-  const hourlyMap = new Map<number, { exposed: number; interested: number }>();
-  for (const r of hourlyResults) {
-    const h = (new Date(r.hour).getUTCHours() + 9) % 24;
-    const cur = hourlyMap.get(h) ?? { exposed: 0, interested: 0 };
-    hourlyMap.set(h, {
-      exposed: cur.exposed + r.exposure_count,
-      interested: cur.interested + r.interested_count,
-    });
-  }
-  const hourlyTrendData = hourlyMap.size > 0
-    ? Array.from({ length: 24 }, (_, h) => {
-      const label = `${String(h).padStart(2, "0")}:00`;
-      const { exposed = 0, interested = 0 } = hourlyMap.get(h) ?? {};
-      return { label, exposed, interested };
-    })
-    : undefined;
-
   return (
     <div className="space-y-8">
       {/* Stats Row 1 */}
@@ -125,10 +103,6 @@ export default async function Dashboard() {
         <AgeChart data={ageData} />
       </section>
 
-      {/* Exposure Chart */}
-      <section>
-        <ExposureTrendChart trendData={hourlyTrendData} />
-      </section>
     </div>
   );
 }
