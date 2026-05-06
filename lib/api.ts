@@ -172,6 +172,13 @@ export async function apiRegister(email: string, password: string, code: string)
   if (!res.ok) throw new Error(data.detail ?? "회원가입 실패");
 }
 
+export async function apiLogout(token: string): Promise<void> {
+  await fetch(`${AUTH_BASE}/auth/logout`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 // ── Events CSV 다운로드 URL 생성 ──────────────────────────────────────────────
 
 export function buildExportUrl(params: {
