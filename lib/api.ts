@@ -24,6 +24,13 @@ export interface AggResult {
   count_female: number;
   created_at: string;
   updated_at: string;
+  // 고급 분석 지표 (CampaignAdvancedAgg)
+  avg_revisit_count:       number;
+  avg_fixation_latency_ms: number | null;
+  viewability_score:       number;
+  avg_attention_time_ms:   number;
+  peak_hour:               number | null;
+  target_match_rate:       number | null;
 }
 
 export interface CampaignAggListResponse {
@@ -66,6 +73,13 @@ export interface RangeStatsResponse {
   count_female: number;
   hourly_trend: HourlyTrendPoint[];
   daily_trend: DailyTrendPoint[];
+  // 고급 분석 지표
+  avg_revisit_count:       number;
+  avg_fixation_latency_ms: number | null;
+  viewability_score:       number;
+  avg_attention_time_ms:   number;
+  peak_hour:               number | null;
+  target_match_rate:       number | null;
 }
 
 // ── 골든존 타입 ───────────────────────────────────────────────────────────────
