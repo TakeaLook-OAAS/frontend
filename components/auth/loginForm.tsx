@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { apiLogin } from "@/lib/api"
+import { apiLogin, apiGetMe } from "@/lib/api"
 
 export function LoginForm() {
   const router = useRouter()
@@ -26,6 +26,8 @@ export function LoginForm() {
     try {
       const token = await apiLogin(email, password)
       localStorage.setItem("access_token", token)
+      const me = await apiGetMe(token)
+      localStorage.setItem("user_role", me.role)
       router.push("/dashboard")
     } catch (err) {
       setError(err instanceof Error ? err.message : "로그인 실패")

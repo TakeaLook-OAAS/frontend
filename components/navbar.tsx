@@ -2,12 +2,18 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Calendar, LogOut } from "lucide-react";
+import { useEffect, useState } from "react";
+import { BarChart3, Calendar, LogOut, Shield } from "lucide-react";
 import { apiLogout } from "@/lib/api";
 
 export default function Navbar() {
   const pathname = usePathname();
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    setIsAdmin(localStorage.getItem("user_role") === "ADMIN");
+  }, []);
 
   const isActive = (path: string) => pathname === path;
 
@@ -23,6 +29,20 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between">
           <div className="flex space-x-8">
+            {isAdmin && (
+              <Link
+                href="/admin"
+                className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
+                  isActive("/admin")
+                    ? "border-blue-600 text-blue-600"
+                    : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                }`}
+              >
+                <Shield className="w-4 h-4" />
+                관리자
+              </Link>
+            )}
+
             <Link
               href="/dashboard"
               className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${

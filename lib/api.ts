@@ -193,6 +193,53 @@ export async function apiLogout(token: string): Promise<void> {
   });
 }
 
+export interface UserInfo {
+  id: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  created_at: string;
+}
+
+export async function apiGetMe(token: string): Promise<UserInfo> {
+  const res = await fetch(`${AUTH_BASE}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "사용자 정보 조회 실패");
+  return data;
+}
+
+export async function apiGetAdminUsers(token: string): Promise<UserInfo[]> {
+  const res = await fetch(`${AUTH_BASE}/admin/users`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "유저 목록 조회 실패");
+  return data;
+}
+
+export async function apiDeleteUser(token: string, userId: string): Promise<void> {
+  const res = await fetch(`${AUTH_BASE}/admin/users/${userId}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({}));
+    throw new Error(data.detail ?? "유저 삭제 실패");
+  }
+}
+
+export async function apiSuspendUser(token: string, userId: string): Promise<UserInfo> {
+  const res = await fetch(`${AUTH_BASE}/admin/users/${userId}/suspend`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "유저 정지 실패");
+  return data;
+}
+
 // ── Events CSV 다운로드 URL 생성 ──────────────────────────────────────────────
 
 export function buildExportUrl(params: {
