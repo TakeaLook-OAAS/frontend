@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { BarChart3, Calendar, LogOut } from "lucide-react";
+import { BarChart3, Calendar, TrendingUp, LogOut } from "lucide-react";
 import { apiLogout } from "@/lib/api";
 
 export default function Navbar() {
@@ -45,6 +45,18 @@ export default function Navbar() {
             >
               <Calendar className="w-4 h-4" />
               기간별 분석
+            </Link>
+
+            <Link
+              href="/trends"
+              className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
+                isActive("/trends")
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+              }`}
+            >
+              <TrendingUp className="w-4 h-4" />
+              시계열 분석
             </Link>
           </div>
 
