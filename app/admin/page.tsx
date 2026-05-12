@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/Navbar";
 import { apiGetAdminUsers, apiDeleteUser, apiSuspendUser, UserInfo } from "@/lib/api";
 
 export default function AdminPage() {

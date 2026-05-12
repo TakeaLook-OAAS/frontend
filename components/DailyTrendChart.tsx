@@ -20,7 +20,7 @@ interface Props {
   dailyData?: TrendPoint[];
 }
 
-export default function ExposureTimeAverageChart({ dailyData }: Props) {
+export default function DailyTrendChart({ dailyData }: Props) {
   const data = dailyData ?? [];
 
   return (

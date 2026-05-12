@@ -27,35 +27,35 @@ export default function AgeChart({ data }: { data?: AgeData[] }) {
           기간을 선택하면 차트가 표시됩니다
         </div>
       ) : (
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={data}>
 
-          <XAxis dataKey="age" stroke="#6b7280" />
+            <XAxis dataKey="age" stroke="#6b7280" />
 
-          <YAxis
-            stroke="#6b7280"
-            label={{
-              value: "(%)",
-              angle: 0,
-              position: "insideLeft",
-              dx: 1,
-              dy: 0
-            }}/>
+            <YAxis
+              stroke="#6b7280"
+              label={{
+                value: "(%)",
+                angle: 0,
+                position: "insideLeft",
+                dx: 1,
+                dy: 0
+              }} />
 
-          <Tooltip
-            formatter={(value) => `${value}%`}
-            contentStyle={{
-              backgroundColor: "#fff",
-              border: "1px solid #e5e7eb",
-            }}
-          />
+            <Tooltip
+              formatter={(value) => `${value}%`}
+              contentStyle={{
+                backgroundColor: "#fff",
+                border: "1px solid #e5e7eb",
+              }}
+            />
 
-          <Legend />
+            <Legend />
 
-          <Bar dataKey="value" fill="#8B5CF6" name="비율" radius={[8, 8, 0, 0]} />
+            <Bar dataKey="value" fill="#8B5CF6" name="비율" radius={[8, 8, 0, 0]} />
 
-        </BarChart>
-      </ResponsiveContainer>
+          </BarChart>
+        </ResponsiveContainer>
       )}
     </div>
   );

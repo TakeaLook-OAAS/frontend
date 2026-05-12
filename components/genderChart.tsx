@@ -27,30 +27,30 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
           기간을 선택하면 차트가 표시됩니다
         </div>
       ) : (
-      <ResponsiveContainer width="100%" height={300}>
-        <PieChart>
-          <Pie
-            data={data}
-            cx="50%"
-            cy="50%"
-            labelLine={false}
-            label={({ name, percent }) =>
-              `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`
-            }
-            outerRadius={99}
-            dataKey="value"
-            startAngle={90}
-            endAngle={-270}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} />
-            ))}
-          </Pie>
+        <ResponsiveContainer width="100%" height={300}>
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              label={({ name, percent }) =>
+                `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`
+              }
+              outerRadius={99}
+              dataKey="value"
+              startAngle={90}
+              endAngle={-270}
+            >
+              {data.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.color} />
+              ))}
+            </Pie>
 
-          <Tooltip formatter={(value) => `${value}%`} />
-          <Legend />
-        </PieChart>
-      </ResponsiveContainer>
+            <Tooltip formatter={(value) => `${value}%`} />
+            <Legend />
+          </PieChart>
+        </ResponsiveContainer>
       )}
     </div>
   );
