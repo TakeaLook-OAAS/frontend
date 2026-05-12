@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { Users, Clock, Eye, TrendingUp, Target, UserCheck, RefreshCw, Timer, Activity, Crosshair } from "lucide-react";
 
-import GenderChart from "@/components/genderChart";
-import AgeChart from "@/components/ageChart";
+import GenderChart from "@/components/GenderChart";
+import AgeChart from "@/components/AgeChart";
 import SimpleCard from "@/components/Simplecard";
 import CampaignSelector from "@/components/CampaignSelector";
 

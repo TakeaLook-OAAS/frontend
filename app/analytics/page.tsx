@@ -17,11 +17,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-import GenderChart from "@/components/genderChart";
-import AgeChart from "@/components/ageChart";
-import DateRangePicker from "@/components/dateRangePicker";
-import ExposureTrendChart from "@/components/ExposureTrendChart";
-import ExposureTimeAverageChart from "@/components/ExposureTimeAverageChart";
+import GenderChart from "@/components/GenderChart";
+import AgeChart from "@/components/AgeChart";
+import DateRangePicker from "@/components/DateRangePicker";
+import HourlyTrendChart from "@/components/HourlyTrendChart";
+import DailyTrendChart from "@/components/DailyTrendChart";
 import SimpleCard from "@/components/Simplecard";
 import DbscanChart from "@/components/DbscanChart";
 import DailyMetricsChart, { DailyChartPoint } from "@/components/DailyMetricsChart";
@@ -414,8 +414,8 @@ export default function AnalyticsPage() {
 
         {/* Trend Charts */}
         <section className="space-y-6">
-          <ExposureTrendChart trendData={hourlyTrend} />
-          <ExposureTimeAverageChart dailyData={dailyTrend} />
+          <HourlyTrendChart trendData={hourlyTrend} />
+          <DailyTrendChart dailyData={dailyTrend} />
         </section>
 
         {/* 기간별 노출·시청 추이 요약 배지 */}
