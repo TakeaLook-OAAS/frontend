@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { format, eachDayOfInterval, parseISO } from "date-fns";
 import { DateRange } from "react-day-picker";
-import { Users, Clock, Eye, TrendingUp, Target, Download, UserCheck, RefreshCw, Timer, Activity, Crosshair } from "lucide-react";
+import { Users, Clock, Eye, TrendingUp, Target, Download, UserCheck } from "lucide-react";
 
 import GenderChart from "@/components/GenderChart";
 import AgeChart from "@/components/AgeChart";
@@ -177,7 +177,7 @@ export default function AnalyticsPage() {
   // stats 카드
   const totalExposure = rangeStats?.exposure_count ?? 0;
   const interestedCount = rangeStats?.interested_count ?? 0;
-  const avgDwellTimeSec = rangeStats ? (rangeStats.avg_dwell_time_ms / 1000).toFixed(1) : "0.0";
+  const totalDwellTimeSec = Math.round((rangeStats?.avg_dwell_time_ms ?? 0) * totalExposure / 1000);
   const attentionTimeSec = Math.round((rangeStats?.total_attention_time_ms ?? 0) / 1000);
   const attentionRateTimes = rangeStats ? (rangeStats.attention_rate_times * 100).toFixed(1) : "0.0";
   const attentionRateTracks = rangeStats ? rangeStats.attention_rate_tracks.toFixed(2) : "0.00";
@@ -208,16 +208,6 @@ export default function AnalyticsPage() {
     { age: "60대+", value: totalAge > 0 ? Math.round((count60 / totalAge) * 100) : 0 },
   ] : undefined;
 
-  // 고급 분석 지표
-  const avgRevisitCount = rangeStats?.avg_revisit_count?.toFixed(2) ?? "0.00";
-  const avgFixationLatency = rangeStats?.avg_fixation_latency_ms != null
-    ? `${rangeStats.avg_fixation_latency_ms.toFixed(1)}ms` : "-";
-  const viewabilityScore = rangeStats ? (rangeStats.viewability_score / 1000).toFixed(2) : "0.00";
-  const avgAttentionTime = rangeStats ? (rangeStats.avg_attention_time_ms / 1000).toFixed(1) : "0.0";
-  const peakHour = rangeStats?.peak_hour != null
-    ? `${String(rangeStats.peak_hour).padStart(2, "0")}:00` : "-";
-  const targetMatchRate = rangeStats?.target_match_rate != null
-    ? `${(rangeStats.target_match_rate * 100).toFixed(1)}%` : "-";
 
   // DailyMetricsChart 데이터 — 선택 범위의 모든 날짜를 표시 (데이터 없는 날은 0)
   const dailyMetricsData: DailyChartPoint[] = (() => {
@@ -239,14 +229,18 @@ export default function AnalyticsPage() {
 
 
   const hourlyAudienceData = rangeStats
-    ? rangeStats.hourly_trend.map(h => ({
-      label: `${h.hour}:00`,
-      exposure: h.exposure_count,
-      interested: h.interested_count,
-      attentionRate: h.exposure_count > 0
-        ? parseFloat(((h.interested_count / h.exposure_count) * 100).toFixed(1))
-        : 0,
-    }))
+    ? Array.from({ length: 12 }, (_, i) => {
+        const h0 = rangeStats.hourly_trend.find(h => h.hour === String(i * 2).padStart(2, "0"));
+        const h1 = rangeStats.hourly_trend.find(h => h.hour === String(i * 2 + 1).padStart(2, "0"));
+        const exposure = (h0?.exposure_count ?? 0) + (h1?.exposure_count ?? 0);
+        const interested = (h0?.interested_count ?? 0) + (h1?.interested_count ?? 0);
+        return {
+          label: `${String(i * 2).padStart(2, "0")}:00`,
+          exposure,
+          interested,
+          attentionRate: exposure > 0 ? parseFloat(((interested / exposure) * 100).toFixed(1)) : 0,
+        };
+      })
     : [];
 
   function handleDownload() {
@@ -292,125 +286,70 @@ export default function AnalyticsPage() {
           </button>
         </div>
 
-        {/* Stats Row 1 */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Stats */}
+        <section className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <SimpleCard
             title="노출 인구 (Impressions)"
             value={totalExposure.toLocaleString()}
             subtitle="전체 Track 수"
-            icon={<Users className="w-5 h-5" />}
+            icon={<Users className="w-4 h-4" />}
+            className="p-4"
           />
-          <SimpleCard
-            title="광고 근처 머문 시간 (Avg Dwell Time)"
-            value={`${avgDwellTimeSec}초`}
-            subtitle="총 체류시간 / 총 Track 수"
-            icon={<Clock className="w-5 h-5" />}
-          />
-          <SimpleCard
-            title="광고 시청 시간 (Attention Time)"
-            value={`${attentionTimeSec.toLocaleString()}초`}
-            subtitle="Look_Times 총합"
-            icon={<Eye className="w-5 h-5" />}
-          />
-        </section>
-
-        {/* Stats Row 2 */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <SimpleCard
             title="관심 인구 (Interested)"
             value={interestedCount.toLocaleString()}
             subtitle="실제로 광고를 응시한 Track 수"
-            icon={<UserCheck className="w-5 h-5" />}
-          />
-          <SimpleCard
-            title="심층 관심도 (Attention Rate_Times)"
-            value={`${attentionRateTimes}%`}
-            subtitle="Look_Times 총합 / Exposure Times 총합"
-            icon={<TrendingUp className="w-5 h-5" />}
+            icon={<UserCheck className="w-4 h-4" />}
+            className="p-4"
           />
           <SimpleCard
             title="포착 관심도 (Attention Rate_Tracks)"
             value={attentionRateTracks}
             subtitle="Look_Times 보유 Track 수 / 전체 Track 수"
-            icon={<Target className="w-5 h-5" />}
+            icon={<Target className="w-4 h-4" />}
+            className="p-4"
+          />
+          <SimpleCard
+            title="광고 근처 머문 시간 (total Dwell Time)"
+            value={`${totalDwellTimeSec.toLocaleString()}초`}
+            subtitle="총 체류시간"
+            icon={<Clock className="w-4 h-4" />}
+            className="p-4"
+          />
+          <SimpleCard
+            title="광고 시청 시간 (total Attention Time)"
+            value={`${attentionTimeSec.toLocaleString()}초`}
+            subtitle="Look_Times 총합"
+            icon={<Eye className="w-4 h-4" />}
+            className="p-4"
+          />
+          <SimpleCard
+            title="심층 관심도 (Attention Rate_Times)"
+            value={`${attentionRateTimes}%`}
+            subtitle="Look_Times 총합 / Exposure Times 총합"
+            icon={<TrendingUp className="w-4 h-4" />}
+            className="p-4"
           />
         </section>
 
-        {/* Advanced Stats */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <SimpleCard
-            title="반복 시선 횟수 (Avg Revisit Count)"
-            value={`${avgRevisitCount}회`}
-            subtitle="1인당 평균 Look 횟수"
-            icon={<RefreshCw className="w-5 h-5" />}
-          />
-          <SimpleCard
-            title="첫 주목 반응 시간 (Fixation Latency)"
-            value={avgFixationLatency}
-            subtitle="노출 후 첫 시선까지 걸린 시간"
-            icon={<Timer className="w-5 h-5" />}
-          />
-          <SimpleCard
-            title="시청 효율 (Viewability Score)"
-            value={`${viewabilityScore}`}
-            subtitle="포착 관심도 × 평균 광고 시청 시간(초)"
-            icon={<Activity className="w-5 h-5" />}
-          />
-        </section>
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <SimpleCard
-            title="평균 광고 시청 시간 (Avg Attention Time)"
-            value={`${avgAttentionTime}초`}
-            subtitle="관심 인구의 평균 Look 지속 시간"
-            icon={<Eye className="w-5 h-5" />}
-          />
-          <SimpleCard
-            title="피크 시간대 (Peak Hour)"
-            value={peakHour}
-            subtitle="노출이 가장 많은 시간대 (KST)"
-            icon={<Clock className="w-5 h-5" />}
-          />
-          <SimpleCard
-            title="타겟 정합률 (Target Match Rate)"
-            value={targetMatchRate}
-            subtitle="관심 인구 중 타겟 오디언스 비율"
-            icon={<Crosshair className="w-5 h-5" />}
-          />
-        </section>
-
-        {/* Gender & Age Charts */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Row 1: GenderChart AgeChart FixationHistogram PeakHourChart */}
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
           <GenderChart data={genderData} />
           <AgeChart data={ageData} />
-        </section>
-
-        <section>
-          <DbscanChart goldenZone={goldenZone} />
-        </section>
-
-        {/* 기간별 노출·시청 추이 차트*/}
-        <section>
-          <DailyMetricsChart data={dailyMetricsData} dateLabel={dateLabel} loading={hasRange && !rangeStats} hasRange={hasRange} />
-        </section>
-
-        {/* 날짜별 피크 시간대 */}
-        <section>
+          <FixationHistogram dwellMs={dwellMs} fixationMs={fixationMs} loading={histLoading} hasRange={hasRange} />
           <PeakHourChart data={peakData} loading={perDayLoading} />
         </section>
 
-        {/* 일별 광고 효과 지표 */}
-        <section>
+        {/* Row 2: DailyEffectsChart HourlyAudienceChart */}
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
-        </section>
-
-        {/* 첫 주목 반응 시간 분포 */}
-        <section>
-          <FixationHistogram dwellMs={dwellMs} fixationMs={fixationMs} loading={histLoading} hasRange={hasRange} />
-        </section>
-
-        {/* 시간대별 노출·관심 인구 및 포착 관심도 */}
-        <section>
           <HourlyAudienceChart data={hourlyAudienceData} />
+        </section>
+
+        {/* Row 3: DbscanChart DailyMetricsChart */}
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <DbscanChart goldenZone={goldenZone} />
+          <DailyMetricsChart data={dailyMetricsData} dateLabel={dateLabel} loading={hasRange && !rangeStats} hasRange={hasRange} />
         </section>
       </div>
     </DashboardLayout>

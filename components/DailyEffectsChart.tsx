@@ -38,8 +38,8 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-8">
       <div>
-        <h2 className="text-base font-semibold text-gray-800 mb-1">일별 광고 효과 지표</h2>
-        <p className="text-xs text-gray-400 mb-5">평균 시청 시간(초) · 포착 관심도(%)</p>
+        <h2 className="text-xs font-semibold text-gray-800 mb-1">일별 광고 효과 지표</h2>
+        <p className="text-gray-400 mb-5" style={{ fontSize: 8 }}>평균 시청 시간(초) · 포착 관심도(%)</p>
         {loading || !hasRange ? empty : (
           <ResponsiveContainer width="100%" height={260}>
             <ComposedChart data={data} margin={{ top: 8, right: 55, left: 0, bottom: 0 }}>
@@ -50,9 +50,9 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} tickFormatter={(v) => v.slice(5)} tickLine={false} />
-              <YAxis yAxisId="sec" domain={attentionDomain} tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}s`} width={48} axisLine={false} tickLine={false} />
-              <YAxis yAxisId="pct" orientation="right" domain={[0, 100]} tick={{ fontSize: 11, fill: "#10B981" }} tickFormatter={(v) => `${v}%`} width={48} axisLine={false} tickLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 8 }} tickFormatter={(v) => v.slice(5)} tickLine={false} />
+              <YAxis yAxisId="sec" domain={attentionDomain} tick={{ fontSize: 8 }} tickFormatter={(v) => `${v}s`} width={48} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="pct" orientation="right" domain={[0, 100]} tick={{ fontSize: 8, fill: "#10B981" }} tickFormatter={(v) => `${v}%`} width={48} axisLine={false} tickLine={false} />
               <Tooltip
                 formatter={(value, name) => {
                   if (name === "평균 시청 시간") return [`${value}초`, name];
@@ -61,7 +61,7 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
                 }}
                 labelFormatter={(label) => `날짜: ${label}`}
               />
-              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} iconType="square" />
+              <Legend wrapperStyle={{ fontSize: 8, paddingTop: 12 }} iconType="square" />
               <Area yAxisId="sec" type="monotone" dataKey="avg_attention_time" name="평균 시청 시간" stroke="#3B82F6" strokeWidth={2} fill="url(#attentionGrad)" dot={false} activeDot={{ r: 6, fill: "#3B82F6" }} connectNulls />
               <Line yAxisId="pct" type="monotone" dataKey="attention_rate_tracks" name="포착 관심도" stroke="#10B981" strokeWidth={2} dot={false} activeDot={{ r: 6, fill: "#10B981" }} connectNulls />
             </ComposedChart>
@@ -82,13 +82,13 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-              <XAxis dataKey="date" tick={{ fontSize: 12 }} tickFormatter={(v) => v.slice(5)} tickLine={false} />
-              <YAxis tick={{ fontSize: 11 }} tickFormatter={(v) => `${v}`} width={48} axisLine={false} tickLine={false} />
+              <XAxis dataKey="date" tick={{ fontSize: 8 }} tickFormatter={(v) => v.slice(5)} tickLine={false} />
+              <YAxis tick={{ fontSize: 8 }} tickFormatter={(v) => `${v}`} width={48} axisLine={false} tickLine={false} />
               <Tooltip
                 formatter={(value) => [`${value}`, "시청 효율"]}
                 labelFormatter={(label) => `날짜: ${label}`}
               />
-              <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} iconType="square" />
+              <Legend wrapperStyle={{ fontSize: 8, paddingTop: 12 }} iconType="square" />
               <Area type="monotone" dataKey="viewability_score" name="시청 효율" stroke="#F59E0B" strokeWidth={2} fill="url(#viewabilityGrad)" connectNulls />
             </ComposedChart>
           </ResponsiveContainer>

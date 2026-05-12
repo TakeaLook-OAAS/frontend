@@ -18,7 +18,7 @@ interface AgeData {
 export default function AgeChart({ data }: { data?: AgeData[] }) {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <h3 className="text-xs font-semibold text-gray-900 mb-4">
         노출 인구 연령대 분포
       </h3>
 
@@ -30,16 +30,18 @@ export default function AgeChart({ data }: { data?: AgeData[] }) {
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={data}>
 
-            <XAxis dataKey="age" stroke="#6b7280" />
+            <XAxis dataKey="age" stroke="#6b7280" tick={{ fontSize: 8 }} />
 
             <YAxis
               stroke="#6b7280"
+              tick={{ fontSize: 8 }}
               label={{
                 value: "(%)",
                 angle: 0,
                 position: "insideLeft",
                 dx: 1,
-                dy: 0
+                dy: 0,
+                style: { fontSize: 8 },
               }} />
 
             <Tooltip
@@ -50,7 +52,7 @@ export default function AgeChart({ data }: { data?: AgeData[] }) {
               }}
             />
 
-            <Legend />
+            <Legend wrapperStyle={{ fontSize: 8 }} />
 
             <Bar dataKey="value" fill="#8B5CF6" name="비율" radius={[8, 8, 0, 0]} />
 
