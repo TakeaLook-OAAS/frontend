@@ -74,7 +74,7 @@ export default function PeakHourChart({ data, loading }: Props) {
         </div>
       ) : data.length === 0 ? (
         <div className="flex items-center justify-center h-[280px] text-gray-400 text-sm">
-          날짜를 선택하면 데이터가 표시됩니다
+          기간을 선택하면 차트가 표시됩니다
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={280}>

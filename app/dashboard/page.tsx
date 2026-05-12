@@ -9,7 +9,6 @@ import SimpleCard from "@/components/Simplecard";
 import CampaignSelector from "@/components/CampaignSelector";
 
 import { getCampaignAggs, AggResult } from "@/lib/api";
-import MixedChart from "@/components/MixedChart1";
 
 export default function Dashboard() {
   const [options, setOptions] = useState<AggResult[]>([]);
@@ -166,9 +165,6 @@ export default function Dashboard() {
         <GenderChart data={genderData} />
         <AgeChart data={ageData} />
       </section>
-              <section className="space-y-6">
-          <MixedChart />
-        </section>
     </div>
 
 

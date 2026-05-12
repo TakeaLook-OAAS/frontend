@@ -24,7 +24,7 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
 
       {!data || data.every((d) => d.value === 0) ? (
         <div className="flex items-center justify-center h-[300px] text-gray-400 text-sm">
-          기간을 선택하면 데이터가 표시됩니다
+          기간을 선택하면 차트가 표시됩니다
         </div>
       ) : (
       <ResponsiveContainer width="100%" height={300}>

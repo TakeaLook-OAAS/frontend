@@ -31,7 +31,7 @@ export default function ExposureTimeAverageChart({ dailyData }: Props) {
 
       {data.length === 0 ? (
         <div className="flex items-center justify-center h-[300px] text-gray-400 text-sm">
-          데이터 없음
+          기간을 선택하면 차트가 표시됩니다
         </div>
       ) : (
         <ResponsiveContainer width="100%" height={300}>
