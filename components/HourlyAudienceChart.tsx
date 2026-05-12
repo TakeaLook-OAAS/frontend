@@ -58,6 +58,7 @@ export default function HourlyAudienceChart({ data }: Props) {
                 <YAxis
                   yAxisId="right"
                   orientation="right"
+                  domain={[0, 100]}
                   tick={{ fill: "#6b7280", fontSize: 12 }}
                   axisLine={{ stroke: "#d1d5db" }}
                   tickLine={{ stroke: "#d1d5db" }}
@@ -74,7 +75,7 @@ export default function HourlyAudienceChart({ data }: Props) {
                 />
                 <Bar yAxisId="left" dataKey="exposure" name="노출인구" fill="#1e3a5f" radius={[4, 4, 0, 0]} barSize={28} />
                 <Bar yAxisId="left" dataKey="interested" name="관심인구" fill="#4ade80" radius={[4, 4, 0, 0]} barSize={28} />
-                <Line yAxisId="right" type="monotone" dataKey="attentionRate" name="포착관심도" stroke="#16a34a" strokeWidth={3} dot={{ fill: "#16a34a", strokeWidth: 2, r: 5 }} activeDot={{ r: 7, fill: "#16a34a" }} />
+                <Line yAxisId="right" type="monotone" dataKey="attentionRate" name="포착관심도" stroke="#16a34a" strokeWidth={2} dot={false} activeDot={{ r: 7, fill: "#16a34a" }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

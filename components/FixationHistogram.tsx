@@ -1,55 +1,81 @@
 "use client";
 
 import {
-  BarChart,
-  Bar,
+  ComposedChart,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
+  Legend,
   ResponsiveContainer,
 } from "recharts";
 
-const BINS = [0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
-const BIN_LABELS = [
-  "0~0.5s", "0.5~1s", "1~1.5s", "1.5~2s", "2~2.5s",
-  "2.5~3s", "3~3.5s", "3.5~4s", "4~4.5s", "4.5~5s", "5s+",
-];
+const BIN_SIZE_MS = 1000;
+const MAX_BINS = 25;
 
-export type HistBin = { label: string; count: number };
+function buildBins(dwellMs: number[], fixationMs: number[]) {
+  if (dwellMs.length === 0 && fixationMs.length === 0) return [];
+  const allMax = Math.max(0, ...dwellMs, ...fixationMs);
+  const binCount = Math.min(Math.ceil(allMax / BIN_SIZE_MS), MAX_BINS);
 
-export function buildHistogram(latencies: number[]): HistBin[] {
-  const counts = new Array(BIN_LABELS.length).fill(0);
-  for (const ms of latencies) {
-    let i = BINS.findIndex((_b, idx) => ms < BINS[idx + 1] || idx === BINS.length - 1);
-    if (ms >= BINS[BINS.length - 1]) i = BINS.length - 1;
-    counts[i]++;
+  const dwellCounts = new Array(binCount + 1).fill(0);
+  const fixationCounts = new Array(binCount + 1).fill(0);
+
+  for (const ms of dwellMs) {
+    const i = Math.min(Math.floor(ms / BIN_SIZE_MS), binCount);
+    dwellCounts[i]++;
   }
-  return BIN_LABELS.map((label, i) => ({ label, count: counts[i] }));
+  for (const ms of fixationMs) {
+    const i = Math.min(Math.floor(ms / BIN_SIZE_MS), binCount);
+    fixationCounts[i]++;
+  }
+
+  return Array.from({ length: binCount + 1 }, (_, i) => ({
+    label: i < binCount ? `${i}~${i + 1}s` : `${binCount}s+`,
+    dwell: dwellCounts[i],
+    fixation: fixationCounts[i],
+  }));
 }
 
 type Props = {
-  data: HistBin[];
+  dwellMs: number[];
+  fixationMs: number[];
   loading: boolean;
   hasRange: boolean;
 };
 
-export default function FixationHistogram({ data, loading, hasRange }: Props) {
+export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRange }: Props) {
+  const bins = buildBins(dwellMs, fixationMs);
+  const isEmpty = bins.every((b) => b.dwell === 0 && b.fixation === 0);
+
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-base font-semibold text-gray-800 mb-1">첫 주목 반응 시간 분포</h2>
-      <p className="text-xs text-gray-400 mb-5">노출 시작 후 첫 시선까지 걸린 시간 구간별 track 수 (최대 1,000건)</p>
+      <h2 className="text-base font-semibold text-gray-800 mb-1">노출·시청 시간 분포</h2>
+      <p className="text-xs text-gray-400 mb-5">
+        노출 시간(Dwell) 및 첫 주목 반응 시간(Fixation) 구간별 track 수 (최대 1,000건)
+      </p>
       {loading ? (
-        <div className="h-64 flex items-center justify-center text-gray-400 text-sm">불러오는 중...</div>
+        <div className="h-72 flex items-center justify-center text-gray-400 text-sm">불러오는 중...</div>
       ) : !hasRange ? (
-        <div className="h-64 flex items-center justify-center text-gray-400 text-sm">기간을 선택하면 차트가 표시됩니다</div>
-      ) : data.every((b) => b.count === 0) ? (
-        <div className="h-64 flex items-center justify-center text-gray-400 text-sm">해당 기간에 시선 데이터가 없습니다</div>
+        <div className="h-72 flex items-center justify-center text-gray-400 text-sm">기간을 선택하면 차트가 표시됩니다</div>
+      ) : isEmpty ? (
+        <div className="h-72 flex items-center justify-center text-gray-400 text-sm">해당 기간에 데이터가 없습니다</div>
       ) : (
-        <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={data} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+        <ResponsiveContainer width="100%" height={288}>
+          <ComposedChart data={bins} margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
+            <defs>
+              <linearGradient id="dwellGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#F97316" stopOpacity={0.65} />
+                <stop offset="95%" stopColor="#F97316" stopOpacity={0.05} />
+              </linearGradient>
+              <linearGradient id="fixationGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#1E3A5F" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="#1E3A5F" stopOpacity={0.15} />
+              </linearGradient>
+            </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="label" tick={{ fontSize: 11 }} />
+            <XAxis dataKey="label" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
             <YAxis
               tick={{ fontSize: 12 }}
               label={{ value: "track 수", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 11 } }}
@@ -57,11 +83,13 @@ export default function FixationHistogram({ data, loading, hasRange }: Props) {
               allowDecimals={false}
             />
             <Tooltip
-              formatter={(value) => [`${value}명`, "track 수"]}
+              formatter={(value, name) => [`${value}명`, String(name)]}
               labelFormatter={(label) => `구간: ${label}`}
             />
-            <Bar dataKey="count" name="track 수" fill="#6366F1" radius={[4, 4, 0, 0]} />
-          </BarChart>
+            <Legend />
+            <Area type="monotone" dataKey="dwell" name="노출 시간 (Dwell)" stroke="#F97316" strokeWidth={2} fill="url(#dwellGrad)" />
+            <Area type="monotone" dataKey="fixation" name="첫 주목 시간 (Fixation)" stroke="#1E3A5F" strokeWidth={2} fill="url(#fixationGrad)" />
+          </ComposedChart>
         </ResponsiveContainer>
       )}
     </div>
