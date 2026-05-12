@@ -20,8 +20,6 @@ import {
 import GenderChart from "@/components/GenderChart";
 import AgeChart from "@/components/AgeChart";
 import DateRangePicker from "@/components/DateRangePicker";
-import HourlyTrendChart from "@/components/HourlyTrendChart";
-import DailyTrendChart from "@/components/DailyTrendChart";
 import SimpleCard from "@/components/Simplecard";
 import DbscanChart from "@/components/DbscanChart";
 import DailyMetricsChart, { DailyChartPoint } from "@/components/DailyMetricsChart";
@@ -40,8 +38,6 @@ import {
 } from "@/lib/api";
 import CampaignSelector from "@/components/CampaignSelector";
 import DashboardLayout from "../dashboard/layout";
-
-type TrendPoint = { label: string; exposed: number; interested: number };
 
 const MAX_DAYS = 15;
 const BINS = [0, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 4500, 5000];
@@ -238,15 +234,6 @@ export default function AnalyticsPage() {
   const targetMatchRate = rangeStats?.target_match_rate != null
     ? `${(rangeStats.target_match_rate * 100).toFixed(1)}%` : "-";
 
-  // 트렌드 차트 데이터
-  const hourlyTrend: TrendPoint[] = rangeStats
-    ? rangeStats.hourly_trend.map(h => ({ label: `${h.hour}:00`, exposed: h.exposure_count, interested: h.interested_count }))
-    : [];
-
-  const dailyTrend: TrendPoint[] = rangeStats
-    ? rangeStats.daily_trend.map(d => ({ label: d.date, exposed: d.exposure_count, interested: d.interested_count }))
-    : [];
-
   // DailyMetricsChart 데이터 (rangeStats.daily_trend에서 파생)
   const dailyMetricsData: DailyChartPoint[] = rangeStats
     ? rangeStats.daily_trend.map((d) => ({
@@ -410,12 +397,6 @@ export default function AnalyticsPage() {
 
         <section>
           <DbscanChart goldenZone={goldenZone} />
-        </section>
-
-        {/* Trend Charts */}
-        <section className="space-y-6">
-          <HourlyTrendChart trendData={hourlyTrend} />
-          <DailyTrendChart dailyData={dailyTrend} />
         </section>
 
         {/* 기간별 노출·시청 추이 요약 배지 */}
