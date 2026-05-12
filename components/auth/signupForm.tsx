@@ -46,7 +46,7 @@ export function SignupForm() {
     setIsLoading(true)
     try {
       await apiRegister(email, password, code)
-      router.push("/")
+      router.push("/login")
     } catch (err) {
       setError(err instanceof Error ? err.message : "회원가입 실패")
     } finally {
@@ -194,7 +194,7 @@ export function SignupForm() {
 
             <div className="mt-6 text-center text-sm text-white/50">
               이미 계정이 있으신가요?{" "}
-              <Link href="/" className="text-blue-400 font-medium hover:text-blue-300 hover:underline">
+              <Link href="/login" className="text-blue-400 font-medium hover:text-blue-300 hover:underline">
                 로그인
               </Link>
             </div>
