@@ -79,7 +79,6 @@ export default function Navbar() {
               시계열 분석
             </Link>
           </div>
-
           <button
             onClick={handleLogout}
             className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-red-600 transition-colors"
