@@ -95,7 +95,7 @@ export default function PeakHourChart({ data, loading }: Props) {
               <LabelList
                 dataKey="peakHour"
                 position="top"
-                formatter={(v: number) => timeLabel(v)}
+                formatter={(v: unknown) => timeLabel(Number(v))}
                 style={{ fontSize: 11, fill: "#6b7280" }}
               />
               {data.map((entry) => (
