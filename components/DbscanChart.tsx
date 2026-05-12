@@ -33,13 +33,13 @@ export default function DbscanChart({ goldenZone }: Props) {
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200">
       <div className="px-6 pt-6 pb-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-1">
+        <h3 className="text-xs font-semibold text-gray-900 mb-1">
           화면 주목 영역 분석 (DBSCAN)
         </h3>
-        <p className="text-sm text-gray-500">
+        <p className="text-gray-500" style={{ fontSize: 8 }}>
           광고 화면 내 시선 집중 클러스터 분포 (X·Y: 화면 내 상대 위치 %)
           {goldenZone && (
-            <span className="ml-2 text-xs text-gray-400">
+            <span className="ml-2 text-gray-400" style={{ fontSize: 8 }}>
               · 클러스터 {goldenZone.dbscan.cluster_count}개
               · 포인트 {goldenZone.point_count.toLocaleString()}개
             </span>
@@ -58,19 +58,19 @@ export default function DbscanChart({ goldenZone }: Props) {
               <XAxis
                 type="number" dataKey="x" domain={[0, 100]}
                 name="X 위치" unit="%" stroke="#6b7280"
-                tick={{ fontSize: 12 }} orientation="top"
+                tick={{ fontSize: 8 }} orientation="top"
               />
               <YAxis
                 type="number" dataKey="y" domain={[0, 100]}
                 name="Y 위치" unit="%" stroke="#6b7280"
-                tick={{ fontSize: 12 }} reversed
+                tick={{ fontSize: 8 }} reversed
               />
               <Tooltip
                 cursor={{ strokeDasharray: "3 3" }}
                 formatter={(value) => `${value}%`}
                 contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px" }}
               />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 8 }} />
               {clusters.map((c) => (
                 <Scatter
                   key={c.name}

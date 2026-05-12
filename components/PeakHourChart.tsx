@@ -55,12 +55,10 @@ const HOUR_TICKS = [0, 6, 12, 18, 23];
 export default function PeakHourChart({ data, loading }: Props) {
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-      <div className="flex items-center justify-between mb-5">
-        <div>
-          <h3 className="text-base font-semibold text-gray-900">날짜별 피크 시간대</h3>
-          <p className="text-xs text-gray-400 mt-0.5">각 날짜의 노출이 가장 많은 시간대</p>
-        </div>
-        <div className="flex items-center gap-3 text-xs text-gray-500">
+      <div className="mb-4">
+        <h3 className="text-xs font-semibold text-gray-900">날짜별 피크 시간대</h3>
+        <p className="text-gray-400 mt-0.5 mb-2" style={{ fontSize: 8 }}>각 날짜의 노출이 가장 많은 시간대</p>
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-gray-500" style={{ fontSize: 8 }}>
           <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block bg-indigo-500"></span>새벽(0-5)</span>
           <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block bg-amber-400"></span>오전(6-11)</span>
           <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-sm inline-block bg-green-500"></span>오후(12-17)</span>
@@ -80,10 +78,10 @@ export default function PeakHourChart({ data, loading }: Props) {
         <ResponsiveContainer width="100%" height={280}>
           <BarChart data={data} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" vertical={false} />
-            <XAxis dataKey="date" stroke="#9ca3af" tick={{ fontSize: 11 }} tickLine={false} />
+            <XAxis dataKey="date" stroke="#9ca3af" tick={{ fontSize: 8 }} tickLine={false} />
             <YAxis
               stroke="#9ca3af"
-              tick={{ fontSize: 11 }}
+              tick={{ fontSize: 8 }}
               axisLine={false}
               tickLine={false}
               ticks={HOUR_TICKS}
@@ -96,7 +94,7 @@ export default function PeakHourChart({ data, loading }: Props) {
                 dataKey="peakHour"
                 position="top"
                 formatter={(v: unknown) => timeLabel(Number(v))}
-                style={{ fontSize: 11, fill: "#6b7280" }}
+                style={{ fontSize: 8, fill: "#6b7280" }}
               />
               {data.map((entry) => (
                 <Cell key={entry.date} fill={barColor(entry.peakHour)} />

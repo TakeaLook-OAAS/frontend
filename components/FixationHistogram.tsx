@@ -51,8 +51,8 @@ export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRan
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-base font-semibold text-gray-800 mb-1">노출·시청 시간 분포</h2>
-      <p className="text-xs text-gray-400 mb-5">
+      <h2 className="text-xs font-semibold text-gray-800 mb-1">노출·시청 시간 분포</h2>
+      <p className="text-gray-400 mb-5" style={{ fontSize: 8 }}>
         노출 시간(Dwell) 및 첫 주목 반응 시간(Fixation) 구간별 track 수 (최대 1,000건)
       </p>
       {loading ? (
@@ -75,10 +75,10 @@ export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRan
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-            <XAxis dataKey="label" tick={{ fontSize: 11 }} interval="preserveStartEnd" />
+            <XAxis dataKey="label" tick={{ fontSize: 8 }} interval="preserveStartEnd" />
             <YAxis
-              tick={{ fontSize: 12 }}
-              label={{ value: "track 수", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 11 } }}
+              tick={{ fontSize: 8 }}
+              label={{ value: "track 수", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 8 } }}
               width={56}
               allowDecimals={false}
             />
@@ -86,7 +86,7 @@ export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRan
               formatter={(value, name) => [`${value}명`, String(name)]}
               labelFormatter={(label) => `구간: ${label}`}
             />
-            <Legend />
+            <Legend wrapperStyle={{ fontSize: 8 }} />
             <Area type="monotone" dataKey="dwell" name="노출 시간 (Dwell)" stroke="#F97316" strokeWidth={2} fill="url(#dwellGrad)" />
             <Area type="monotone" dataKey="fixation" name="첫 주목 시간 (Fixation)" stroke="#1E3A5F" strokeWidth={2} fill="url(#fixationGrad)" />
           </ComposedChart>

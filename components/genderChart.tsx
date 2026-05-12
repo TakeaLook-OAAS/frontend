@@ -18,7 +18,7 @@ interface GenderData {
 export default function GenderChart({ data }: { data?: GenderData[] }) {
   return (
     <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4">
+      <h3 className="text-xs font-semibold text-gray-900 mb-4">
         노출 인구 성별 분포
       </h3>
 
@@ -34,9 +34,11 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent }) =>
-                `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`
-              }
+              label={({ name, percent, x, y, textAnchor }) => (
+                <text x={x} y={y} textAnchor={textAnchor} dominantBaseline="central" fontSize={8} fill="#374151">
+                  {`${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
+                </text>
+              )}
               outerRadius={99}
               dataKey="value"
               startAngle={90}

@@ -25,10 +25,10 @@ interface Props {
 export default function HourlyAudienceChart({ data }: Props) {
   return (
     <div className="rounded-lg border bg-white p-6 shadow-sm">
-      <h2 className="mb-1 text-base font-semibold text-gray-800">
+      <h2 className="mb-1 text-xs font-semibold text-gray-800">
         시간대별 노출 인구, 관심 인구 및 포착 관심도
       </h2>
-      <p className="text-xs text-gray-400 mb-5">노출 인구(명) · 관심 인구(명) · 포착 관심도(%)</p>
+      <p className="text-gray-400 mb-5" style={{ fontSize: 8 }}>노출 인구(명) · 관심 인구(명) · 포착 관심도(%)</p>
 
       {data.length === 0 ? (
         <div className="h-[400px] flex items-center justify-center text-gray-400 text-sm">
@@ -42,28 +42,28 @@ export default function HourlyAudienceChart({ data }: Props) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                 <XAxis
                   dataKey="label"
-                  tick={{ fill: "#6b7280", fontSize: 12 }}
+                  tick={{ fill: "#6b7280", fontSize: 8 }}
                   axisLine={{ stroke: "#d1d5db" }}
                   tickLine={{ stroke: "#d1d5db" }}
-                  label={{ value: "시간", position: "insideBottom", offset: -10, fill: "#374151" }}
+                  label={{ value: "시간", position: "insideBottom", offset: -10, fill: "#374151", style: { fontSize: 8 } }}
                 />
                 <YAxis
                   yAxisId="left"
                   orientation="left"
-                  tick={{ fill: "#6b7280", fontSize: 12 }}
+                  tick={{ fill: "#6b7280", fontSize: 8 }}
                   axisLine={{ stroke: "#d1d5db" }}
                   tickLine={{ stroke: "#d1d5db" }}
-                  label={{ value: "인구 (명)", angle: -90, position: "insideLeft", fill: "#374151", style: { textAnchor: "middle" } }}
+                  label={{ value: "인구 (명)", angle: -90, position: "insideLeft", fill: "#374151", style: { textAnchor: "middle", fontSize: 8 } }}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
                   domain={[0, 100]}
-                  tick={{ fill: "#6b7280", fontSize: 12 }}
+                  tick={{ fill: "#6b7280", fontSize: 8 }}
                   axisLine={{ stroke: "#d1d5db" }}
                   tickLine={{ stroke: "#d1d5db" }}
                   tickFormatter={(v) => `${v}%`}
-                  label={{ value: "포착 관심도 (%)", angle: 90, position: "insideRight", fill: "#374151", style: { textAnchor: "middle" } }}
+                  label={{ value: "포착 관심도 (%)", angle: 90, position: "insideRight", fill: "#374151", style: { textAnchor: "middle", fontSize: 8 } }}
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}
@@ -73,13 +73,13 @@ export default function HourlyAudienceChart({ data }: Props) {
                     return [`${n.toLocaleString()}명`, String(name)]
                   }}
                 />
-                <Bar yAxisId="left" dataKey="exposure" name="노출인구" fill="#1e3a5f" radius={[4, 4, 0, 0]} barSize={28} />
-                <Bar yAxisId="left" dataKey="interested" name="관심인구" fill="#4ade80" radius={[4, 4, 0, 0]} barSize={28} />
+                <Bar yAxisId="left" dataKey="exposure" name="노출인구" fill="#1e3a5f" radius={[4, 4, 0, 0]} barSize={7} />
+                <Bar yAxisId="left" dataKey="interested" name="관심인구" fill="#4ade80" radius={[4, 4, 0, 0]} barSize={7} />
                 <Line yAxisId="right" type="monotone" dataKey="attentionRate" name="포착관심도" stroke="#16a34a" strokeWidth={2} dot={false} activeDot={{ r: 7, fill: "#16a34a" }} />
               </ComposedChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-4 flex justify-center gap-6 text-sm text-gray-500">
+          <div className="mt-4 flex justify-center gap-6 text-gray-500" style={{ fontSize: 8 }}>
             <div className="flex items-center gap-2">
               <div className="h-4 w-4 rounded bg-[#1e3a5f]" />
               <span>노출인구</span>

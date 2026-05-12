@@ -38,8 +38,8 @@ export default function DailyMetricsChart({ data, dateLabel, loading, hasRange }
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <h2 className="text-base font-semibold text-gray-800 mb-1">기간별 노출·시청 추이</h2>
-      <p className="text-xs text-gray-400 mb-5">
+      <h2 className="text-xs font-semibold text-gray-800 mb-1">기간별 노출·시청 추이</h2>
+      <p className="text-gray-400 mb-5" style={{ fontSize: 8 }}>
         {dateLabel ?? "노출 시간(s) · 시청 시간(s) · 심층관심도(%)"}
       </p>
 
@@ -57,9 +57,9 @@ export default function DailyMetricsChart({ data, dateLabel, loading, hasRange }
               </linearGradient>
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-            <XAxis dataKey="label" tick={{ fontSize: 12 }} tickLine={false} />
-            <YAxis yAxisId="left" domain={timesDomain} tick={{ fontSize: 11 }} tickFormatter={(v: number) => `${v}s`} width={48} axisLine={false} tickLine={false} />
-            <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fontSize: 11, fill: "#f97316" }} tickFormatter={(v: number) => `${v}%`} width={48} axisLine={false} tickLine={false} />
+            <XAxis dataKey="label" tick={{ fontSize: 8 }} tickLine={false} />
+            <YAxis yAxisId="left" domain={timesDomain} tick={{ fontSize: 8 }} tickFormatter={(v: number) => `${v}s`} width={48} axisLine={false} tickLine={false} />
+            <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fontSize: 8, fill: "#f97316" }} tickFormatter={(v: number) => `${v}%`} width={48} axisLine={false} tickLine={false} />
             <Tooltip
               formatter={(value, name) => {
                 if (name === "심층관심도") return [`${value}%`, name];
@@ -67,7 +67,7 @@ export default function DailyMetricsChart({ data, dateLabel, loading, hasRange }
               }}
               labelFormatter={(label) => `날짜: ${label}`}
             />
-            <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} iconType="square" />
+            <Legend wrapperStyle={{ fontSize: 8, paddingTop: 12 }} iconType="square" />
             <Area yAxisId="left" type="monotone" dataKey="exposureTimes" name="노출 시간" stroke="#22c55e" strokeWidth={2} fill="url(#exposureGrad)" dot={false} activeDot={{ r: 6, fill: "#22c55e" }} connectNulls />
             <Area yAxisId="left" type="monotone" dataKey="lookTimes" name="시청 시간" stroke="#3b82f6" strokeWidth={2} fill="url(#lookGrad)" dot={false} activeDot={{ r: 6, fill: "#3b82f6" }} connectNulls />
             <Line yAxisId="right" type="monotone" dataKey="attentionRate" name="심층관심도" stroke="#f97316" strokeWidth={2} dot={false} activeDot={{ r: 6, fill: "#f97316" }} connectNulls />
