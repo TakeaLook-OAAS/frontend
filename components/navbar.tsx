@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BarChart3, Calendar, TrendingUp, LogOut, Shield } from "lucide-react";
+import { BarChart3, Calendar, LineChart, TrendingUp, LogOut, Shield } from "lucide-react";
 import { apiLogout } from "@/lib/api";
 
 export default function Navbar() {
@@ -32,11 +32,10 @@ export default function Navbar() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
-                  isActive("/admin")
+                className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${isActive("/admin")
                     ? "border-blue-600 text-blue-600"
                     : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
-                }`}
+                  }`}
               >
                 <Shield className="w-4 h-4" />
                 관리자
@@ -45,11 +44,10 @@ export default function Navbar() {
 
             <Link
               href="/dashboard"
-              className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
-                isActive("/dashboard")
+              className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${isActive("/dashboard")
                   ? "border-blue-600 text-blue-600"
                   : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
-              }`}
+                }`}
             >
               <BarChart3 className="w-4 h-4" />
               메인 대시보드
@@ -57,14 +55,24 @@ export default function Navbar() {
 
             <Link
               href="/analytics"
-              className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
-                isActive("/analytics")
+              className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${isActive("/analytics")
                   ? "border-blue-600 text-blue-600"
                   : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
-              }`}
+                }`}
             >
               <Calendar className="w-4 h-4" />
               기간별 분석
+            </Link>
+
+            <Link
+              href="/analytics_test"
+              className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${isActive("/analytics_test")
+                  ? "border-blue-600 text-blue-600"
+                  : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
+                }`}
+            >
+              <LineChart className="w-4 h-4" />
+              지표 트렌드 (테스트)
             </Link>
 
             <Link

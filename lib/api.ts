@@ -193,6 +193,8 @@ export async function apiLogout(token: string): Promise<void> {
   });
 }
 
+// ── 관리자 API ────────────────────────────────────────────────────────────────
+
 export interface UserInfo {
   id: string;
   email: string;
@@ -238,6 +240,42 @@ export async function apiSuspendUser(token: string, userId: string): Promise<Use
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(data.detail ?? "유저 정지 실패");
   return data;
+}
+
+// ── Raw Events 조회 ───────────────────────────────────────────────────────────
+
+export interface EventRawItem {
+  id: string;
+  ts: string;
+  device_id: string;
+  campaign_id: string;
+  track_id: number;
+  exposure_start_ms: number;
+  exposure_end_ms: number;
+  exposure_ms: number;
+  look_times: { start_ms: number; end_ms: number }[];
+  total_look_duration_ms: number;
+  age_group: string | null;
+  gender: string | null;
+}
+
+export interface EventListResponse {
+  events: EventRawItem[];
+  total: number;
+}
+
+export async function getEvents(params: {
+  device_id?: string;
+  campaign_id?: string;
+  limit?: number;
+}): Promise<EventListResponse> {
+  const url = new URL(`${BASE}/events/`);
+  if (params.device_id)   url.searchParams.set("device_id",   params.device_id);
+  if (params.campaign_id) url.searchParams.set("campaign_id", params.campaign_id);
+  url.searchParams.set("limit", String(params.limit ?? 1000));
+  const res = await fetch(url.toString(), { cache: "no-store" });
+  if (!res.ok) throw new Error(`/events/ 오류: ${res.status}`);
+  return res.json();
 }
 
 // ── Events CSV 다운로드 URL 생성 ──────────────────────────────────────────────
