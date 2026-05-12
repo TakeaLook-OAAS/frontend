@@ -46,11 +46,6 @@ export interface HourlyTrendPoint {
   interested_count: number;
 }
 
-export interface DailyTrendPoint {
-  date: string; // "YYYY-MM-DD"
-  exposure_count: number;
-  interested_count: number;
-}
 
 export interface RangeStatsResponse {
   start_date: string;
@@ -72,7 +67,7 @@ export interface RangeStatsResponse {
   count_male: number;
   count_female: number;
   hourly_trend: HourlyTrendPoint[];
-  daily_trend: DailyTrendPoint[];
+  daily_trend: { date: string; exposure_count: number; interested_count: number }[];
   // 고급 분석 지표
   avg_revisit_count:       number;
   avg_fixation_latency_ms: number | null;
@@ -153,10 +148,9 @@ export async function getGoldenZone(
 
 // ── 인증 ──────────────────────────────────────────────────────────────────────
 
-const AUTH_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 export async function apiLogin(email: string, password: string): Promise<string> {
-  const res = await fetch(`${AUTH_BASE}/auth/login`, {
+  const res = await fetch(`${BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -167,7 +161,7 @@ export async function apiLogin(email: string, password: string): Promise<string>
 }
 
 export async function apiSendCode(email: string): Promise<void> {
-  const res = await fetch(`${AUTH_BASE}/auth/send-code`, {
+  const res = await fetch(`${BASE}/auth/send-code`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email }),
@@ -177,7 +171,7 @@ export async function apiSendCode(email: string): Promise<void> {
 }
 
 export async function apiRegister(email: string, password: string, code: string): Promise<void> {
-  const res = await fetch(`${AUTH_BASE}/auth/register`, {
+  const res = await fetch(`${BASE}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password, code }),
@@ -187,7 +181,7 @@ export async function apiRegister(email: string, password: string, code: string)
 }
 
 export async function apiLogout(token: string): Promise<void> {
-  await fetch(`${AUTH_BASE}/auth/logout`, {
+  await fetch(`${BASE}/auth/logout`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -204,7 +198,7 @@ export interface UserInfo {
 }
 
 export async function apiGetMe(token: string): Promise<UserInfo> {
-  const res = await fetch(`${AUTH_BASE}/auth/me`, {
+  const res = await fetch(`${BASE}/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json().catch(() => ({}));
@@ -213,7 +207,7 @@ export async function apiGetMe(token: string): Promise<UserInfo> {
 }
 
 export async function apiGetAdminUsers(token: string): Promise<UserInfo[]> {
-  const res = await fetch(`${AUTH_BASE}/admin/users`, {
+  const res = await fetch(`${BASE}/admin/users`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json().catch(() => ({}));
@@ -222,7 +216,7 @@ export async function apiGetAdminUsers(token: string): Promise<UserInfo[]> {
 }
 
 export async function apiDeleteUser(token: string, userId: string): Promise<void> {
-  const res = await fetch(`${AUTH_BASE}/admin/users/${userId}`, {
+  const res = await fetch(`${BASE}/admin/users/${userId}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -233,7 +227,7 @@ export async function apiDeleteUser(token: string, userId: string): Promise<void
 }
 
 export async function apiSuspendUser(token: string, userId: string): Promise<UserInfo> {
-  const res = await fetch(`${AUTH_BASE}/admin/users/${userId}/suspend`, {
+  const res = await fetch(`${BASE}/admin/users/${userId}/suspend`, {
     method: "PATCH",
     headers: { Authorization: `Bearer ${token}` },
   });
