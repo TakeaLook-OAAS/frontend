@@ -14,7 +14,7 @@ import DailyMetricsChart, { DailyChartPoint } from "@/components/DailyMetricsCha
 import PeakHourChart, { DayPeakPoint } from "@/components/PeakHourChart";
 import HourlyAudienceChart from "@/components/HourlyAudienceChart";
 import DailyEffectsChart, { DayPoint } from "@/components/DailyEffectsChart";
-import FixationHistogram, { HistBin, buildHistogram } from "@/components/FixationHistogram";
+import FixationHistogram from "@/components/FixationHistogram";
 
 import {
   getCampaignAggs,
@@ -41,8 +41,11 @@ export default function AnalyticsPage() {
   const [advChartData, setAdvChartData] = useState<DayPoint[]>([]);
   const [perDayLoading, setPerDayLoading] = useState(false);
   const [truncated, setTruncated] = useState(false);
-  const [histData, setHistData] = useState<HistBin[]>([]);
+  const [dwellMs, setDwellMs] = useState<number[]>([]);
+  const [fixationMs, setFixationMs] = useState<number[]>([]);
   const [histLoading, setHistLoading] = useState(false);
+  const [exposureMsPerDay, setExposureMsPerDay] = useState<Record<string, number>>({});
+  const [lookMsPerDay, setLookMsPerDay] = useState<Record<string, number>>({});
 
   const campaignId = selected?.campaign_id;
   const deviceId = selected?.device_id;
@@ -130,10 +133,13 @@ export default function AnalyticsPage() {
       .finally(() => setPerDayLoading(false));
   }, [startDate, endDate, campaignId, deviceId]);
 
-  // 첫 주목 반응 시간 히스토그램
+  // 노출·시청 시간 분포 히스토그램 + 일별 노출/시청 시간(초) 합산
   useEffect(() => {
     if (!startDate || !campaignId || !deviceId) {
-      setHistData([]);
+      setDwellMs([]);
+      setFixationMs([]);
+      setExposureMsPerDay({});
+      setLookMsPerDay({});
       return;
     }
     setHistLoading(true);
@@ -145,13 +151,26 @@ export default function AnalyticsPage() {
             .slice(0, 10);
           return kstDate >= startDate! && kstDate <= endDate!;
         });
-        const latencies = filtered
-          .filter((e) => e.look_times.length > 0)
-          .map((e) => e.look_times[0].start_ms - e.exposure_start_ms)
-          .filter((ms) => ms >= 0);
-        setHistData(buildHistogram(latencies));
+        setDwellMs(filtered.map((e) => e.exposure_ms).filter((ms) => ms >= 0));
+        setFixationMs(
+          filtered
+            .filter((e) => e.look_times.length > 0)
+            .map((e) => e.look_times[0].start_ms - e.exposure_start_ms)
+            .filter((ms) => ms >= 0)
+        );
+        const expPerDay: Record<string, number> = {};
+        const lookPerDay: Record<string, number> = {};
+        filtered.forEach((e) => {
+          const kstDate = new Date(new Date(e.ts).getTime() + 9 * 3600 * 1000)
+            .toISOString()
+            .slice(0, 10);
+          expPerDay[kstDate] = (expPerDay[kstDate] ?? 0) + e.exposure_ms / 1000;
+          lookPerDay[kstDate] = (lookPerDay[kstDate] ?? 0) + e.total_look_duration_ms / 1000;
+        });
+        setExposureMsPerDay(expPerDay);
+        setLookMsPerDay(lookPerDay);
       })
-      .catch(() => setHistData([]))
+      .catch(() => { setDwellMs([]); setFixationMs([]); setExposureMsPerDay({}); setLookMsPerDay({}); })
       .finally(() => setHistLoading(false));
   }, [startDate, endDate, campaignId, deviceId]);
 
@@ -200,21 +219,24 @@ export default function AnalyticsPage() {
   const targetMatchRate = rangeStats?.target_match_rate != null
     ? `${(rangeStats.target_match_rate * 100).toFixed(1)}%` : "-";
 
-  // DailyMetricsChart 데이터 (rangeStats.daily_trend에서 파생)
-  const dailyMetricsData: DailyChartPoint[] = rangeStats
-    ? rangeStats.daily_trend.map((d) => ({
-      label: d.date.slice(5),
-      exposureTimes: d.exposure_count,
-      lookTimes: d.interested_count,
-      attentionRate: d.exposure_count > 0
-        ? parseFloat(((d.interested_count / d.exposure_count) * 100).toFixed(1))
-        : 0,
-    }))
-    : [];
+  // DailyMetricsChart 데이터 — 선택 범위의 모든 날짜를 표시 (데이터 없는 날은 0)
+  const dailyMetricsData: DailyChartPoint[] = (() => {
+    if (!startDate) return [];
+    let days = eachDayOfInterval({ start: parseISO(startDate), end: parseISO(endDate!) })
+      .map((d) => format(d, "yyyy-MM-dd"));
+    if (days.length > MAX_DAYS) days = days.slice(days.length - MAX_DAYS);
+    return days.map((day) => {
+      const expSec = parseFloat((exposureMsPerDay[day] ?? 0).toFixed(1));
+      const lookSec = parseFloat((lookMsPerDay[day] ?? 0).toFixed(1));
+      return {
+        label: day.slice(5),
+        exposureTimes: expSec,
+        lookTimes: lookSec,
+        attentionRate: expSec > 0 ? parseFloat(((lookSec / expSec) * 100).toFixed(1)) : 0,
+      };
+    });
+  })();
 
-  const trendAvgRate = totalExposure > 0
-    ? ((interestedCount / totalExposure) * 100).toFixed(1)
-    : "0.0";
 
   const hourlyAudienceData = rangeStats
     ? rangeStats.hourly_trend.map(h => ({
@@ -250,7 +272,8 @@ export default function AnalyticsPage() {
                 setGoldenZone(undefined);
                 setPeakData([]);
                 setAdvChartData([]);
-                setHistData([]);
+                setDwellMs([]);
+                setFixationMs([]);
               }}
             />
             <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
@@ -365,36 +388,25 @@ export default function AnalyticsPage() {
           <DbscanChart goldenZone={goldenZone} />
         </section>
 
-        {/* 기간별 노출·시청 추이 요약 배지 */}
-        {dailyMetricsData.length > 0 && (
-          <div className="flex flex-wrap items-center gap-3 text-sm">
-            <div className="flex items-center gap-2 bg-green-50 border border-green-200 rounded-lg px-4 py-2">
-              <span className="text-green-600 font-semibold">총 노출</span>
-              <span className="text-green-800 font-bold">{totalExposure.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-lg px-4 py-2">
-              <span className="text-blue-600 font-semibold">총 시청</span>
-              <span className="text-blue-800 font-bold">{interestedCount.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-lg px-4 py-2">
-              <span className="text-orange-600 font-semibold">평균 심층관심도</span>
-              <span className="text-orange-800 font-bold">{trendAvgRate}%</span>
-            </div>
-          </div>
-        )}
-
-        {/* 기간별 노출·시청 추이 차트 (from trends) */}
+        {/* 기간별 노출·시청 추이 차트*/}
         <section>
-          <DailyMetricsChart data={dailyMetricsData} dateLabel={dateLabel} />
+          <DailyMetricsChart data={dailyMetricsData} dateLabel={dateLabel} loading={hasRange && !rangeStats} hasRange={hasRange} />
         </section>
 
-        {/* 날짜별 피크 시간대 (from trends) */}
+        {/* 날짜별 피크 시간대 */}
         <section>
           <PeakHourChart data={peakData} loading={perDayLoading} />
         </section>
 
-        <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
-        <FixationHistogram data={histData} loading={histLoading} hasRange={hasRange} />
+        {/* 일별 광고 효과 지표 */}
+        <section>
+          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
+        </section>
+
+        {/* 첫 주목 반응 시간 분포 */}
+        <section>
+          <FixationHistogram dwellMs={dwellMs} fixationMs={fixationMs} loading={histLoading} hasRange={hasRange} />
+        </section>
 
         {/* 시간대별 노출·관심 인구 및 포착 관심도 */}
         <section>
