@@ -64,10 +64,11 @@ export default function DbscanChart({ goldenZone }: Props) {
                 type="number" dataKey="y" domain={[0, 100]}
                 name="Y 위치" unit="%" stroke="#6b7280"
                 tick={{ fontSize: 8 }} reversed
+                width={30}
               />
               <Tooltip
                 cursor={{ strokeDasharray: "3 3" }}
-                formatter={(value) => `${value}%`}
+                formatter={(value) => `${value}`}
                 contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px" }}
               />
               <Legend wrapperStyle={{ fontSize: 8 }} />
@@ -78,6 +79,9 @@ export default function DbscanChart({ goldenZone }: Props) {
                   data={c.data}
                   fill={c.isNoise ? NOISE_COLOR : CLUSTER_COLORS[c.idx % CLUSTER_COLORS.length]}
                   opacity={c.isNoise ? 0.4 : 0.85}
+                  shape={(props: { cx?: number; cy?: number; fill?: string; opacity?: number }) => (
+                    <circle cx={props.cx} cy={props.cy} r={2} fill={props.fill} opacity={props.opacity} />
+                  )}
                 />
               ))}
             </ScatterChart>

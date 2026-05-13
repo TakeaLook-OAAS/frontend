@@ -34,11 +34,16 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
               cx="50%"
               cy="50%"
               labelLine={false}
-              label={({ name, percent, x, y, textAnchor }) => (
-                <text x={x} y={y} textAnchor={textAnchor} dominantBaseline="central" fontSize={8} fill="#374151">
-                  {`${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
-                </text>
-              )}
+              label={({ name, percent, cx, cy, midAngle, outerRadius }: { name?: string; percent?: number; cx?: number; cy?: number; midAngle?: number; outerRadius?: number }) => {
+                const RADIAN = Math.PI / 180;
+                const x = (cx ?? 0) + (outerRadius ?? 0) * 0.6 * Math.cos(-(midAngle ?? 0) * RADIAN);
+                const y = (cy ?? 0) + (outerRadius ?? 0) * 0.6 * Math.sin(-(midAngle ?? 0) * RADIAN);
+                return (
+                  <text x={x} y={y} textAnchor="middle" dominantBaseline="central" fontSize={10} fontWeight={600} fill="#fff">
+                    {`${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
+                  </text>
+                );
+              }}
               outerRadius={99}
               dataKey="value"
               startAngle={90}

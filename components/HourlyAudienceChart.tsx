@@ -53,7 +53,7 @@ export default function HourlyAudienceChart({ data }: Props) {
                   tick={{ fill: "#6b7280", fontSize: 8 }}
                   axisLine={{ stroke: "#d1d5db" }}
                   tickLine={{ stroke: "#d1d5db" }}
-                  label={{ value: "인구 (명)", angle: -90, position: "insideLeft", fill: "#374151", style: { textAnchor: "middle", fontSize: 8 } }}
+                  width={15}
                 />
                 <YAxis
                   yAxisId="right"
@@ -63,7 +63,7 @@ export default function HourlyAudienceChart({ data }: Props) {
                   axisLine={{ stroke: "#d1d5db" }}
                   tickLine={{ stroke: "#d1d5db" }}
                   tickFormatter={(v) => `${v}%`}
-                  label={{ value: "포착 관심도 (%)", angle: 90, position: "insideRight", fill: "#374151", style: { textAnchor: "middle", fontSize: 8 } }}
+                  width={15}
                 />
                 <Tooltip
                   contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px", boxShadow: "0 4px 6px -1px rgba(0,0,0,0.1)" }}

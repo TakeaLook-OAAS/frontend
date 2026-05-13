@@ -180,7 +180,7 @@ export default function AnalyticsPage() {
   const totalDwellTimeSec = Math.round((rangeStats?.avg_dwell_time_ms ?? 0) * totalExposure / 1000);
   const attentionTimeSec = Math.round((rangeStats?.total_attention_time_ms ?? 0) / 1000);
   const attentionRateTimes = rangeStats ? (rangeStats.attention_rate_times * 100).toFixed(1) : "0.0";
-  const attentionRateTracks = rangeStats ? rangeStats.attention_rate_tracks.toFixed(2) : "0.00";
+  const attentionRateTracks = rangeStats ? (rangeStats.attention_rate_tracks * 100).toFixed(1) : "0.0";
 
   // 성별 데이터
   const totalMale = rangeStats?.count_male ?? 0;
@@ -230,17 +230,17 @@ export default function AnalyticsPage() {
 
   const hourlyAudienceData = rangeStats
     ? Array.from({ length: 12 }, (_, i) => {
-        const h0 = rangeStats.hourly_trend.find(h => h.hour === String(i * 2).padStart(2, "0"));
-        const h1 = rangeStats.hourly_trend.find(h => h.hour === String(i * 2 + 1).padStart(2, "0"));
-        const exposure = (h0?.exposure_count ?? 0) + (h1?.exposure_count ?? 0);
-        const interested = (h0?.interested_count ?? 0) + (h1?.interested_count ?? 0);
-        return {
-          label: `${String(i * 2).padStart(2, "0")}:00`,
-          exposure,
-          interested,
-          attentionRate: exposure > 0 ? parseFloat(((interested / exposure) * 100).toFixed(1)) : 0,
-        };
-      })
+      const h0 = rangeStats.hourly_trend.find(h => h.hour === String(i * 2).padStart(2, "0"));
+      const h1 = rangeStats.hourly_trend.find(h => h.hour === String(i * 2 + 1).padStart(2, "0"));
+      const exposure = (h0?.exposure_count ?? 0) + (h1?.exposure_count ?? 0);
+      const interested = (h0?.interested_count ?? 0) + (h1?.interested_count ?? 0);
+      return {
+        label: `${String(i * 2).padStart(2, "0")}:00`,
+        exposure,
+        interested,
+        attentionRate: exposure > 0 ? parseFloat(((interested / exposure) * 100).toFixed(1)) : 0,
+      };
+    })
     : [];
 
   function handleDownload() {
@@ -304,7 +304,7 @@ export default function AnalyticsPage() {
           />
           <SimpleCard
             title="포착 관심도 (Attention Rate_Tracks)"
-            value={attentionRateTracks}
+            value={`${attentionRateTracks}%`}
             subtitle="Look_Times 보유 Track 수 / 전체 Track 수"
             icon={<Target className="w-4 h-4" />}
             className="p-4"
@@ -333,11 +333,11 @@ export default function AnalyticsPage() {
         </section>
 
         {/* Row 1: GenderChart AgeChart FixationHistogram PeakHourChart */}
-        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           <GenderChart data={genderData} />
           <AgeChart data={ageData} />
           <FixationHistogram dwellMs={dwellMs} fixationMs={fixationMs} loading={histLoading} hasRange={hasRange} />
-          <PeakHourChart data={peakData} loading={perDayLoading} />
+          {/* <PeakHourChart data={peakData} loading={perDayLoading} /> */}
         </section>
 
         {/* Row 2: DailyEffectsChart HourlyAudienceChart */}

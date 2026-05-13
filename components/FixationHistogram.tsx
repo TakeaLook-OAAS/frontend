@@ -78,8 +78,8 @@ export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRan
             <XAxis dataKey="label" tick={{ fontSize: 8 }} interval="preserveStartEnd" />
             <YAxis
               tick={{ fontSize: 8 }}
-              label={{ value: "track 수", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 8 } }}
-              width={56}
+              //label={{ value: "track 수", angle: -90, position: "insideLeft", offset: 12, style: { fontSize: 8 } }}
+              width={30}
               allowDecimals={false}
             />
             <Tooltip

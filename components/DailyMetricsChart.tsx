@@ -58,8 +58,8 @@ export default function DailyMetricsChart({ data, dateLabel, loading, hasRange }
             </defs>
             <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
             <XAxis dataKey="label" tick={{ fontSize: 8 }} tickLine={false} />
-            <YAxis yAxisId="left" domain={timesDomain} tick={{ fontSize: 8 }} tickFormatter={(v: number) => `${v}s`} width={48} axisLine={false} tickLine={false} />
-            <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fontSize: 8, fill: "#f97316" }} tickFormatter={(v: number) => `${v}%`} width={48} axisLine={false} tickLine={false} />
+            <YAxis yAxisId="left" domain={timesDomain} tick={{ fontSize: 8 }} tickFormatter={(v: number) => `${v}s`} width={30} axisLine={false} tickLine={false} />
+            <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fontSize: 8 }} tickFormatter={(v: number) => `${v}%`} width={1} axisLine={false} tickLine={false} />
             <Tooltip
               formatter={(value, name) => {
                 if (name === "심층관심도") return [`${value}%`, name];
