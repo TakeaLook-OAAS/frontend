@@ -146,6 +146,34 @@ export async function getGoldenZone(
   return res.json();
 }
 
+// ── 캠페인 목록 ───────────────────────────────────────────────────────────────
+
+export interface DeviceSimple {
+  id:     string;
+  name:   string;
+  status: string; // ENABLE | DISABLE | MAINTENANCE
+}
+
+export interface CampaignItem {
+  id:         string;
+  name:       string;
+  status:     string; // DRAFT | RUNNING | PAUSED | ENDED
+  start_date: string;
+  end_date:   string;
+  devices:    DeviceSimple[];
+}
+
+export interface CampaignListResponse {
+  results: CampaignItem[];
+  total:   number;
+}
+
+export async function getCampaigns(): Promise<CampaignListResponse> {
+  const res = await fetch(`${BASE}/campaigns/`, { cache: "no-store" });
+  if (!res.ok) throw new Error(`/campaigns/ 오류: ${res.status}`);
+  return res.json();
+}
+
 // ── 인증 ──────────────────────────────────────────────────────────────────────
 
 
