@@ -51,8 +51,8 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
               <XAxis dataKey="date" tick={{ fontSize: 8 }} tickFormatter={(v) => v.slice(5)} tickLine={false} />
-              <YAxis yAxisId="sec" domain={attentionDomain} tick={{ fontSize: 8 }} tickFormatter={(v) => `${v}s`} width={48} axisLine={false} tickLine={false} />
-              <YAxis yAxisId="pct" orientation="right" domain={[0, 100]} tick={{ fontSize: 8, fill: "#10B981" }} tickFormatter={(v) => `${v}%`} width={48} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="sec" domain={attentionDomain} tick={{ fontSize: 8 }} tickFormatter={(v) => `${v}s`} width={30} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="pct" orientation="right" domain={[0, 100]} tick={{ fontSize: 8 }} tickFormatter={(v) => `${v}%`} width={30} axisLine={false} tickLine={false} />
               <Tooltip
                 formatter={(value, name) => {
                   if (name === "평균 시청 시간") return [`${value}초`, name];
@@ -83,7 +83,7 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
               <XAxis dataKey="date" tick={{ fontSize: 8 }} tickFormatter={(v) => v.slice(5)} tickLine={false} />
-              <YAxis tick={{ fontSize: 8 }} tickFormatter={(v) => `${v}`} width={48} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 8 }} tickFormatter={(v) => `${v}`} width={30} axisLine={false} tickLine={false} />
               <Tooltip
                 formatter={(value) => [`${value}`, "시청 효율"]}
                 labelFormatter={(label) => `날짜: ${label}`}

@@ -35,14 +35,10 @@ export default function AgeChart({ data }: { data?: AgeData[] }) {
             <YAxis
               stroke="#6b7280"
               tick={{ fontSize: 8 }}
-              label={{
-                value: "(%)",
-                angle: 0,
-                position: "insideLeft",
-                dx: 1,
-                dy: 0,
-                style: { fontSize: 8 },
-              }} />
+              tickFormatter={(v) => `${v}%`}
+              domain={[0, 100]}
+              width={30}
+            />
 
             <Tooltip
               formatter={(value) => `${value}%`}
