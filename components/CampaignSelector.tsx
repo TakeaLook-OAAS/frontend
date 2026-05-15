@@ -183,7 +183,7 @@ function Row({
 }: {
   label: string;
   children: React.ReactNode;
-  chipsRef: React.RefObject<HTMLDivElement>;
+  chipsRef: React.RefObject<HTMLDivElement | null>;
   onLeft: () => void;
   onRight: () => void;
   style?: React.CSSProperties;
