@@ -47,7 +47,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
   const campRowRef = useRef<HTMLDivElement>(null);
   const devRowRef = useRef<HTMLDivElement>(null);
 
-  function scroll(ref: React.RefObject<HTMLDivElement>, dir: 1 | -1) {
+  function scroll(ref: React.RefObject<HTMLDivElement | null>, dir: 1 | -1) {
     ref.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
   }
 
