@@ -5,8 +5,8 @@ import { format, eachDayOfInterval, parseISO, subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Users, Clock, Eye, TrendingUp, Target, Download, UserCheck } from "lucide-react";
 
-import GenderChart from "@/components/genderChart";
-import AgeChart from "@/components/ageChart";
+import GenderChart from "@/components/GenderChart";
+import AgeChart from "@/components/AgeChart";
 import DateRangePicker from "@/components/DateRangePicker";
 import SimpleCard from "@/components/Simplecard";
 import DbscanChart from "@/components/DbscanChart";
@@ -74,7 +74,7 @@ export default function AnalyticsPage() {
         setOptions(results);
         if (results.length > 0) setSelected(results[0]);
       })
-      .catch(() => {});
+      .catch(() => { });
   }, []);
 
   useEffect(() => {
@@ -224,17 +224,17 @@ export default function AnalyticsPage() {
 
   const hourlyAudienceData = rangeStats
     ? Array.from({ length: 12 }, (_, i) => {
-        const h0 = rangeStats.hourly_trend.find((h) => h.hour === String(i * 2).padStart(2, "0"));
-        const h1 = rangeStats.hourly_trend.find((h) => h.hour === String(i * 2 + 1).padStart(2, "0"));
-        const exposure = (h0?.exposure_count ?? 0) + (h1?.exposure_count ?? 0);
-        const interested = (h0?.interested_count ?? 0) + (h1?.interested_count ?? 0);
-        return {
-          label: `${String(i * 2).padStart(2, "0")}:00`,
-          exposure,
-          interested,
-          attentionRate: exposure > 0 ? parseFloat(((interested / exposure) * 100).toFixed(1)) : 0,
-        };
-      })
+      const h0 = rangeStats.hourly_trend.find((h) => h.hour === String(i * 2).padStart(2, "0"));
+      const h1 = rangeStats.hourly_trend.find((h) => h.hour === String(i * 2 + 1).padStart(2, "0"));
+      const exposure = (h0?.exposure_count ?? 0) + (h1?.exposure_count ?? 0);
+      const interested = (h0?.interested_count ?? 0) + (h1?.interested_count ?? 0);
+      return {
+        label: `${String(i * 2).padStart(2, "0")}:00`,
+        exposure,
+        interested,
+        attentionRate: exposure > 0 ? parseFloat(((interested / exposure) * 100).toFixed(1)) : 0,
+      };
+    })
     : [];
 
   function handleDownload() {
@@ -272,281 +272,281 @@ export default function AnalyticsPage() {
   /* ------------------------------------------------------------------ */
   return (
     <>
-        {/* ---------------- top header ---------------- */}
-        <header
+      {/* ---------------- top header ---------------- */}
+      <header
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          padding: "22px 36px",
+          background: t.bg,
+          borderBottom: `1px solid ${t.lineSoft}`,
+        }}
+      >
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>DASHBOARD</span>
+            <span style={{ color: t.line }}>/</span>
+            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>ANALYTICS</span>
+          </div>
+          <h1 style={{ margin: "6px 0 0", fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", color: t.ink }}>
+            캠페인 성과 분석
+          </h1>
+          <div style={{ fontSize: 13, color: t.muted, marginTop: 6 }}>
+            노출·관심·체류·반응 데이터를 한눈에 확인하고 다음 캠페인 의사결정에 활용하세요.
+          </div>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {truncated && (
+            <div style={{
+              fontFamily: "JetBrains Mono, monospace", fontSize: 11,
+              color: "#7A4B12", background: "#FCEDD0",
+              padding: "6px 10px", borderRadius: 8, border: "1px solid #F3D9A4",
+              letterSpacing: "0.04em", fontWeight: 600,
+            }}>
+              ⚠ 15일 초과 — 마지막 15일만 표시됩니다
+            </div>
+          )}
+          <button
+            onClick={handleDownload}
+            disabled={!campaignId || !startDate}
+            style={{
+              padding: "9px 18px",
+              borderRadius: 9,
+              border: "none",
+              background: !campaignId || !startDate ? t.lineSoft : t.ink,
+              color: !campaignId || !startDate ? t.mono : "#fff",
+              fontWeight: 700,
+              fontFamily: "inherit",
+              fontSize: 13,
+              cursor: !campaignId || !startDate ? "not-allowed" : "pointer",
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 7,
+              boxShadow: !campaignId || !startDate ? "none" : "0 1px 2px rgba(13,42,92,0.1), 0 8px 18px -8px rgba(13,42,92,0.4)",
+            }}
+          >
+            <Download className="w-4 h-4" />
+            전체 CSV 다운로드
+          </button>
+        </div>
+      </header>
+
+      {/* ---------------- body ---------------- */}
+      <div style={{ padding: "26px 36px 60px", display: "flex", flexDirection: "column", gap: 22 }}>
+        {/* ---------------- campaign / device selector ---------------- */}
+        <CampaignSelector
+          options={options}
+          selected={selected}
+          onChange={(agg) => {
+            setSelected(agg);
+            setRangeStats(null);
+            setGoldenZone(undefined);
+            setAdvChartData([]);
+            setDwellMs([]);
+            setFixationMs([]);
+          }}
+        />
+
+        {/* ---------------- date filter row ---------------- */}
+        <div
           style={{
+            background: "#fff",
+            border: `1px solid ${t.lineSoft}`,
+            borderRadius: 14,
+            boxShadow: "0 1px 2px rgba(13,42,92,0.03)",
+            padding: "14px 16px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            padding: "22px 36px",
-            background: t.bg,
-            borderBottom: `1px solid ${t.lineSoft}`,
+            gap: 16,
+            flexWrap: "wrap",
           }}
         >
-          <div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>DASHBOARD</span>
-              <span style={{ color: t.line }}>/</span>
-              <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>ANALYTICS</span>
-            </div>
-            <h1 style={{ margin: "6px 0 0", fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", color: t.ink }}>
-              캠페인 성과 분석
-            </h1>
-            <div style={{ fontSize: 13, color: t.muted, marginTop: 6 }}>
-              노출·관심·체류·반응 데이터를 한눈에 확인하고 다음 캠페인 의사결정에 활용하세요.
-            </div>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            {truncated && (
-              <div style={{
-                fontFamily: "JetBrains Mono, monospace", fontSize: 11,
-                color: "#7A4B12", background: "#FCEDD0",
-                padding: "6px 10px", borderRadius: 8, border: "1px solid #F3D9A4",
-                letterSpacing: "0.04em", fontWeight: 600,
-              }}>
-                ⚠ 15일 초과 — 마지막 15일만 표시됩니다
-              </div>
-            )}
-            <button
-              onClick={handleDownload}
-              disabled={!campaignId || !startDate}
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <div
               style={{
-                padding: "9px 18px",
-                borderRadius: 9,
-                border: "none",
-                background: !campaignId || !startDate ? t.lineSoft : t.ink,
-                color: !campaignId || !startDate ? t.mono : "#fff",
-                fontWeight: 700,
-                fontFamily: "inherit",
-                fontSize: 13,
-                cursor: !campaignId || !startDate ? "not-allowed" : "pointer",
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 7,
-                boxShadow: !campaignId || !startDate ? "none" : "0 1px 2px rgba(13,42,92,0.1), 0 8px 18px -8px rgba(13,42,92,0.4)",
+                fontFamily: "JetBrains Mono, monospace",
+                fontSize: 10,
+                color: t.mono,
+                letterSpacing: "0.14em",
+                fontWeight: 600,
+                width: 78,
               }}
             >
-              <Download className="w-4 h-4" />
-              전체 CSV 다운로드
-            </button>
-          </div>
-        </header>
-
-        {/* ---------------- body ---------------- */}
-        <div style={{ padding: "26px 36px 60px", display: "flex", flexDirection: "column", gap: 22 }}>
-          {/* ---------------- campaign / device selector ---------------- */}
-          <CampaignSelector
-            options={options}
-            selected={selected}
-            onChange={(agg) => {
-              setSelected(agg);
-              setRangeStats(null);
-              setGoldenZone(undefined);
-              setAdvChartData([]);
-              setDwellMs([]);
-              setFixationMs([]);
-            }}
-          />
-
-          {/* ---------------- date filter row ---------------- */}
-          <div
-            style={{
-              background: "#fff",
-              border: `1px solid ${t.lineSoft}`,
-              borderRadius: 14,
-              boxShadow: "0 1px 2px rgba(13,42,92,0.03)",
-              padding: "14px 16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 16,
-              flexWrap: "wrap",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-              <div
-                style={{
-                  fontFamily: "JetBrains Mono, monospace",
-                  fontSize: 10,
-                  color: t.mono,
-                  letterSpacing: "0.14em",
-                  fontWeight: 600,
-                  width: 78,
-                }}
-              >
-                PERIOD
-              </div>
-              <div style={{ display: "flex", gap: 6 }}>
-                {([
-                  { id: "7d",     l: "지난 7일"  },
-                  { id: "30d",    l: "지난 30일" },
-                  { id: "custom", l: "사용자 지정" },
-                ] as const).map((p) => {
-                  const active = activePreset === p.id;
-                  return (
-                    <button
-                      key={p.id}
-                      type="button"
-                      onClick={() => {
-                        if (p.id === "custom") return;
-                        applyPreset(p.id);
-                      }}
-                      style={{
-                        padding: "8px 14px",
-                        borderRadius: 8,
-                        border: active ? "none" : `1px solid ${t.line}`,
-                        background: active ? t.ink : "#fff",
-                        color: active ? "#fff" : t.inkSoft,
-                        fontSize: 12.5,
-                        fontFamily: "inherit",
-                        fontWeight: 600,
-                        cursor: p.id === "custom" ? "default" : "pointer",
-                      }}
-                    >
-                      {p.l}
-                    </button>
-                  );
-                })}
-              </div>
-              <span style={{ width: 1, height: 22, background: t.lineSoft }} />
-              <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
-              {dateLabel && (
-                <span
-                  style={{
-                    fontFamily: "JetBrains Mono, monospace",
-                    fontSize: 11,
-                    color: t.muted,
-                    padding: "6px 10px",
-                    borderRadius: 7,
-                    background: t.bgWarm,
-                    border: `1px solid ${t.lineSoft}`,
-                  }}
-                >
-                  {dateLabel}
-                </span>
-              )}
+              PERIOD
             </div>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ display: "flex", gap: 6 }}>
+              {([
+                { id: "7d", l: "지난 7일" },
+                { id: "30d", l: "지난 30일" },
+                { id: "custom", l: "사용자 지정" },
+              ] as const).map((p) => {
+                const active = activePreset === p.id;
+                return (
+                  <button
+                    key={p.id}
+                    type="button"
+                    onClick={() => {
+                      if (p.id === "custom") return;
+                      applyPreset(p.id);
+                    }}
+                    style={{
+                      padding: "8px 14px",
+                      borderRadius: 8,
+                      border: active ? "none" : `1px solid ${t.line}`,
+                      background: active ? t.ink : "#fff",
+                      color: active ? "#fff" : t.inkSoft,
+                      fontSize: 12.5,
+                      fontFamily: "inherit",
+                      fontWeight: 600,
+                      cursor: p.id === "custom" ? "default" : "pointer",
+                    }}
+                  >
+                    {p.l}
+                  </button>
+                );
+              })}
+            </div>
+            <span style={{ width: 1, height: 22, background: t.lineSoft }} />
+            <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+            {dateLabel && (
               <span
                 style={{
                   fontFamily: "JetBrains Mono, monospace",
                   fontSize: 11,
                   color: t.muted,
-                  padding: "8px 12px",
-                  borderRadius: 8,
+                  padding: "6px 10px",
+                  borderRadius: 7,
                   background: t.bgWarm,
                   border: `1px solid ${t.lineSoft}`,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
                 }}
               >
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: hasRange ? t.green : t.mono }} />
-                {hasRange ? "기간 선택 완료" : "기간을 선택해 주세요"}
+                {dateLabel}
               </span>
-            </div>
+            )}
           </div>
 
-          {/* ---------------- KPI 6 cards ---------------- */}
-          <section
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
-              gap: 12,
-            }}
-          >
-            <SimpleCard
-              title="노출 인구"
-              value={totalExposure.toLocaleString()}
-              subtitle="Impressions · 전체 Track 수"
-              icon={<Users className="w-4 h-4" />}
-              tone="blue"
-            />
-            <SimpleCard
-              title="관심 인구"
-              value={interestedCount.toLocaleString()}
-              subtitle="Interested · 응시 Track 수"
-              icon={<UserCheck className="w-4 h-4" />}
-              tone="green"
-            />
-            <SimpleCard
-              title="포착 관심도"
-              value={`${attentionRateTracks}%`}
-              subtitle="Attention Rate (Tracks)"
-              icon={<Target className="w-4 h-4" />}
-              tone="green"
-            />
-            <SimpleCard
-              title="총 체류 시간"
-              value={`${totalDwellTimeSec.toLocaleString()}초`}
-              subtitle="Total Dwell Time"
-              icon={<Clock className="w-4 h-4" />}
-              tone="violet"
-            />
-            <SimpleCard
-              title="총 시청 시간"
-              value={`${attentionTimeSec.toLocaleString()}초`}
-              subtitle="Total Attention Time · Look Times 합"
-              icon={<Eye className="w-4 h-4" />}
-              tone="amber"
-            />
-            <SimpleCard
-              title="심층 관심도"
-              value={`${attentionRateTimes}%`}
-              subtitle="Attention Rate (Times)"
-              icon={<TrendingUp className="w-4 h-4" />}
-              tone="amber"
-            />
-          </section>
-
-          {/* ---------------- Row 1: Gender / Age / Fixation ---------------- */}
-          <section
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-              gap: 16,
-            }}
-          >
-            <GenderChart data={genderData} />
-            <AgeChart data={ageData} />
-            <FixationHistogram
-              dwellMs={dwellMs}
-              fixationMs={fixationMs}
-              loading={histLoading}
-              hasRange={hasRange}
-            />
-          </section>
-
-          {/* ---------------- Row 2: DailyEffects / Hourly ---------------- */}
-          <section
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: 16,
-            }}
-          >
-            <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
-            <HourlyAudienceChart data={hourlyAudienceData} />
-          </section>
-
-          {/* ---------------- Row 3: DBSCAN / Daily Metrics ---------------- */}
-          <section
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-              gap: 16,
-            }}
-          >
-            <DbscanChart goldenZone={goldenZone} />
-            <DailyMetricsChart
-              data={dailyMetricsData}
-              dateLabel={dateLabel}
-              loading={hasRange && !rangeStats}
-              hasRange={hasRange}
-            />
-          </section>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span
+              style={{
+                fontFamily: "JetBrains Mono, monospace",
+                fontSize: 11,
+                color: t.muted,
+                padding: "8px 12px",
+                borderRadius: 8,
+                background: t.bgWarm,
+                border: `1px solid ${t.lineSoft}`,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
+              }}
+            >
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: hasRange ? t.green : t.mono }} />
+              {hasRange ? "기간 선택 완료" : "기간을 선택해 주세요"}
+            </span>
+          </div>
         </div>
+
+        {/* ---------------- KPI 6 cards ---------------- */}
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(6, minmax(0, 1fr))",
+            gap: 12,
+          }}
+        >
+          <SimpleCard
+            title="노출 인구"
+            value={totalExposure.toLocaleString()}
+            subtitle="Impressions · 전체 Track 수"
+            icon={<Users className="w-4 h-4" />}
+            tone="blue"
+          />
+          <SimpleCard
+            title="관심 인구"
+            value={interestedCount.toLocaleString()}
+            subtitle="Interested · 응시 Track 수"
+            icon={<UserCheck className="w-4 h-4" />}
+            tone="green"
+          />
+          <SimpleCard
+            title="포착 관심도"
+            value={`${attentionRateTracks}%`}
+            subtitle="Attention Rate (Tracks)"
+            icon={<Target className="w-4 h-4" />}
+            tone="green"
+          />
+          <SimpleCard
+            title="총 체류 시간"
+            value={`${totalDwellTimeSec.toLocaleString()}초`}
+            subtitle="Total Dwell Time"
+            icon={<Clock className="w-4 h-4" />}
+            tone="violet"
+          />
+          <SimpleCard
+            title="총 시청 시간"
+            value={`${attentionTimeSec.toLocaleString()}초`}
+            subtitle="Total Attention Time · Look Times 합"
+            icon={<Eye className="w-4 h-4" />}
+            tone="amber"
+          />
+          <SimpleCard
+            title="심층 관심도"
+            value={`${attentionRateTimes}%`}
+            subtitle="Attention Rate (Times)"
+            icon={<TrendingUp className="w-4 h-4" />}
+            tone="amber"
+          />
+        </section>
+
+        {/* ---------------- Row 1: Gender / Age / Fixation ---------------- */}
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gap: 16,
+          }}
+        >
+          <GenderChart data={genderData} />
+          <AgeChart data={ageData} />
+          <FixationHistogram
+            dwellMs={dwellMs}
+            fixationMs={fixationMs}
+            loading={histLoading}
+            hasRange={hasRange}
+          />
+        </section>
+
+        {/* ---------------- Row 2: DailyEffects / Hourly ---------------- */}
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: 16,
+          }}
+        >
+          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
+          <HourlyAudienceChart data={hourlyAudienceData} />
+        </section>
+
+        {/* ---------------- Row 3: DBSCAN / Daily Metrics ---------------- */}
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: 16,
+          }}
+        >
+          <DbscanChart goldenZone={goldenZone} />
+          <DailyMetricsChart
+            data={dailyMetricsData}
+            dateLabel={dateLabel}
+            loading={hasRange && !rangeStats}
+            hasRange={hasRange}
+          />
+        </section>
+      </div>
     </>
   );
 }
