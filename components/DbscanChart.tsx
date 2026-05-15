@@ -1,13 +1,31 @@
 "use client";
 
 import {
-  ScatterChart, Scatter, XAxis, YAxis,
-  Tooltip, ResponsiveContainer, Legend,
+  ScatterChart,
+  Scatter,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Legend,
 } from "recharts";
 import { GoldenZoneResponse } from "@/lib/api";
 
-const CLUSTER_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444"];
-const NOISE_COLOR = "#9CA3AF";
+const C = {
+  ink: "#0A1A35",
+  muted: "#5B6786",
+  mono: "#8893AB",
+  lineSoft: "#E7EAF2",
+  blue: "#1E5BFF",
+  green: "#0FA968",
+  amber: "#E89B2A",
+  violet: "#7C3AED",
+  red: "#D7563D",
+};
+// 클러스터 순서별 색 — OAAS 톤
+const CLUSTER_COLORS = [C.blue, C.green, C.amber, C.violet, C.red];
+const NOISE_COLOR = C.mono;
+
 const SCREEN_W = 1280;
 const SCREEN_H = 720;
 
@@ -31,15 +49,36 @@ export default function DbscanChart({ goldenZone }: Props) {
   const clusters = goldenZone ? toChartClusters(goldenZone) : [];
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="px-6 pt-6 pb-4">
-        <h3 className="text-xs font-semibold text-gray-900 mb-1">
-          화면 주목 영역 분석 (DBSCAN)
+    <div
+      style={{
+        background: "#fff",
+        borderRadius: 14,
+        border: `1px solid ${C.lineSoft}`,
+        boxShadow: "0 1px 2px rgba(13,42,92,0.03)",
+        padding: 20,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <span
+        style={{
+          position: "absolute",
+          left: 0, top: 0, width: "100%", height: 3,
+          background: C.violet,
+          opacity: 0.85,
+        }}
+      />
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.violet, letterSpacing: "0.14em", fontWeight: 700 }}>
+          GOLDEN ZONE · DBSCAN
+        </div>
+        <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
+          화면 주목 영역 분석
         </h3>
-        <p className="text-gray-500" style={{ fontSize: 8 }}>
-          광고 화면 내 시선 집중 클러스터 분포 (X·Y: 화면 내 상대 위치 %)
+        <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
+          광고 화면 내 시선 집중 클러스터 분포 · X·Y는 화면 내 상대 위치(%)
           {goldenZone && (
-            <span className="ml-2 text-gray-400" style={{ fontSize: 8 }}>
+            <span style={{ marginLeft: 6, color: C.mono }}>
               · 클러스터 {goldenZone.dbscan.cluster_count}개
               · 포인트 {goldenZone.point_count.toLocaleString()}개
             </span>
@@ -47,47 +86,65 @@ export default function DbscanChart({ goldenZone }: Props) {
         </p>
       </div>
 
-      <div className="mx-6 mb-6">
-        {!goldenZone ? (
-          <div className="flex items-center justify-center h-[400px] text-gray-400 text-sm">
-            기간을 선택하면 차트가 표시됩니다
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height={400}>
-            <ScatterChart margin={{ top: 30, right: 30, bottom: 10, left: 0 }}>
-              <XAxis
-                type="number" dataKey="x" domain={[0, 100]}
-                name="X 위치" unit="%" stroke="#6b7280"
-                tick={{ fontSize: 8 }} orientation="top"
+      {!goldenZone ? (
+        <div style={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
+          기간을 선택하면 차트가 표시됩니다
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={400}>
+          <ScatterChart margin={{ top: 24, right: 16, bottom: 8, left: 0 }}>
+            <XAxis
+              type="number"
+              dataKey="x"
+              domain={[0, 100]}
+              name="X 위치"
+              unit="%"
+              stroke={C.muted}
+              tick={{ fontSize: 9, fill: C.muted }}
+              orientation="top"
+              axisLine={{ stroke: C.lineSoft }}
+              tickLine={false}
+            />
+            <YAxis
+              type="number"
+              dataKey="y"
+              domain={[0, 100]}
+              name="Y 위치"
+              unit="%"
+              stroke={C.muted}
+              tick={{ fontSize: 9, fill: C.muted }}
+              reversed
+              width={32}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              cursor={{ strokeDasharray: "3 3", stroke: C.lineSoft }}
+              formatter={(value) => `${value}`}
+              contentStyle={{
+                backgroundColor: "#fff",
+                border: `1px solid ${C.lineSoft}`,
+                borderRadius: 8,
+                fontSize: 11,
+                boxShadow: "0 8px 20px -8px rgba(13,42,92,0.18)",
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8, color: C.muted }} iconType="square" />
+            {clusters.map((c) => (
+              <Scatter
+                key={c.name}
+                name={c.name}
+                data={c.data}
+                fill={c.isNoise ? NOISE_COLOR : CLUSTER_COLORS[c.idx % CLUSTER_COLORS.length]}
+                opacity={c.isNoise ? 0.35 : 0.85}
+                shape={(props: { cx?: number; cy?: number; fill?: string; opacity?: number }) => (
+                  <circle cx={props.cx} cy={props.cy} r={2.5} fill={props.fill} opacity={props.opacity} />
+                )}
               />
-              <YAxis
-                type="number" dataKey="y" domain={[0, 100]}
-                name="Y 위치" unit="%" stroke="#6b7280"
-                tick={{ fontSize: 8 }} reversed
-                width={30}
-              />
-              <Tooltip
-                cursor={{ strokeDasharray: "3 3" }}
-                formatter={(value) => `${value}`}
-                contentStyle={{ backgroundColor: "#fff", border: "1px solid #e5e7eb", borderRadius: "8px" }}
-              />
-              <Legend wrapperStyle={{ fontSize: 8 }} />
-              {clusters.map((c) => (
-                <Scatter
-                  key={c.name}
-                  name={c.name}
-                  data={c.data}
-                  fill={c.isNoise ? NOISE_COLOR : CLUSTER_COLORS[c.idx % CLUSTER_COLORS.length]}
-                  opacity={c.isNoise ? 0.4 : 0.85}
-                  shape={(props: { cx?: number; cy?: number; fill?: string; opacity?: number }) => (
-                    <circle cx={props.cx} cy={props.cy} r={2} fill={props.fill} opacity={props.opacity} />
-                  )}
-                />
-              ))}
-            </ScatterChart>
-          </ResponsiveContainer>
-        )}
-      </div>
+            ))}
+          </ScatterChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 }
