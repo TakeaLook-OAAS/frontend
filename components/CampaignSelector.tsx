@@ -44,8 +44,8 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
   const devicesForSelected =
     campaigns.find((c) => c.campaign_id === selected?.campaign_id)?.devs ?? [];
 
-  const campRowRef = useRef<HTMLDivElement | null>(null);
-  const devRowRef = useRef<HTMLDivElement | null>(null);
+  const campRowRef = useRef<HTMLDivElement>(null);
+  const devRowRef = useRef<HTMLDivElement>(null);
 
   function scroll(ref: React.RefObject<HTMLDivElement>, dir: 1 | -1) {
     ref.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
