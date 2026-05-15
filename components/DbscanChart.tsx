@@ -11,118 +11,140 @@ import {
 } from "recharts";
 import { GoldenZoneResponse } from "@/lib/api";
 
-const CLUSTER_COLORS = ["#3B82F6", "#10B981", "#F59E0B", "#8B5CF6", "#EF4444"];
-const NOISE_COLOR = "#9CA3AF";
-
-// ── 골든존 API 응답 → ScatterChart 형식 변환 ───────────────────────────────────
+const C = {
+  ink: "#0A1A35",
+  muted: "#5B6786",
+  mono: "#8893AB",
+  lineSoft: "#E7EAF2",
+  blue: "#1E5BFF",
+  green: "#0FA968",
+  amber: "#E89B2A",
+  violet: "#7C3AED",
+  red: "#D7563D",
+};
+// 클러스터 순서별 색 — OAAS 톤
+const CLUSTER_COLORS = [C.blue, C.green, C.amber, C.violet, C.red];
+const NOISE_COLOR = C.mono;
 
 const SCREEN_W = 1280;
 const SCREEN_H = 720;
 
-function toChartClusters(goldenZone: GoldenZoneResponse) {
-  return goldenZone.clusters.map((cluster, idx) => ({
-    name: cluster.label === -1 ? "노이즈" : `클러스터 ${idx + 1}`,
-    data: (cluster.points ?? []).map(([x, y]: [number, number]) => ({
+function toChartClusters(gz: GoldenZoneResponse) {
+  return gz.clusters.map((c, idx) => ({
+    name: c.label === -1 ? "노이즈" : `클러스터 ${idx + 1}`,
+    data: (c.points ?? []).map(([x, y]: [number, number]) => ({
       x: Math.round((x / SCREEN_W) * 100),
       y: Math.round((y / SCREEN_H) * 100),
     })),
-    isNoise: cluster.label === -1,
+    isNoise: c.label === -1,
+    idx,
   }));
 }
 
-// ── 폴백 목 데이터 ─────────────────────────────────────────────────────────────
+interface Props {
+  goldenZone?: GoldenZoneResponse;
+}
 
-const FALLBACK_CLUSTERS = [
-  {
-    name: "클러스터 1",
-    data: [
-      { x: 42, y: 48 }, { x: 45, y: 50 }, { x: 43, y: 52 }, { x: 47, y: 47 },
-      { x: 40, y: 50 }, { x: 44, y: 53 }, { x: 46, y: 49 }, { x: 41, y: 51 },
-    ],
-    isNoise: false,
-    isMain: true,
-  },
-  {
-    name: "클러스터 2",
-    data: [
-      { x: 75, y: 25 }, { x: 78, y: 23 }, { x: 73, y: 27 }, { x: 76, y: 28 },
-      { x: 74, y: 24 }, { x: 77, y: 26 },
-    ],
-    isNoise: false,
-    isMain: false,
-  },
-  {
-    name: "노이즈",
-    data: [
-      { x: 5, y: 10 }, { x: 90, y: 85 }, { x: 15, y: 60 }, { x: 60, y: 15 },
-    ],
-    isNoise: true,
-    isMain: false,
-  },
-];
-
-// ── 컴포넌트 ──────────────────────────────────────────────────────────────────
-
-export default function DbscanChart({ goldenZone }: { goldenZone?: GoldenZoneResponse }) {
-  const clusters = goldenZone ? toChartClusters(goldenZone) : FALLBACK_CLUSTERS;
+export default function DbscanChart({ goldenZone }: Props) {
+  const clusters = goldenZone ? toChartClusters(goldenZone) : [];
 
   return (
-    <div className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
-      <h3 className="text-lg font-semibold text-gray-900 mb-1">
-        화면 주목 영역 분석 (DBSCAN)
-      </h3>
-      <p className="text-sm text-gray-500 mb-4">
-        광고 화면 내 시선 집중 클러스터 분포 (X·Y: 화면 내 상대 위치 %)
-        {goldenZone && (
-          <span className="ml-2 text-xs text-gray-400">
-            · 클러스터 {goldenZone.dbscan.cluster_count}개 · 포인트 {goldenZone.point_count.toLocaleString()}개
-          </span>
-        )}
-      </p>
+    <div
+      style={{
+        background: "#fff",
+        borderRadius: 14,
+        border: `1px solid ${C.lineSoft}`,
+        boxShadow: "0 1px 2px rgba(13,42,92,0.03)",
+        padding: 20,
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      <span
+        style={{
+          position: "absolute",
+          left: 0, top: 0, width: "100%", height: 3,
+          background: C.violet,
+          opacity: 0.85,
+        }}
+      />
+      <div style={{ marginBottom: 12 }}>
+        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.violet, letterSpacing: "0.14em", fontWeight: 700 }}>
+          GOLDEN ZONE · DBSCAN
+        </div>
+        <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
+          화면 주목 영역 분석
+        </h3>
+        <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
+          광고 화면 내 시선 집중 클러스터 분포 · X·Y는 화면 내 상대 위치(%)
+          {goldenZone && (
+            <span style={{ marginLeft: 6, color: C.mono }}>
+              · 클러스터 {goldenZone.dbscan.cluster_count}개
+              · 포인트 {goldenZone.point_count.toLocaleString()}개
+            </span>
+          )}
+        </p>
+      </div>
 
-      <ResponsiveContainer width="100%" height={400}>
-        <ScatterChart margin={{ top: 30, right: 30, bottom: 10, left: 0 }}>
-          <XAxis
-            type="number"
-            dataKey="x"
-            domain={[0, 100]}
-            name="X 위치"
-            unit="%"
-            stroke="#6b7280"
-            tick={{ fontSize: 12 }}
-            orientation="top"
-          />
-          <YAxis
-            type="number"
-            dataKey="y"
-            domain={[0, 100]}
-            name="Y 위치"
-            unit="%"
-            stroke="#6b7280"
-            tick={{ fontSize: 12 }}
-            reversed
-          />
-          <Tooltip
-            cursor={{ strokeDasharray: "3 3" }}
-            formatter={(value) => `${value}%`}
-            contentStyle={{
-              backgroundColor: "#fff",
-              border: "1px solid #e5e7eb",
-              borderRadius: "8px",
-            }}
-          />
-          <Legend />
-          {clusters.map((cluster, idx) => (
-            <Scatter
-              key={cluster.name}
-              name={cluster.name}
-              data={cluster.data}
-              fill={cluster.isNoise ? NOISE_COLOR : CLUSTER_COLORS[idx % CLUSTER_COLORS.length]}
-              opacity={cluster.isNoise ? 0.4 : 0.85}
+      {!goldenZone ? (
+        <div style={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
+          기간을 선택하면 차트가 표시됩니다
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={400}>
+          <ScatterChart margin={{ top: 24, right: 16, bottom: 8, left: 0 }}>
+            <XAxis
+              type="number"
+              dataKey="x"
+              domain={[0, 100]}
+              name="X 위치"
+              unit="%"
+              stroke={C.muted}
+              tick={{ fontSize: 9, fill: C.muted }}
+              orientation="top"
+              axisLine={{ stroke: C.lineSoft }}
+              tickLine={false}
             />
-          ))}
-        </ScatterChart>
-      </ResponsiveContainer>
+            <YAxis
+              type="number"
+              dataKey="y"
+              domain={[0, 100]}
+              name="Y 위치"
+              unit="%"
+              stroke={C.muted}
+              tick={{ fontSize: 9, fill: C.muted }}
+              reversed
+              width={32}
+              axisLine={false}
+              tickLine={false}
+            />
+            <Tooltip
+              cursor={{ strokeDasharray: "3 3", stroke: C.lineSoft }}
+              formatter={(value) => `${value}`}
+              contentStyle={{
+                backgroundColor: "#fff",
+                border: `1px solid ${C.lineSoft}`,
+                borderRadius: 8,
+                fontSize: 11,
+                boxShadow: "0 8px 20px -8px rgba(13,42,92,0.18)",
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8, color: C.muted }} iconType="square" />
+            {clusters.map((c) => (
+              <Scatter
+                key={c.name}
+                name={c.name}
+                data={c.data}
+                fill={c.isNoise ? NOISE_COLOR : CLUSTER_COLORS[c.idx % CLUSTER_COLORS.length]}
+                opacity={c.isNoise ? 0.35 : 0.85}
+                shape={(props: { cx?: number; cy?: number; fill?: string; opacity?: number }) => (
+                  <circle cx={props.cx} cy={props.cy} r={2.5} fill={props.fill} opacity={props.opacity} />
+                )}
+              />
+            ))}
+          </ScatterChart>
+        </ResponsiveContainer>
+      )}
     </div>
   );
 }

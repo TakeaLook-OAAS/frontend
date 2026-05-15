@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BarChart3, Calendar, LineChart, TrendingUp, LogOut, Shield } from "lucide-react";
+import { BarChart3, Calendar, LogOut, Shield } from "lucide-react";
 import { apiLogout } from "@/lib/api";
 
 export default function Navbar() {
@@ -64,28 +64,6 @@ export default function Navbar() {
               기간별 분석
             </Link>
 
-            <Link
-              href="/analytics_test"
-              className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${isActive("/analytics_test")
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
-                }`}
-            >
-              <LineChart className="w-4 h-4" />
-              지표 트렌드 (테스트)
-            </Link>
-
-            <Link
-              href="/trends"
-              className={`flex items-center gap-2 px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
-                isActive("/trends")
-                  ? "border-blue-600 text-blue-600"
-                  : "border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300"
-              }`}
-            >
-              <TrendingUp className="w-4 h-4" />
-              시계열 분석
-            </Link>
           </div>
           <button
             onClick={handleLogout}
