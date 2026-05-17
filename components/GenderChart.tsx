@@ -5,7 +5,6 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Legend,
   Tooltip,
 } from "recharts";
 
@@ -43,67 +42,76 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
       {!normalized || normalized.every((d) => d.value === 0) ? (
         <EmptyState height={300} />
       ) : (
-        <ResponsiveContainer width="100%" height={300}>
-          <PieChart>
-            <Pie
-              data={normalized}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              label={({
-                name,
-                percent,
-                cx,
-                cy,
-                midAngle,
-                outerRadius,
-              }: {
-                name?: string;
-                percent?: number;
-                cx?: number;
-                cy?: number;
-                midAngle?: number;
-                outerRadius?: number;
-              }) => {
-                const RADIAN = Math.PI / 180;
-                const x =
-                  (cx ?? 0) +
-                  (outerRadius ?? 0) * 0.6 * Math.cos(-(midAngle ?? 0) * RADIAN);
-                const y =
-                  (cy ?? 0) +
-                  (outerRadius ?? 0) * 0.6 * Math.sin(-(midAngle ?? 0) * RADIAN);
-                return (
-                  <text
-                    x={x}
-                    y={y}
-                    textAnchor="middle"
-                    dominantBaseline="central"
-                    fontSize={10}
-                    fontWeight={700}
-                    fill="#fff"
-                  >
-                    {`${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
-                  </text>
-                );
-              }}
-              outerRadius={99}
-              dataKey="value"
-              startAngle={90}
-              endAngle={-270}
-              stroke="#fff"
-              strokeWidth={2}
-            >
-              {normalized.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
-              ))}
-            </Pie>
-            <Tooltip
-              formatter={(value) => `${value}%`}
-              contentStyle={tooltipStyle}
-            />
-            <Legend wrapperStyle={legendStyle} iconType="square" />
-          </PieChart>
-        </ResponsiveContainer>
+        <>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={normalized}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={({
+                  name,
+                  percent,
+                  cx,
+                  cy,
+                  midAngle,
+                  outerRadius,
+                }: {
+                  name?: string;
+                  percent?: number;
+                  cx?: number;
+                  cy?: number;
+                  midAngle?: number;
+                  outerRadius?: number;
+                }) => {
+                  const RADIAN = Math.PI / 180;
+                  const x =
+                    (cx ?? 0) +
+                    (outerRadius ?? 0) * 0.6 * Math.cos(-(midAngle ?? 0) * RADIAN);
+                  const y =
+                    (cy ?? 0) +
+                    (outerRadius ?? 0) * 0.6 * Math.sin(-(midAngle ?? 0) * RADIAN);
+                  return (
+                    <text
+                      x={x}
+                      y={y}
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fontSize={10}
+                      fontWeight={700}
+                      fill="#fff"
+                    >
+                      {`${name}: ${((percent ?? 0) * 100).toFixed(0)}%`}
+                    </text>
+                  );
+                }}
+                outerRadius={99}
+                dataKey="value"
+                startAngle={90}
+                endAngle={-270}
+                stroke="#fff"
+                strokeWidth={2}
+              >
+                {normalized.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip
+                formatter={(value) => `${value}%`}
+                contentStyle={tooltipStyle}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div style={fixedLegendStyle}>
+            {normalized.map((d) => (
+              <span key={d.name} style={legendItemStyle}>
+                <span style={{ ...legendDot, background: d.color }} />
+                {d.name}
+              </span>
+            ))}
+          </div>
+        </>
       )}
     </ChartShell>
   );
@@ -198,8 +206,23 @@ const tooltipStyle: React.CSSProperties = {
   fontSize: 11,
 };
 
-const legendStyle: React.CSSProperties = {
-  fontSize: 10,
+const fixedLegendStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  gap: 16,
   paddingTop: 8,
+  flexWrap: "wrap",
+};
+const legendItemStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  fontSize: 10,
   color: C.muted,
+};
+const legendDot: React.CSSProperties = {
+  display: "inline-block",
+  width: 10,
+  height: 10,
+  borderRadius: 2,
 };

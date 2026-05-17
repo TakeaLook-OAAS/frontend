@@ -114,10 +114,10 @@ export default function HourlyAudienceChart({ data }: Props) {
               </ComposedChart>
             </ResponsiveContainer>
           </div>
-          <div style={{ marginTop: 12, display: "flex", justifyContent: "center", gap: 18, color: C.muted, fontSize: 10 }}>
-            <LegendItem swatchType="bar"  color={C.blue}  label="노출 인구" />
-            <LegendItem swatchType="bar"  color={C.green} label="관심 인구" />
-            <LegendItem swatchType="line" color={C.amber} label="포착 관심도" />
+          <div style={fixedLegendStyle}>
+            <span style={legendItemStyle}><span style={{ ...legendDot, background: C.blue }} />노출 인구</span>
+            <span style={legendItemStyle}><span style={{ ...legendDot, background: C.green }} />관심 인구</span>
+            <span style={legendItemStyle}><span style={{ display: "inline-block", width: 18, height: 2, borderRadius: 1, background: C.amber }} />포착 관심도</span>
           </div>
         </>
       )}
@@ -125,21 +125,26 @@ export default function HourlyAudienceChart({ data }: Props) {
   );
 }
 
-function LegendItem({ color, label, swatchType }: { color: string; label: string; swatchType: "bar" | "line" }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
-      <span
-        style={{
-          width: swatchType === "line" ? 18 : 12,
-          height: swatchType === "line" ? 2 : 12,
-          borderRadius: swatchType === "line" ? 1 : 3,
-          background: color,
-        }}
-      />
-      <span>{label}</span>
-    </div>
-  );
-}
+const fixedLegendStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  gap: 16,
+  paddingTop: 8,
+  flexWrap: "wrap",
+};
+const legendItemStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  fontSize: 10,
+  color: C.muted,
+};
+const legendDot: React.CSSProperties = {
+  display: "inline-block",
+  width: 10,
+  height: 10,
+  borderRadius: 2,
+};
 
 const tooltipStyle: React.CSSProperties = {
   backgroundColor: "#fff",
