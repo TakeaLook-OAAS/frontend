@@ -7,7 +7,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from "recharts";
 
@@ -117,31 +116,36 @@ export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRan
       ) : isEmpty ? (
         <Empty msg="해당 기간에 데이터가 없습니다" />
       ) : (
-        <ResponsiveContainer width="100%" height={288}>
-          <ComposedChart data={bins} margin={{ top: 6, right: 12, left: 0, bottom: 5 }}>
-            <defs>
-              <linearGradient id="dwellGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={C.blue} stopOpacity={0.55} />
-                <stop offset="95%" stopColor={C.blue} stopOpacity={0.04} />
-              </linearGradient>
-              <linearGradient id="fixationGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={C.green} stopOpacity={0.55} />
-                <stop offset="95%" stopColor={C.green} stopOpacity={0.04} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false} />
-            <XAxis dataKey="label" tick={{ fontSize: 9, fill: C.muted }} interval="preserveStartEnd" tickLine={false} axisLine={{ stroke: C.lineSoft }} />
-            <YAxis tick={{ fontSize: 9, fill: C.muted }} width={32} allowDecimals={false} axisLine={false} tickLine={false} />
-            <Tooltip
-              formatter={(value, name) => [`${value}명`, String(name)]}
-              labelFormatter={(label) => `구간: ${label}`}
-              contentStyle={tooltipStyle}
-            />
-            <Legend wrapperStyle={legendStyle} iconType="square" />
-            <Area type="monotone" dataKey="dwell" name="노출 시간 (Dwell)" stroke={C.blue} strokeWidth={2} fill="url(#dwellGrad)" />
-            <Area type="monotone" dataKey="fixation" name="첫 주목 시간 (Fixation)" stroke={C.green} strokeWidth={2} fill="url(#fixationGrad)" />
-          </ComposedChart>
-        </ResponsiveContainer>
+        <>
+          <ResponsiveContainer width="100%" height={288}>
+            <ComposedChart data={bins} margin={{ top: 6, right: 12, left: 0, bottom: 5 }}>
+              <defs>
+                <linearGradient id="dwellGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={C.blue} stopOpacity={0.55} />
+                  <stop offset="95%" stopColor={C.blue} stopOpacity={0.04} />
+                </linearGradient>
+                <linearGradient id="fixationGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={C.green} stopOpacity={0.55} />
+                  <stop offset="95%" stopColor={C.green} stopOpacity={0.04} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false} />
+              <XAxis dataKey="label" tick={{ fontSize: 9, fill: C.muted }} interval="preserveStartEnd" tickLine={false} axisLine={{ stroke: C.lineSoft }} />
+              <YAxis tick={{ fontSize: 9, fill: C.muted }} width={32} allowDecimals={false} axisLine={false} tickLine={false} />
+              <Tooltip
+                formatter={(value, name) => [`${value}명`, String(name)]}
+                labelFormatter={(label) => `구간: ${label}`}
+                contentStyle={tooltipStyle}
+              />
+              <Area type="monotone" dataKey="dwell" name="노출 시간 (Dwell)" stroke={C.blue} strokeWidth={2} fill="url(#dwellGrad)" />
+              <Area type="monotone" dataKey="fixation" name="첫 주목 시간 (Fixation)" stroke={C.green} strokeWidth={2} fill="url(#fixationGrad)" />
+            </ComposedChart>
+          </ResponsiveContainer>
+          <div style={fixedLegendStyle}>
+            <span style={legendItemStyle}><span style={{ ...legendDot, background: C.blue }} />노출 시간 (Dwell)</span>
+            <span style={legendItemStyle}><span style={{ ...legendDot, background: C.green }} />첫 주목 시간 (Fixation)</span>
+          </div>
+        </>
       )}
     </div>
   );
@@ -162,8 +166,23 @@ const tooltipStyle: React.CSSProperties = {
   boxShadow: "0 8px 20px -8px rgba(13,42,92,0.18)",
   fontSize: 11,
 };
-const legendStyle: React.CSSProperties = {
-  fontSize: 10,
+const fixedLegendStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  gap: 16,
   paddingTop: 8,
+  flexWrap: "wrap",
+};
+const legendItemStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  fontSize: 10,
   color: C.muted,
+};
+const legendDot: React.CSSProperties = {
+  display: "inline-block",
+  width: 10,
+  height: 10,
+  borderRadius: 2,
 };

@@ -7,7 +7,6 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  Legend,
 } from "recharts";
 import { GoldenZoneResponse } from "@/lib/api";
 
@@ -91,60 +90,90 @@ export default function DbscanChart({ goldenZone }: Props) {
           기간을 선택하면 차트가 표시됩니다
         </div>
       ) : (
-        <ResponsiveContainer width="100%" height={400}>
-          <ScatterChart margin={{ top: 24, right: 16, bottom: 8, left: 0 }}>
-            <XAxis
-              type="number"
-              dataKey="x"
-              domain={[0, 100]}
-              name="X 위치"
-              unit="%"
-              stroke={C.muted}
-              tick={{ fontSize: 9, fill: C.muted }}
-              orientation="top"
-              axisLine={{ stroke: C.lineSoft }}
-              tickLine={false}
-            />
-            <YAxis
-              type="number"
-              dataKey="y"
-              domain={[0, 100]}
-              name="Y 위치"
-              unit="%"
-              stroke={C.muted}
-              tick={{ fontSize: 9, fill: C.muted }}
-              reversed
-              width={32}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip
-              cursor={{ strokeDasharray: "3 3", stroke: C.lineSoft }}
-              formatter={(value) => `${value}`}
-              contentStyle={{
-                backgroundColor: "#fff",
-                border: `1px solid ${C.lineSoft}`,
-                borderRadius: 8,
-                fontSize: 11,
-                boxShadow: "0 8px 20px -8px rgba(13,42,92,0.18)",
-              }}
-            />
-            <Legend wrapperStyle={{ fontSize: 10, paddingTop: 8, color: C.muted }} iconType="square" />
-            {clusters.map((c) => (
-              <Scatter
-                key={c.name}
-                name={c.name}
-                data={c.data}
-                fill={c.isNoise ? NOISE_COLOR : CLUSTER_COLORS[c.idx % CLUSTER_COLORS.length]}
-                opacity={c.isNoise ? 0.35 : 0.85}
-                shape={(props: { cx?: number; cy?: number; fill?: string; opacity?: number }) => (
-                  <circle cx={props.cx} cy={props.cy} r={2.5} fill={props.fill} opacity={props.opacity} />
-                )}
+        <>
+          <ResponsiveContainer width="100%" height={400}>
+            <ScatterChart margin={{ top: 24, right: 16, bottom: 8, left: 0 }}>
+              <XAxis
+                type="number"
+                dataKey="x"
+                domain={[0, 100]}
+                name="X 위치"
+                unit="%"
+                stroke={C.muted}
+                tick={{ fontSize: 9, fill: C.muted }}
+                orientation="top"
+                axisLine={{ stroke: C.lineSoft }}
+                tickLine={false}
               />
+              <YAxis
+                type="number"
+                dataKey="y"
+                domain={[0, 100]}
+                name="Y 위치"
+                unit="%"
+                stroke={C.muted}
+                tick={{ fontSize: 9, fill: C.muted }}
+                reversed
+                width={32}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                cursor={{ strokeDasharray: "3 3", stroke: C.lineSoft }}
+                formatter={(value) => `${value}`}
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  border: `1px solid ${C.lineSoft}`,
+                  borderRadius: 8,
+                  fontSize: 11,
+                  boxShadow: "0 8px 20px -8px rgba(13,42,92,0.18)",
+                }}
+              />
+              {clusters.map((c) => (
+                <Scatter
+                  key={c.name}
+                  name={c.name}
+                  data={c.data}
+                  fill={c.isNoise ? NOISE_COLOR : CLUSTER_COLORS[c.idx % CLUSTER_COLORS.length]}
+                  opacity={c.isNoise ? 0.35 : 0.85}
+                  shape={(props: { cx?: number; cy?: number; fill?: string; opacity?: number }) => (
+                    <circle cx={props.cx} cy={props.cy} r={2.5} fill={props.fill} opacity={props.opacity} />
+                  )}
+                />
+              ))}
+            </ScatterChart>
+          </ResponsiveContainer>
+          <div style={fixedLegendStyle}>
+            {clusters.map((c) => (
+              <span key={c.name} style={legendItemStyle}>
+                <span style={{ ...legendDot, background: c.isNoise ? NOISE_COLOR : CLUSTER_COLORS[c.idx % CLUSTER_COLORS.length], opacity: c.isNoise ? 0.35 : 0.85 }} />
+                {c.name}
+              </span>
             ))}
-          </ScatterChart>
-        </ResponsiveContainer>
+          </div>
+        </>
       )}
     </div>
   );
 }
+
+const fixedLegendStyle: React.CSSProperties = {
+  display: "flex",
+  justifyContent: "center",
+  gap: 16,
+  paddingTop: 8,
+  flexWrap: "wrap",
+};
+const legendItemStyle: React.CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  fontSize: 10,
+  color: C.muted,
+};
+const legendDot: React.CSSProperties = {
+  display: "inline-block",
+  width: 10,
+  height: 10,
+  borderRadius: 2,
+};
