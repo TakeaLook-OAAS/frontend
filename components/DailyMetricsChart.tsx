@@ -42,7 +42,7 @@ export default function DailyMetricsChart({ data, dateLabel, loading, hasRange }
   const timesDomain: [number, number] = [0, parseFloat((maxTimes * 1.5).toFixed(0))];
 
   const empty = (
-    <div style={{ height: 280, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
+    <div style={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
       {loading ? "불러오는 중..." : "기간을 선택하면 차트가 표시됩니다"}
     </div>
   );
@@ -80,8 +80,8 @@ export default function DailyMetricsChart({ data, dateLabel, loading, hasRange }
       </div>
 
       {loading || !hasRange ? empty : (
-        <ResponsiveContainer width="100%" height={280}>
-          <ComposedChart data={data} margin={{ top: 6, right: 36, left: 0, bottom: 0 }}>
+        <ResponsiveContainer width="100%" height={400}>
+          <ComposedChart data={data} margin={{ top: 6, right: 4, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="exposureGrad" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={C.blue} stopOpacity={0.55} />

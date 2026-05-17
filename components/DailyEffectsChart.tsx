@@ -84,7 +84,7 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
         </div>
 
         {loading || !hasRange ? empty(260) : (
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={200}>
             <ComposedChart data={data} margin={{ top: 6, right: 36, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="attentionGrad" x1="0" y1="0" x2="0" y2="1">
@@ -131,7 +131,7 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
         </div>
 
         {loading || !hasRange ? empty(220) : (
-          <ResponsiveContainer width="100%" height={220}>
+          <ResponsiveContainer width="100%" height={150}>
             <ComposedChart data={data} margin={{ top: 6, right: 36, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="viewabilityGrad" x1="0" y1="0" x2="0" y2="1">
@@ -142,6 +142,7 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
               <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false} />
               <XAxis dataKey="date" tick={{ fontSize: 9, fill: C.muted }} tickFormatter={(v) => v.slice(5)} tickLine={false} axisLine={{ stroke: C.lineSoft }} />
               <YAxis tick={{ fontSize: 9, fill: C.muted }} tickFormatter={(v) => `${v}`} width={32} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="ghost" orientation="right" width={32} tick={false} axisLine={false} tickLine={false} />
               <Tooltip
                 contentStyle={tooltipStyle}
                 formatter={(value) => [`${value}`, "시청 효율"]}

@@ -35,14 +35,22 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
 
   useEffect(() => {
     setEmail(localStorage.getItem("user_email") ?? "");
+    setCollapsed(localStorage.getItem("sidebar_collapsed") === "true");
   }, []);
 
+  function toggleCollapsed() {
+    setCollapsed(c => {
+      localStorage.setItem("sidebar_collapsed", String(!c));
+      return !c;
+    });
+  }
+
   const items: { id: NavKind; label: string; icon: NavKind; href: string }[] = [
-    { id: "home",  label: "메인 페이지",  icon: "home",  href: "/main"      },
-    { id: "dash",  label: "대시보드",     icon: "dash",  href: "/dashboard" },
-    { id: "ads",   label: "내 광고 관리", icon: "ads",   href: "#"          },
-    { id: "guide", label: "이용 방법",    icon: "guide", href: "#"          },
-    { id: "patch", label: "패치 노트",    icon: "patch", href: "#"          },
+    { id: "home", label: "메인 페이지", icon: "home", href: "/main" },
+    { id: "dash", label: "대시보드", icon: "dash", href: "/dashboard" },
+    { id: "ads", label: "내 광고 관리", icon: "ads", href: "/analytics" },
+    { id: "guide", label: "이용 방법", icon: "guide", href: "/guide" },
+    { id: "patch", label: "패치 노트", icon: "patch", href: "/changelog" },
   ];
 
   return (
@@ -60,9 +68,11 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
       {/* logo + toggle */}
       <div style={{
         padding: "22px 16px 18px",
-        display: "flex", alignItems: "center",
+        display: "flex",
+        flexDirection: collapsed ? "column" : "row",
+        alignItems: "center",
         justifyContent: collapsed ? "center" : "space-between",
-        gap: 8,
+        gap: collapsed ? 10 : 8,
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
           <div style={{
@@ -80,7 +90,7 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
           )}
         </div>
         <button
-          onClick={() => setCollapsed(c => !c)}
+          onClick={toggleCollapsed}
           style={{
             background: "rgba(255,255,255,0.06)", border: "none", borderRadius: 7,
             width: 28, height: 28, display: "flex", alignItems: "center", justifyContent: "center",
@@ -104,7 +114,7 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>FC</div>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-0.01em" }}>공석</div>
+            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-0.01em" }}>aaaaaaaaaaaa</div>
             <div style={{ fontSize: 11, color: "#A8B4C9", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{email}</div>
           </div>
         </div>
@@ -163,31 +173,61 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
         })}
       </nav>
 
-      <div style={{ flex: 1 }} />
+      <div style={{ flex: 1, minHeight: 24 }} />
 
       {/* help card */}
       {!collapsed && (
-        <div style={{ margin: 16, padding: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, position: "relative", overflow: "hidden" }}>
+        <div style={{ margin: "0 16px", padding: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", right: -30, top: -30, width: 80, height: 80, borderRadius: "50%", background: t.blue, opacity: 0.25, filter: "blur(28px)" }} />
           <div style={{ position: "relative", fontFamily: "JetBrains Mono, monospace", fontSize: 9.5, color: t.blueLight, letterSpacing: "0.14em" }}>NEED HELP?</div>
           <div style={{ position: "relative", fontSize: 13, fontWeight: 700, marginTop: 6, lineHeight: 1.35 }}>
-            OAAS 사용법이<br />궁금하신가요?
+            궁금하신 점이 있으신가요?
           </div>
-          <button style={{
-            marginTop: 12, width: "100%", padding: "9px 12px", borderRadius: 8,
-            background: "#fff", color: t.ink, border: "none",
+          <a href="/faq" style={{
+            display: "block", marginTop: 12, width: "100%", padding: "9px 12px", borderRadius: 8,
+            background: "#fff", color: t.ink, border: "none", textDecoration: "none", textAlign: "center",
             fontFamily: "inherit", fontSize: 12, fontWeight: 700, cursor: "pointer",
-            letterSpacing: "-0.005em",
-          }}>이용 방법 보기 →</button>
+            letterSpacing: "-0.005em", boxSizing: "border-box",
+          }}>FAQ 보기 →</a>
         </div>
       )}
+
+      {/* logout */}
+      <div style={{ padding: collapsed ? "12px 8px 20px" : "12px 16px 20px" }}>
+        <button
+          onClick={() => {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("user_email");
+            localStorage.removeItem("user_role");
+            window.location.href = "/";
+          }}
+          style={{
+            width: "100%", padding: collapsed ? "10px 0" : "10px 14px",
+            borderRadius: 9, border: "1px solid rgba(255,255,255,0.1)",
+            background: "rgba(255,255,255,0.05)", color: "#B6C0D5",
+            fontFamily: "inherit", fontSize: 13, fontWeight: 600,
+            cursor: "pointer", display: "flex", alignItems: "center",
+            justifyContent: collapsed ? "center" : "flex-start", gap: 10,
+          }}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          {!collapsed && "로그아웃"}
+        </button>
+      </div>
     </aside>
   );
 }
 
 const PATH_TO_NAV: Record<string, NavKind> = {
-  "/main":      "home",
+  "/main": "home",
   "/dashboard": "dash",
+  "/analytics": "ads",
+  "/guide": "guide",
+  "/changelog": "patch",
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
