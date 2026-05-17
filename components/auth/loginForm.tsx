@@ -29,7 +29,7 @@ export function LoginForm() {
       const me = await apiGetMe(token)
       localStorage.setItem("user_role", me.role)
       localStorage.setItem("user_email", me.email)
-      router.push("/dashboard")
+      router.push("/main")
     } catch (err) {
       setError(err instanceof Error ? err.message : "로그인 실패")
     } finally {

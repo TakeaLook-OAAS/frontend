@@ -168,8 +168,11 @@ export interface CampaignListResponse {
   total:   number;
 }
 
-export async function getCampaigns(): Promise<CampaignListResponse> {
-  const res = await fetch(`${BASE}/campaigns/`, { cache: "no-store" });
+export async function getCampaigns(token?: string): Promise<CampaignListResponse> {
+  const res = await fetch(`${BASE}/campaigns/`, {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!res.ok) throw new Error(`/campaigns/ 오류: ${res.status}`);
   return res.json();
 }

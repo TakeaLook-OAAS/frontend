@@ -70,7 +70,7 @@ export default function DbscanChart({ goldenZone }: Props) {
       />
       <div style={{ marginBottom: 12 }}>
         <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.violet, letterSpacing: "0.14em", fontWeight: 700 }}>
-          GOLDEN ZONE · DBSCAN
+          DBSCAN
         </div>
         <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
           화면 주목 영역 분석

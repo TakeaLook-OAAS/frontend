@@ -459,14 +459,14 @@ export default function AnalyticsPage() {
           <SimpleCard
             title="노출 인구"
             value={totalExposure.toLocaleString()}
-            subtitle="Impressions · 전체 Track 수"
+            subtitle="Impressions"
             icon={<Users className="w-4 h-4" />}
             tone="blue"
           />
           <SimpleCard
             title="관심 인구"
             value={interestedCount.toLocaleString()}
-            subtitle="Interested · 응시 Track 수"
+            subtitle="Interested"
             icon={<UserCheck className="w-4 h-4" />}
             tone="green"
           />
@@ -487,7 +487,7 @@ export default function AnalyticsPage() {
           <SimpleCard
             title="총 시청 시간"
             value={`${attentionTimeSec.toLocaleString()}초`}
-            subtitle="Total Attention Time · Look Times 합"
+            subtitle="Total Attention Time"
             icon={<Eye className="w-4 h-4" />}
             tone="amber"
           />
@@ -526,8 +526,13 @@ export default function AnalyticsPage() {
             gap: 16,
           }}
         >
-          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
           <HourlyAudienceChart data={hourlyAudienceData} />
+          <DailyMetricsChart
+            data={dailyMetricsData}
+            dateLabel={dateLabel}
+            loading={hasRange && !rangeStats}
+            hasRange={hasRange}
+          />
         </section>
 
         {/* ---------------- Row 3: DBSCAN / Daily Metrics ---------------- */}
@@ -538,13 +543,8 @@ export default function AnalyticsPage() {
             gap: 16,
           }}
         >
+          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
           <DbscanChart goldenZone={goldenZone} />
-          <DailyMetricsChart
-            data={dailyMetricsData}
-            dateLabel={dateLabel}
-            loading={hasRange && !rangeStats}
-            hasRange={hasRange}
-          />
         </section>
       </div>
     </>
