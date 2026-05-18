@@ -27,8 +27,6 @@ import {
   RangeStatsResponse,
 } from "@/lib/api";
 
-const MAX_DAYS = 15;
-
 /* ---------- design tokens (synced with main page) ---------- */
 const t = {
   bg: "#F4F6FB", bgWarm: "#F9FAFD",
@@ -53,7 +51,6 @@ export default function AnalyticsPage() {
   const [rangeStats, setRangeStats] = useState<RangeStatsResponse | null>(null);
   const [advChartData, setAdvChartData] = useState<DayPoint[]>([]);
   const [perDayLoading, setPerDayLoading] = useState(false);
-  const [truncated, setTruncated] = useState(false);
   const [dwellMs, setDwellMs] = useState<number[]>([]);
   const [fixationMs, setFixationMs] = useState<number[]>([]);
   const [histLoading, setHistLoading] = useState(false);
@@ -96,16 +93,12 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (!startDate || !campaignId || !deviceId) {
       setAdvChartData([]);
-      setTruncated(false);
       return;
     }
 
     let days = eachDayOfInterval({ start: parseISO(startDate), end: parseISO(endDate!) })
       .map((d) => format(d, "yyyy-MM-dd"));
 
-    const wasTruncated = days.length > MAX_DAYS;
-    if (wasTruncated) days = days.slice(days.length - MAX_DAYS);
-    setTruncated(wasTruncated);
     setPerDayLoading(true);
 
     Promise.all(
@@ -209,7 +202,6 @@ export default function AnalyticsPage() {
     if (!startDate) return [];
     let days = eachDayOfInterval({ start: parseISO(startDate), end: parseISO(endDate!) })
       .map((d) => format(d, "yyyy-MM-dd"));
-    if (days.length > MAX_DAYS) days = days.slice(days.length - MAX_DAYS);
     return days.map((day) => {
       const expSec = parseFloat((exposureMsPerDay[day] ?? 0).toFixed(1));
       const lookSec = parseFloat((lookMsPerDay[day] ?? 0).toFixed(1));
@@ -297,16 +289,6 @@ export default function AnalyticsPage() {
           </div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {truncated && (
-            <div style={{
-              fontFamily: "JetBrains Mono, monospace", fontSize: 11,
-              color: "#7A4B12", background: "#FCEDD0",
-              padding: "6px 10px", borderRadius: 8, border: "1px solid #F3D9A4",
-              letterSpacing: "0.04em", fontWeight: 600,
-            }}>
-              ⚠ 15일 초과 — 마지막 15일만 표시됩니다
-            </div>
-          )}
           <button
             onClick={handleDownload}
             disabled={!campaignId || !startDate}
@@ -459,14 +441,14 @@ export default function AnalyticsPage() {
           <SimpleCard
             title="노출 인구"
             value={totalExposure.toLocaleString()}
-            subtitle="Impressions · 전체 Track 수"
+            subtitle="Impressions"
             icon={<Users className="w-4 h-4" />}
             tone="blue"
           />
           <SimpleCard
             title="관심 인구"
             value={interestedCount.toLocaleString()}
-            subtitle="Interested · 응시 Track 수"
+            subtitle="Interested"
             icon={<UserCheck className="w-4 h-4" />}
             tone="green"
           />
@@ -487,7 +469,7 @@ export default function AnalyticsPage() {
           <SimpleCard
             title="총 시청 시간"
             value={`${attentionTimeSec.toLocaleString()}초`}
-            subtitle="Total Attention Time · Look Times 합"
+            subtitle="Total Attention Time"
             icon={<Eye className="w-4 h-4" />}
             tone="amber"
           />
@@ -526,8 +508,13 @@ export default function AnalyticsPage() {
             gap: 16,
           }}
         >
-          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
           <HourlyAudienceChart data={hourlyAudienceData} />
+          <DailyMetricsChart
+            data={dailyMetricsData}
+            dateLabel={dateLabel}
+            loading={hasRange && !rangeStats}
+            hasRange={hasRange}
+          />
         </section>
 
         {/* ---------------- Row 3: DBSCAN / Daily Metrics ---------------- */}
@@ -538,13 +525,8 @@ export default function AnalyticsPage() {
             gap: 16,
           }}
         >
+          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
           <DbscanChart goldenZone={goldenZone} />
-          <DailyMetricsChart
-            data={dailyMetricsData}
-            dateLabel={dateLabel}
-            loading={hasRange && !rangeStats}
-            hasRange={hasRange}
-          />
         </section>
       </div>
     </>

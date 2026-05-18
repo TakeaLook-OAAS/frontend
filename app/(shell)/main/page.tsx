@@ -52,7 +52,7 @@ type Campaign = {
 
 function mapCampaignStatus(s: string): CampaignStatus {
   if (s === "RUNNING") return "live";
-  if (s === "ENDED")   return "ended";
+  if (s === "ENDED") return "ended";
   return "scheduled";
 }
 
@@ -63,17 +63,17 @@ function mapDeviceStatus(s: string): DeviceStatus {
 
 function fromApi(item: CampaignItem): Campaign {
   return {
-    id:    item.id,
+    id: item.id,
     title: item.name,
     brand: "",
     status: mapCampaignStatus(item.status),
     devices: item.devices.length,
     devicesList: item.devices.map(d => ({
-      id:     d.id,
-      name:   d.name,
-      type:   "--",
+      id: d.id,
+      name: d.name,
+      type: "--",
       status: mapDeviceStatus(d.status),
-      sync:   "--",
+      sync: "--",
     })),
   };
 }
@@ -112,7 +112,7 @@ function Eyebrow({ children, light = false }: { children: React.ReactNode; light
 /* ---------------------------------------------------------------- */
 /* header                                                             */
 /* ---------------------------------------------------------------- */
-function TopHeader({ campaigns }: { campaigns: Campaign[] }) {
+function TopHeader({ campaigns, userEmail, onRefresh, onNewCampaign }: { campaigns: Campaign[]; userEmail: string; onRefresh: () => void; onNewCampaign: () => void }) {
   const liveCount = campaigns.filter(c => c.status === "live").length;
   const liveDevices = campaigns.filter(c => c.status === "live").reduce((a, c) => a + c.devices, 0);
   return (
@@ -128,7 +128,7 @@ function TopHeader({ campaigns }: { campaigns: Campaign[] }) {
           <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>OVERVIEW</span>
         </div>
         <h1 style={{ margin: "6px 0 0", fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", color: t.ink }}>
-          안녕하세요, <span style={{ color: t.blue }}>aaaaaaaaaaaa</span> 님
+          안녕하세요, <span style={{ color: t.blue }}>{userEmail || ""}</span>{userEmail ? " 님" : ""}
         </h1>
         <div style={{ fontSize: 13, color: t.muted, marginTop: 6 }}>
           현재 <strong style={{ color: t.ink, fontWeight: 700 }}>{liveCount}개</strong>의 캠페인이 진행 중이고,{" "}
@@ -136,11 +136,7 @@ function TopHeader({ campaigns }: { campaigns: Campaign[] }) {
         </div>
       </div>
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 11, color: t.muted, padding: "8px 12px", borderRadius: 8, background: "#fff", border: `1px solid ${t.line}`, display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: t.green }} />
-          LAST SYNC · 2분 전
-        </div>
-        <button style={{
+        <button onClick={onRefresh} style={{
           padding: "9px 16px", borderRadius: 9, border: `1px solid ${t.line}`,
           background: "#fff", color: t.ink, fontWeight: 600, fontFamily: "inherit",
           fontSize: 13, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 7,
@@ -153,7 +149,7 @@ function TopHeader({ campaigns }: { campaigns: Campaign[] }) {
           background: t.ink, color: "#fff", fontWeight: 700, fontFamily: "inherit",
           fontSize: 13, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 7,
           boxShadow: "0 1px 2px rgba(13,42,92,0.1), 0 8px 18px -8px rgba(13,42,92,0.4)",
-        }}>
+        }} onClick={onNewCampaign}>
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 5v14M5 12h14" /></svg>
           새 캠페인 신청
         </button>
@@ -438,10 +434,10 @@ function CampaignsSection({ campaigns }: { campaigns: Campaign[] }) {
   }, [filter, campaigns]);
 
   const tabs: { id: "all" | CampaignStatus; l: string; n: number }[] = [
-    { id: "all",       l: "전체",   n: campaigns.length },
-    { id: "live",      l: "진행 중", n: campaigns.filter(c => c.status === "live").length },
-    { id: "scheduled", l: "예정",   n: campaigns.filter(c => c.status === "scheduled").length },
-    { id: "ended",     l: "종료",   n: campaigns.filter(c => c.status === "ended").length },
+    { id: "all", l: "전체", n: campaigns.length },
+    { id: "live", l: "진행 중", n: campaigns.filter(c => c.status === "live").length },
+    { id: "scheduled", l: "예정", n: campaigns.filter(c => c.status === "scheduled").length },
+    { id: "ended", l: "종료", n: campaigns.filter(c => c.status === "ended").length },
   ];
 
   return (
@@ -513,18 +509,56 @@ function CampaignsSection({ campaigns }: { campaigns: Campaign[] }) {
 /* ---------------------------------------------------------------- */
 /* page                                                               */
 /* ---------------------------------------------------------------- */
+function NewCampaignModal({ onClose }: { onClose: () => void }) {
+  return (
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 100,
+      background: "rgba(10,26,53,0.45)", backdropFilter: "blur(4px)",
+      display: "flex", alignItems: "center", justifyContent: "center",
+    }} onClick={onClose}>
+      <div style={{
+        width: 640, minHeight: 400, background: "#fff",
+        borderRadius: 18, boxShadow: "0 24px 60px -12px rgba(10,26,53,0.35)",
+        display: "flex", flexDirection: "column",
+        position: "relative",
+      }} onClick={e => e.stopPropagation()}>
+        <div style={{ flex: 1 }} />
+        <div style={{ padding: "20px 24px", display: "flex", justifyContent: "flex-end", borderTop: `1px solid ${t.lineSoft}` }}>
+          <button onClick={onClose} style={{
+            padding: "9px 20px", borderRadius: 9,
+            border: `1px solid ${t.line}`, background: "#fff",
+            color: t.ink, fontWeight: 600, fontFamily: "inherit",
+            fontSize: 13, cursor: "pointer",
+          }}>
+            닫기
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function MainPage() {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [userEmail, setUserEmail] = useState("");
+  const [showModal, setShowModal] = useState(false);
+
+  function fetchCampaigns() {
+    const token = localStorage.getItem("access_token") ?? undefined;
+    getCampaigns(token)
+      .then(res => setCampaigns(res.results.map(fromApi)))
+      .catch(() => { });
+  }
 
   useEffect(() => {
-    getCampaigns()
-      .then(res => setCampaigns(res.results.map(fromApi)))
-      .catch(() => {});
+    setUserEmail(localStorage.getItem("user_email") ?? "");
+    fetchCampaigns();
   }, []);
 
   return (
     <>
-      <TopHeader campaigns={campaigns} />
+      {showModal && <NewCampaignModal onClose={() => setShowModal(false)} />}
+      <TopHeader campaigns={campaigns} userEmail={userEmail} onRefresh={fetchCampaigns} onNewCampaign={() => setShowModal(true)} />
       <div style={{ padding: "26px 36px 60px", display: "flex", flexDirection: "column", gap: 22 }}>
         <CampaignsSection campaigns={campaigns} />
         <MapCard />

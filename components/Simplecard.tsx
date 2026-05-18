@@ -58,12 +58,10 @@ export default function SimpleCard({
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         <div
           style={{
-            fontFamily: "JetBrains Mono, monospace",
-            fontSize: 10,
-            color: "#8893AB",
-            letterSpacing: "0.12em",
-            textTransform: "uppercase",
-            fontWeight: 600,
+            fontSize: 14,
+            color: "#0A1A35",
+            letterSpacing: "-0.015em",
+            fontWeight: 700,
             overflow: "hidden",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
