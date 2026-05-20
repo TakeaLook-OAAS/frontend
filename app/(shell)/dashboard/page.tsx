@@ -41,9 +41,7 @@ const t = {
 };
 
 export default function AnalyticsPage() {
-  /* ------------------------------------------------------------------ */
-  /* 기존 로직 (state + useEffect) — 손대지 않음                          */
-  /* ------------------------------------------------------------------ */
+  const [token, setToken] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [goldenZone, setGoldenZone] = useState<GoldenZoneResponse | undefined>();
   const [options, setOptions] = useState<AggResult[]>([]);
@@ -66,7 +64,9 @@ export default function AnalyticsPage() {
   const dateLabel = startDate === endDate ? startDate : startDate && endDate ? `${startDate} ~ ${endDate}` : undefined;
 
   useEffect(() => {
-    getCampaignAggs()
+    const t = localStorage.getItem("access_token") ?? "";
+    setToken(t);
+    getCampaignAggs(undefined, t)
       .then(({ results }) => {
         setOptions(results);
         if (results.length > 0) setSelected(results[0]);
@@ -81,14 +81,14 @@ export default function AnalyticsPage() {
       return;
     }
     if (campaignId && deviceId) {
-      getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId })
+      getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId }, token)
         .then(setRangeStats)
         .catch(() => setRangeStats(null));
-      getGoldenZone(campaignId, deviceId, startDate, endDate)
+      getGoldenZone(campaignId, deviceId, startDate, endDate, token)
         .then(setGoldenZone)
         .catch(() => setGoldenZone(undefined));
     }
-  }, [startDate, endDate, hasRange, campaignId, deviceId]);
+  }, [startDate, endDate, hasRange, campaignId, deviceId, token]);
 
   useEffect(() => {
     if (!startDate || !campaignId || !deviceId) {
@@ -103,7 +103,7 @@ export default function AnalyticsPage() {
 
     Promise.all(
       days.map((day) =>
-        getRangeStats({ start_date: day, end_date: day, device_id: deviceId, campaign_id: campaignId })
+        getRangeStats({ start_date: day, end_date: day, device_id: deviceId, campaign_id: campaignId }, token)
           .then((res) => ({
             date: day,
             avg_attention_time: res.exposure_count > 0 ? parseFloat((res.avg_attention_time_ms / 1000).toFixed(2)) : null,
@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
         setAdvChartData(results.map(r => ({ date: r.date, avg_attention_time: r.avg_attention_time, attention_rate_tracks: r.attention_rate_tracks, viewability_score: r.viewability_score })));
       })
       .finally(() => setPerDayLoading(false));
-  }, [startDate, endDate, campaignId, deviceId]);
+  }, [startDate, endDate, campaignId, deviceId, token]);
 
   useEffect(() => {
     if (!startDate || !campaignId || !deviceId) {
@@ -133,7 +133,7 @@ export default function AnalyticsPage() {
       return;
     }
     setHistLoading(true);
-    getEvents({ campaign_id: campaignId, device_id: deviceId, limit: 1000 })
+    getEvents({ campaign_id: campaignId, device_id: deviceId, limit: 1000 }, token)
       .then(({ events }) => {
         const filtered = events.filter((e) => {
           const kstDate = new Date(new Date(e.ts).getTime() + 9 * 3600 * 1000)
@@ -162,7 +162,7 @@ export default function AnalyticsPage() {
       })
       .catch(() => { setDwellMs([]); setFixationMs([]); setExposureMsPerDay({}); setLookMsPerDay({}); })
       .finally(() => setHistLoading(false));
-  }, [startDate, endDate, campaignId, deviceId]);
+  }, [startDate, endDate, campaignId, deviceId, token]);
 
   /* ------------------------------------------------------------------ */
   /* 파생값                                                              */
