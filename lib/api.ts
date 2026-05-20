@@ -107,13 +107,16 @@ export async function getRangeStats(params: {
   end_date: string;
   device_id: string;
   campaign_id: string;
-}): Promise<RangeStatsResponse> {
+}, token?: string): Promise<RangeStatsResponse> {
   const url = new URL(`${BASE}/stats/range/`);
   url.searchParams.set("start_date", params.start_date);
   url.searchParams.set("end_date",   params.end_date);
   url.searchParams.set("device_id",   params.device_id);
   url.searchParams.set("campaign_id", params.campaign_id);
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!res.ok) throw new Error(`/stats/range/ 오류: ${res.status}`);
   return res.json();
 }
@@ -121,11 +124,14 @@ export async function getRangeStats(params: {
 export async function getCampaignAggs(params?: {
   device_id?: string;
   campaign_id?: string;
-}): Promise<CampaignAggListResponse> {
+}, token?: string): Promise<CampaignAggListResponse> {
   const url = new URL(`${BASE}/stats/campaign/`);
   if (params?.device_id)   url.searchParams.set("device_id",   params.device_id);
   if (params?.campaign_id) url.searchParams.set("campaign_id", params.campaign_id);
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!res.ok) throw new Error(`/stats/campaign/ 오류: ${res.status}`);
   return res.json();
 }
@@ -135,13 +141,17 @@ export async function getGoldenZone(
   device_id: string,
   start_date?: string,
   end_date?: string,
+  token?: string,
 ): Promise<GoldenZoneResponse> {
   const url = new URL(`${BASE}/stats/golden-zone/`);
   url.searchParams.set("campaign_id", campaign_id);
   url.searchParams.set("device_id", device_id);
   if (start_date) url.searchParams.set("start_date", start_date);
   if (end_date)   url.searchParams.set("end_date",   end_date);
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!res.ok) throw new Error(`/stats/golden-zone/ 오류: ${res.status}`);
   return res.json();
 }
@@ -293,12 +303,15 @@ export async function getEvents(params: {
   device_id?: string;
   campaign_id?: string;
   limit?: number;
-}): Promise<EventListResponse> {
+}, token?: string): Promise<EventListResponse> {
   const url = new URL(`${BASE}/events/`);
   if (params.device_id)   url.searchParams.set("device_id",   params.device_id);
   if (params.campaign_id) url.searchParams.set("campaign_id", params.campaign_id);
   url.searchParams.set("limit", String(params.limit ?? 1000));
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!res.ok) throw new Error(`/events/ 오류: ${res.status}`);
   return res.json();
 }
