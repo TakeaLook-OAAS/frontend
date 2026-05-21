@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { submitApplication, type ApplicationCreateBody } from "@/lib/api";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
@@ -105,12 +106,6 @@ const OutdoorIcon = () => (
 const CaretIcon = () => (
   <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
     <path d="M4 6.5l4 3.5 4-3.5" />
-  </svg>
-);
-
-const CheckIcon = () => (
-  <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M3.5 8.5l3 3 6-7" />
   </svg>
 );
 
@@ -234,7 +229,7 @@ function SelectInput({ value, onChange, options, placeholder }: {
   );
 }
 
-function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: ReactNode }) {
+function Chip({ active, onClick, children, className = "" }: { active: boolean; onClick: () => void; children: ReactNode; className?: string }) {
   return (
     <button
       type="button"
@@ -243,7 +238,7 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
         active
           ? "bg-[#0c1424] border-[#0c1424] text-white font-semibold"
           : "bg-white border-[#d7dce5] text-[#475066] font-medium hover:border-[#8a93a6] hover:text-[#0c1424]"
-      }`}
+      } ${className}`}
     >
       {children}
     </button>
@@ -416,8 +411,7 @@ function SectionMediaTarget({ data, set }: { data: FormData; set: SetFn }) {
     set("slotConfigs", data.slotConfigs.filter((_, k) => k !== i));
   }
   function toggleAge(a: string) {
-    const has = data.ages.includes(a);
-    set("ages", has ? data.ages.filter(x => x !== a) : [...data.ages, a]);
+    set("ages", data.ages[0] === a ? [] : [a]);
   }
 
   return (
@@ -484,14 +478,14 @@ function SectionMediaTarget({ data, set }: { data: FormData; set: SetFn }) {
                     style={{ height: 38 }}
                     value={a.addr}
                     onChange={e => setAddr(i, "addr", e.target.value)}
-                    placeholder="예: 서울특별시 마포구 양화로 45, 3층 (서교동)"
+                    placeholder="예: 서울특별시 종로구 홍지문2길 20"
                   />
                   <input
                     className={inputCls}
                     style={{ height: 38 }}
                     value={a.label}
                     onChange={e => setAddr(i, "label", e.target.value)}
-                    placeholder="별칭 (예: 홍대 1호점)"
+                    placeholder="별칭 (예: 상명대 공학관 정문)"
                   />
                   <button
                     type="button"
@@ -519,11 +513,10 @@ function SectionMediaTarget({ data, set }: { data: FormData; set: SetFn }) {
 
         {/* 연령대 */}
         <div className="col-span-8">
-          <Field label="타겟 연령층" required hint="복수 선택 가능. 시선 데이터의 인구 통계 추정값과 매칭됩니다.">
-            <div className="grid grid-cols-8 gap-2">
+          <Field label="타겟 연령층" required hint="시선 데이터의 인구 통계 추정값과 매칭됩니다.">
+            <div className="grid grid-cols-8 gap-1">
               {AGE_LIST.map(a => (
-                <Chip key={a.id} active={data.ages.includes(a.id)} onClick={() => toggleAge(a.id)}>
-                  {data.ages.includes(a.id) && <CheckIcon />}
+                <Chip key={a.id} active={data.ages.includes(a.id)} onClick={() => toggleAge(a.id)} className="w-full justify-center px-1 text-[12px]">
                   {a.label}
                 </Chip>
               ))}
@@ -598,25 +591,16 @@ function SlotBuilder({ config, addrIdx, addrLabel, brandName, onUpdate }: {
         )}
       </div>
 
-      {/* 광고 길이 */}
-      <div className="flex items-center gap-[10px] flex-wrap">
-        <span className="text-[13px] font-semibold text-[#0c1424] shrink-0">광고 길이</span>
-        <div className="flex gap-2">
-          {[15, 30, 60].map(s => (
-            <Chip key={s} active={Number(config.adLength) === s} onClick={() => setAdLength(s)}>{s}초</Chip>
-          ))}
-        </div>
-        <div className="w-[130px]">
+      {/* controls */}
+      <div className="grid grid-cols-4 gap-5 items-end">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px] font-semibold text-[#0c1424]">광고 길이</span>
           <NumberInput value={config.adLength} onChange={setAdLength} min={5} max={300} suffix="초" />
         </div>
-      </div>
 
-      {/* controls */}
-      <div className="flex gap-5 items-end flex-wrap">
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold text-[#0c1424]">총 슬롯 수</span>
-          <span className="text-[12px] text-[#8a93a6]">한 사이클에 포함되는 광고 개수입니다.</span>
-          <div className="inline-flex items-center h-11 border border-[#d7dce5] rounded-[10px] overflow-hidden bg-white">
+          <div className="inline-flex w-full items-center h-11 border border-[#d7dce5] rounded-[10px] overflow-hidden bg-white">
             <button
               type="button"
               onClick={() => setSlotCount(Math.max(1, config.slots.length - 1))}
@@ -637,7 +621,6 @@ function SlotBuilder({ config, addrIdx, addrLabel, brandName, onUpdate }: {
 
         <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold text-[#0c1424]">내 광고 순서</span>
-          <span className="text-[12px] text-[#8a93a6]">슬롯을 직접 눌러서 지정할 수도 있어요.</span>
           <SelectInput
             value={String(myIdx + 1)}
             onChange={v => chooseMine(Number(v) - 1)}
@@ -645,9 +628,8 @@ function SlotBuilder({ config, addrIdx, addrLabel, brandName, onUpdate }: {
           />
         </div>
 
-        <div className="flex flex-col gap-1.5 min-w-[200px]">
+        <div className="flex flex-col gap-1.5">
           <span className="text-[13px] font-semibold text-[#0c1424]">한 사이클 총 길이</span>
-          <span className="text-[12px] text-[#8a93a6] invisible">placeholder</span>
           <div className="h-11 px-[14px] bg-white border border-[#d7dce5] rounded-[10px] flex items-center font-mono font-semibold text-[14px]">
             {totalLoop}초
             <span className="ml-2 font-normal font-sans text-[#8a93a6] text-[12px]">
@@ -824,7 +806,7 @@ function truncate(s: string, n: number) {
   return s.length > n ? s.slice(0, n) + "…" : s;
 }
 
-function Summary({ data }: { data: FormData }) {
+function Summary({ data, onSubmit, submitting }: { data: FormData; onSubmit?: () => void; submitting?: boolean }) {
   const cat = CATEGORY_LIST.find(c => c.id === data.category);
   const ages = data.ages.length
     ? (data.ages.includes("all") ? "전체 연령" : data.ages.filter(a => a !== "all").map(a => a === "70" ? "70대+" : a + "대").join(", "))
@@ -919,10 +901,11 @@ function Summary({ data }: { data: FormData }) {
         </div>
         <button
           type="button"
-          disabled={pct < 100}
+          disabled={pct < 100 || submitting}
+          onClick={onSubmit}
           className="w-full h-12 flex items-center justify-center text-[15px] font-semibold rounded-[10px] bg-[#0c1424] text-white border-0 cursor-pointer transition-colors hover:bg-[#1a2236] disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {pct < 100 ? `남은 항목 ${checks.length - filled}개` : "캠페인 신청 제출하기"}
+          {submitting ? "제출 중..." : pct < 100 ? `남은 항목 ${checks.length - filled}개` : "캠페인 신청 제출하기"}
         </button>
       </div>
     </aside>
@@ -930,10 +913,51 @@ function Summary({ data }: { data: FormData }) {
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
+const AGE_MAP: Record<string, string> = {
+  "10": "10-19", "20": "20-29", "30": "30-39",
+  "40": "40-49", "50": "50-59", "60": "60+",
+  "70": "60+",   "all": "all",
+};
+
 export default function ApplyPage() {
   const router = useRouter();
   const [data, setData] = useState<FormData>(INITIAL);
   const set: SetFn = (k, v) => setData(d => ({ ...d, [k]: v }));
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  async function handleSubmit() {
+    const token = localStorage.getItem("access_token");
+    if (!token) { setSubmitError("로그인이 필요합니다."); return; }
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const rawAge = data.ages[0] ?? "all";
+      const body: ApplicationCreateBody = {
+        brand:        data.brand,
+        company:      data.company,
+        category:     data.category,
+        start_date:   data.startDate,
+        end_date:     data.endDate,
+        start_time:   data.startTime,
+        end_time:     data.endTime,
+        slot_configs: data.slotConfigs,
+        placement:    data.placement,
+        addresses:    data.addresses,
+        age:          AGE_MAP[rawAge] ?? rawAge,
+        gender:       data.gender,
+        name:         data.name,
+        phone:        data.phone,
+        email:        data.email,
+      };
+      await submitApplication(body, token);
+      router.push("/main");
+    } catch (e: unknown) {
+      setSubmitError(e instanceof Error ? e.message : "알 수 없는 오류가 발생했습니다.");
+    } finally {
+      setSubmitting(false);
+    }
+  }
 
   return (
     <div className="bg-[#f3f5f8] px-9 pt-7 pb-20 min-h-full">
@@ -976,21 +1000,25 @@ export default function ApplyPage() {
           {/* Form footer */}
           <div className={`flex justify-between gap-3 items-center px-7 py-[22px] ${sectionCls}`}>
             <div className="text-[#8a93a6] text-[12px] font-mono tracking-[0.05em]">
-              모든 항목은 신청 후에도 운영팀에 요청해 수정할 수 있어요.
+              {submitError
+                ? <span className="text-red-500">{submitError}</span>
+                : "모든 항목은 신청 후에도 운영팀에 요청해 수정할 수 있어요."}
             </div>
             <div className="flex gap-[10px] shrink-0">
               <button
                 type="button"
-                className="inline-flex items-center gap-2 h-11 px-[18px] rounded-[10px] border-0 bg-[#0c1424] text-[14px] font-semibold text-white cursor-pointer hover:bg-[#1a2236] transition-all"
+                onClick={handleSubmit}
+                disabled={submitting}
+                className="inline-flex items-center gap-2 h-11 px-[18px] rounded-[10px] border-0 bg-[#0c1424] text-[14px] font-semibold text-white cursor-pointer hover:bg-[#1a2236] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                캠페인 신청 제출
+                {submitting ? "제출 중..." : "캠페인 신청 제출"}
               </button>
             </div>
           </div>
         </div>
 
         <div className="sticky top-6">
-          <Summary data={data} />
+          <Summary data={data} onSubmit={handleSubmit} submitting={submitting} />
         </div>
       </div>
     </div>
