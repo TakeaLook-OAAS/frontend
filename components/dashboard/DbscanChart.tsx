@@ -59,16 +59,8 @@ export default function DbscanChart({ goldenZone }: Props) {
         overflow: "hidden",
       }}
     >
-      <span
-        style={{
-          position: "absolute",
-          left: 0, top: 0, width: "100%", height: 3,
-          background: C.violet,
-          opacity: 0.85,
-        }}
-      />
       <div style={{ marginBottom: 12 }}>
-        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.violet, letterSpacing: "0.14em", fontWeight: 700 }}>
+        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
           DBSCAN
         </div>
         <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>

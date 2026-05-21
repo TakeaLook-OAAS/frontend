@@ -67,28 +67,14 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
 
       {/* logo + toggle */}
       <div style={{
-        padding: "22px 16px 18px",
+        padding: "6px 14px",
         display: "flex",
-        flexDirection: collapsed ? "column" : "row",
         alignItems: "center",
         justifyContent: collapsed ? "center" : "space-between",
-        gap: collapsed ? 10 : 8,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
-          <div style={{
-            width: 32, height: 32, flexShrink: 0, borderRadius: 9,
-            background: `linear-gradient(135deg, ${t.blue} 0%, ${t.blueLight} 100%)`,
-            display: "flex", alignItems: "center", justifyContent: "center",
-            fontWeight: 800, fontSize: 14, color: "#fff",
-            boxShadow: "0 6px 18px -6px rgba(30,91,255,0.6)",
-          }}>O</div>
-          {!collapsed && (
-            <div style={{ lineHeight: 1.1 }}>
-              <div style={{ fontSize: 16, fontWeight: 800, letterSpacing: "-0.02em" }}>OAAS</div>
-              <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9.5, color: t.blueLight, letterSpacing: "0.14em", marginTop: 2 }}>TAKEALOOK</div>
-            </div>
-          )}
-        </div>
+        {!collapsed && (
+          <img src="/images/oaas-logo.png" alt="OAAS" style={{ height: 60, width: "auto" }} />
+        )}
         <button
           onClick={toggleCollapsed}
           style={{

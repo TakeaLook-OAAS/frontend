@@ -67,7 +67,8 @@ export interface RangeStatsResponse {
   count_male: number;
   count_female: number;
   hourly_trend: HourlyTrendPoint[];
-  daily_trend: { date: string; exposure_count: number; interested_count: number }[];
+  daily_trend: { date: string; exposure_count: number; interested_count: number; total_dwell_ms: number; total_attention_ms: number }[];
+  distribution: DistributionBucket[];
   // 고급 분석 지표
   avg_revisit_count:       number;
   avg_fixation_latency_ms: number | null;
@@ -107,13 +108,16 @@ export async function getRangeStats(params: {
   end_date: string;
   device_id: string;
   campaign_id: string;
-}): Promise<RangeStatsResponse> {
+}, token?: string): Promise<RangeStatsResponse> {
   const url = new URL(`${BASE}/stats/range/`);
   url.searchParams.set("start_date", params.start_date);
   url.searchParams.set("end_date",   params.end_date);
   url.searchParams.set("device_id",   params.device_id);
   url.searchParams.set("campaign_id", params.campaign_id);
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!res.ok) throw new Error(`/stats/range/ 오류: ${res.status}`);
   return res.json();
 }
@@ -121,11 +125,14 @@ export async function getRangeStats(params: {
 export async function getCampaignAggs(params?: {
   device_id?: string;
   campaign_id?: string;
-}): Promise<CampaignAggListResponse> {
+}, token?: string): Promise<CampaignAggListResponse> {
   const url = new URL(`${BASE}/stats/campaign/`);
   if (params?.device_id)   url.searchParams.set("device_id",   params.device_id);
   if (params?.campaign_id) url.searchParams.set("campaign_id", params.campaign_id);
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!res.ok) throw new Error(`/stats/campaign/ 오류: ${res.status}`);
   return res.json();
 }
@@ -135,13 +142,17 @@ export async function getGoldenZone(
   device_id: string,
   start_date?: string,
   end_date?: string,
+  token?: string,
 ): Promise<GoldenZoneResponse> {
   const url = new URL(`${BASE}/stats/golden-zone/`);
   url.searchParams.set("campaign_id", campaign_id);
   url.searchParams.set("device_id", device_id);
   if (start_date) url.searchParams.set("start_date", start_date);
   if (end_date)   url.searchParams.set("end_date",   end_date);
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!res.ok) throw new Error(`/stats/golden-zone/ 오류: ${res.status}`);
   return res.json();
 }
@@ -267,6 +278,14 @@ export async function apiSuspendUser(token: string, userId: string): Promise<Use
   return data;
 }
 
+// ── 분포 집계 타입 ────────────────────────────────────────────────────────────
+
+export interface DistributionBucket {
+  bucket:         string;
+  dwell_count:    number;
+  fixation_count: number;
+}
+
 // ── Raw Events 조회 ───────────────────────────────────────────────────────────
 
 export interface EventRawItem {
@@ -293,12 +312,15 @@ export async function getEvents(params: {
   device_id?: string;
   campaign_id?: string;
   limit?: number;
-}): Promise<EventListResponse> {
+}, token?: string): Promise<EventListResponse> {
   const url = new URL(`${BASE}/events/`);
   if (params.device_id)   url.searchParams.set("device_id",   params.device_id);
   if (params.campaign_id) url.searchParams.set("campaign_id", params.campaign_id);
   url.searchParams.set("limit", String(params.limit ?? 1000));
-  const res = await fetch(url.toString(), { cache: "no-store" });
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
   if (!res.ok) throw new Error(`/events/ 오류: ${res.status}`);
   return res.json();
 }
@@ -318,4 +340,46 @@ export function buildExportUrl(params: {
   url.searchParams.set("end_date",    params.end_date);
   if (params.device_id) url.searchParams.set("device_id", params.device_id);
   return url.toString();
+}
+
+// ── 광고 신청 (Apply) ──────────────────────────────────────────────────────────
+
+export interface ApplicationCreateBody {
+  brand:        string;
+  company:      string;
+  category:     string;
+  start_date:   string;   // "YYYY-MM-DD"
+  end_date:     string;   // "YYYY-MM-DD"
+  start_time:   string;   // "HH:MM"
+  end_time:     string;   // "HH:MM"
+  slot_configs: { adLength: number | null; slots: { length: number | null; mine: boolean }[] }[];
+  placement:    "indoor" | "outdoor";
+  addresses:    { addr: string; label: string }[];
+  age:          string;   // 단일 값 (예: "20-29") 또는 "all"
+  gender:       "all" | "m" | "f";
+  name:         string;
+  phone:        string;
+  email:        string;
+}
+
+export interface ApplicationResponse {
+  id:         string;
+  name:       string;
+  status:     string;
+  created_at: string;
+}
+
+export async function submitApplication(
+  body: ApplicationCreateBody,
+  token: string,
+): Promise<ApplicationResponse> {
+  const res = await fetch(`${BASE}/applications/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "신청 제출 실패");
+  return data;
 }

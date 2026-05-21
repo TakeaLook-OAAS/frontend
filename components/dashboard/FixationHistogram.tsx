@@ -10,9 +10,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const BIN_SIZE_MS = 1000;
-const MAX_BINS = 25;
-
 const C = {
   ink: "#0A1A35",
   muted: "#5B6786",
@@ -23,40 +20,16 @@ const C = {
   green: "#0FA968",  // 관심(Fixation)
 };
 
-function buildBins(dwellMs: number[], fixationMs: number[]) {
-  if (dwellMs.length === 0 && fixationMs.length === 0) return [];
-  const allMax = Math.max(0, ...dwellMs, ...fixationMs);
-  const binCount = Math.min(Math.ceil(allMax / BIN_SIZE_MS), MAX_BINS);
-
-  const dwellCounts = new Array(binCount + 1).fill(0);
-  const fixationCounts = new Array(binCount + 1).fill(0);
-
-  for (const ms of dwellMs) {
-    const i = Math.min(Math.floor(ms / BIN_SIZE_MS), binCount);
-    dwellCounts[i]++;
-  }
-  for (const ms of fixationMs) {
-    const i = Math.min(Math.floor(ms / BIN_SIZE_MS), binCount);
-    fixationCounts[i]++;
-  }
-
-  return Array.from({ length: binCount + 1 }, (_, i) => ({
-    label: i < binCount ? `${i}~${i + 1}s` : `${binCount}s+`,
-    dwell: dwellCounts[i],
-    fixation: fixationCounts[i],
-  }));
-}
+export type HistogramBin = { label: string; dwell: number; fixation: number };
 
 type Props = {
-  dwellMs: number[];
-  fixationMs: number[];
+  bins: HistogramBin[];
   loading: boolean;
   hasRange: boolean;
 };
 
-export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRange }: Props) {
-  const bins = buildBins(dwellMs, fixationMs);
-  const isEmpty = bins.every((b) => b.dwell === 0 && b.fixation === 0);
+export default function FixationHistogram({ bins, loading, hasRange }: Props) {
+  const isEmpty = bins.length === 0 || bins.every((b) => b.dwell === 0 && b.fixation === 0);
 
   return (
     <div
@@ -70,23 +43,12 @@ export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRan
         overflow: "hidden",
       }}
     >
-      <span
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: 3,
-          background: `linear-gradient(90deg, ${C.blue}, ${C.green})`,
-          opacity: 0.85,
-        }}
-      />
       <div style={{ marginBottom: 12 }}>
         <div
           style={{
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10,
-            color: C.blue,
+            color: C.ink,
             letterSpacing: "0.14em",
             fontWeight: 700,
           }}
@@ -104,9 +66,6 @@ export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRan
         >
           노출·시청 시간 분포
         </h3>
-        <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
-          노출 시간(Dwell) 및 첫 주목 반응 시간(Fixation) 구간별 track 수 · 최대 1,000건
-        </p>
       </div>
 
       {loading ? (

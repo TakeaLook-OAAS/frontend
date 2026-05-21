@@ -1,28 +1,93 @@
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/woff2/PretendardVariable.woff2") format("woff2-variations");
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --accent:   #7B6FF0;
+  --accent-2: #22D3A8;
+  --line:     rgba(10,10,15,0.08);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --color-accent:  #7B6FF0;
+  --color-accent2: #22D3A8;
+  --color-ink:     #0A0A0F;
+  --color-ink2:    #3D3D45;
+  --color-ink3:    #6B6B73;
+  --color-ink4:    #9C9CA3;
+  --color-bg:      #FAFAF7;
+  --color-bgsoft:  #F3F3EE;
+
+  --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-serif: "Times New Roman", "Noto Serif KR", serif;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+body { font-feature-settings: "ss01","cv11"; margin: 0; }
+::selection { background: rgba(123,111,240,0.25); }
+
+.brand-mark {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+.brand-mark::before,
+.brand-mark::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+.brand-mark::before { background: var(--accent); top: 0; left: 0; }
+.brand-mark::after  {
+  background: var(--accent-2);
+  bottom: 0;
+  right: 0;
+  mix-blend-mode: multiply;
+  opacity: .92;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    radial-gradient(ellipse 65% 70% at 10% 30%,  rgba(180,170,255,0.45) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 65% at 90% 20%,  rgba(160,240,220,0.38) 0%, transparent 65%),
+    radial-gradient(ellipse 50% 50% at 50% 100%, rgba(245,243,235,0.6)  0%, transparent 70%),
+    #F5F4EE;
+}
+
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: url('/images/shibuya.png') center / cover no-repeat;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: .28;
+  background-image:
+    linear-gradient(to right, rgba(10,10,15,0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(10,10,15,0.1) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 0%, #000 0%, transparent 100%);
 }
 
 input:-webkit-autofill,

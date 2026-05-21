@@ -35,7 +35,6 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
 
   return (
     <ChartShell
-      accent={C.accent}
       title="노출 인구 성별 분포"
       subtitle="POPULATION · GENDER SPLIT"
     >
@@ -121,12 +120,10 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
 function ChartShell({
   title,
   subtitle,
-  accent,
   children,
 }: {
   title: string;
   subtitle: string;
-  accent: string;
   children: React.ReactNode;
 }) {
   return (
@@ -141,23 +138,12 @@ function ChartShell({
         overflow: "hidden",
       }}
     >
-      <span
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: 3,
-          background: accent,
-          opacity: 0.85,
-        }}
-      />
       <div style={{ marginBottom: 14 }}>
         <div
           style={{
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10,
-            color: accent,
+            color: "#0A1A35",
             letterSpacing: "0.14em",
             fontWeight: 700,
           }}

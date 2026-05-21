@@ -3,10 +3,10 @@
 import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/auth/ui/button"
+import { Input } from "@/components/auth/ui/input"
+import { Label } from "@/components/auth/ui/label"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/auth/ui/card"
 import { Eye, EyeOff, Mail, Lock } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { apiLogin, apiGetMe } from "@/lib/api"
@@ -38,19 +38,19 @@ export function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col px-4 py-8 bg-[#05070D] text-white">
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="mb-10">
-          <Image
-            src="/images/oaas-logo.png"
-            alt="OAAS Logo"
-            width={800}
-            height={240}
-            className="h-56 w-auto"
-            priority
-          />
-        </div>
+    <div className="min-h-screen flex flex-col px-6 py-6 bg-[rgba(10,10,15,0.9)] text-white">
+      <div>
+        <Image
+          src="/images/oaas-logo.png"
+          alt="OAAS Logo"
+          width={800}
+          height={240}
+          className="h-10 w-auto"
+          priority
+        />
+      </div>
 
+      <div className="flex-1 flex flex-col items-center justify-center">
         <Card className="w-full max-w-md shadow-2xl border border-white/10 bg-white/5 backdrop-blur">
           <CardHeader className="text-center pb-4">
             <CardTitle className="text-2xl font-bold text-white">
@@ -126,18 +126,6 @@ export function LoginForm() {
         </Card>
       </div>
 
-      <footer className="flex justify-end items-center pt-6">
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <span className="text-sm">Powered by</span>
-          <Image
-            src="/images/takealook-logo.png"
-            alt="TAKEALOOK Logo"
-            width={100}
-            height={25}
-            className="h-9 w-auto"
-          />
-        </div>
-      </footer>
     </div>
   )
 }
