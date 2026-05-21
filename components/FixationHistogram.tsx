@@ -10,9 +10,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-const BIN_SIZE_MS = 1000;
-const MAX_BINS = 25;
-
 const C = {
   ink: "#0A1A35",
   muted: "#5B6786",
@@ -23,40 +20,16 @@ const C = {
   green: "#0FA968",  // 관심(Fixation)
 };
 
-function buildBins(dwellMs: number[], fixationMs: number[]) {
-  if (dwellMs.length === 0 && fixationMs.length === 0) return [];
-  const allMax = Math.max(0, ...dwellMs, ...fixationMs);
-  const binCount = Math.min(Math.ceil(allMax / BIN_SIZE_MS), MAX_BINS);
-
-  const dwellCounts = new Array(binCount + 1).fill(0);
-  const fixationCounts = new Array(binCount + 1).fill(0);
-
-  for (const ms of dwellMs) {
-    const i = Math.min(Math.floor(ms / BIN_SIZE_MS), binCount);
-    dwellCounts[i]++;
-  }
-  for (const ms of fixationMs) {
-    const i = Math.min(Math.floor(ms / BIN_SIZE_MS), binCount);
-    fixationCounts[i]++;
-  }
-
-  return Array.from({ length: binCount + 1 }, (_, i) => ({
-    label: i < binCount ? `${i}~${i + 1}s` : `${binCount}s+`,
-    dwell: dwellCounts[i],
-    fixation: fixationCounts[i],
-  }));
-}
+export type HistogramBin = { label: string; dwell: number; fixation: number };
 
 type Props = {
-  dwellMs: number[];
-  fixationMs: number[];
+  bins: HistogramBin[];
   loading: boolean;
   hasRange: boolean;
 };
 
-export default function FixationHistogram({ dwellMs, fixationMs, loading, hasRange }: Props) {
-  const bins = buildBins(dwellMs, fixationMs);
-  const isEmpty = bins.every((b) => b.dwell === 0 && b.fixation === 0);
+export default function FixationHistogram({ bins, loading, hasRange }: Props) {
+  const isEmpty = bins.length === 0 || bins.every((b) => b.dwell === 0 && b.fixation === 0);
 
   return (
     <div
