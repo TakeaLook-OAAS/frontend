@@ -468,7 +468,6 @@ export default function AnalyticsPage() {
           <HourlyAudienceChart data={hourlyAudienceData} />
           <DailyMetricsChart
             data={dailyMetricsData}
-            dateLabel={dateLabel}
             loading={hasRange && !rangeStats}
             hasRange={hasRange}
           />

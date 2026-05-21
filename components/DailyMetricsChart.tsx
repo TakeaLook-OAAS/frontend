@@ -20,7 +20,6 @@ export interface DailyChartPoint {
 
 interface Props {
   data: DailyChartPoint[];
-  dateLabel?: string;
   loading?: boolean;
   hasRange?: boolean;
 }
@@ -36,7 +35,7 @@ const C = {
   green: "#0FA968",  // 심층 관심도
 };
 
-export default function DailyMetricsChart({ data, dateLabel, loading, hasRange }: Props) {
+export default function DailyMetricsChart({ data, loading, hasRange }: Props) {
   const maxTimes = Math.max(0, ...data.map((d) => Math.max(d.exposureTimes, d.lookTimes)));
   const timesDomain: [number, number] = [0, parseFloat((maxTimes * 1.5).toFixed(0))];
 
@@ -58,24 +57,13 @@ export default function DailyMetricsChart({ data, dateLabel, loading, hasRange }
         overflow: "hidden",
       }}
     >
-      <span
-        style={{
-          position: "absolute",
-          left: 0, top: 0, width: "100%", height: 3,
-          background: `linear-gradient(90deg, ${C.blue}, ${C.amber}, ${C.green})`,
-          opacity: 0.85,
-        }}
-      />
       <div style={{ marginBottom: 12 }}>
-        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.blue, letterSpacing: "0.14em", fontWeight: 700 }}>
+        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
           DAILY · TREND
         </div>
         <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
           기간별 노출·시청 추이
         </h3>
-        <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
-          {dateLabel ?? "노출 시간(s) · 시청 시간(s) · 심층관심도(%)"}
-        </p>
       </div>
 
       {loading || !hasRange ? empty : (() => {

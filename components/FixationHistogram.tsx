@@ -43,23 +43,12 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
         overflow: "hidden",
       }}
     >
-      <span
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: 3,
-          background: `linear-gradient(90deg, ${C.blue}, ${C.green})`,
-          opacity: 0.85,
-        }}
-      />
       <div style={{ marginBottom: 12 }}>
         <div
           style={{
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10,
-            color: C.blue,
+            color: C.ink,
             letterSpacing: "0.14em",
             fontWeight: 700,
           }}
@@ -77,9 +66,6 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
         >
           노출·시청 시간 분포
         </h3>
-        <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
-          노출 시간(Dwell) 및 첫 주목 반응 시간(Fixation) 구간별 track 수 · 최대 1,000건
-        </p>
       </div>
 
       {loading ? (

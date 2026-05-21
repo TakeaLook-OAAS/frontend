@@ -71,27 +71,16 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
         gap: 24,
       }}
     >
-      <span
-        style={{
-          position: "absolute",
-          left: 0, top: 0, width: "100%", height: 3,
-          background: `linear-gradient(90deg, ${C.amber}, ${C.green})`,
-          opacity: 0.85,
-        }}
-      />
 
       {/* upper: avg attention + attention rate */}
       <div>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.amber, letterSpacing: "0.14em", fontWeight: 700 }}>
+          <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
             DAILY · EFFECTS
           </div>
           <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
             일별 광고 효과 지표
           </h3>
-          <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
-            평균 시청 시간(초) · 포착 관심도(%)
-          </p>
         </div>
 
         {loading || !hasRange ? empty(260) : (
@@ -139,7 +128,7 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
       {/* lower: viewability score */}
       <div>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.amber, letterSpacing: "0.14em", fontWeight: 700 }}>
+          <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
             VIEWABILITY · SCORE
           </div>
           <h3 style={{ margin: "4px 0 0", fontSize: 13, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>

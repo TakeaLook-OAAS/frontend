@@ -46,23 +46,12 @@ export default function AgeChart({ data }: { data?: AgeData[] }) {
         overflow: "hidden",
       }}
     >
-      <span
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: 3,
-          background: accent,
-          opacity: 0.85,
-        }}
-      />
       <div style={{ marginBottom: 14 }}>
         <div
           style={{
             fontFamily: "JetBrains Mono, monospace",
             fontSize: 10,
-            color: accent,
+            color: C.ink,
             letterSpacing: "0.14em",
             fontWeight: 700,
           }}

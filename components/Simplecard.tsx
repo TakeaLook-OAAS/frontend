@@ -43,18 +43,6 @@ export default function SimpleCard({
       }}
       className={className}
     >
-      {/* top accent bar */}
-      <span
-        style={{
-          position: "absolute",
-          left: 0,
-          top: 0,
-          width: "100%",
-          height: 3,
-          background: c.fg,
-          opacity: 0.85,
-        }}
-      />
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
         <div
           style={{
