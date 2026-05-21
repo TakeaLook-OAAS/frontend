@@ -341,3 +341,45 @@ export function buildExportUrl(params: {
   if (params.device_id) url.searchParams.set("device_id", params.device_id);
   return url.toString();
 }
+
+// ── 광고 신청 (Apply) ──────────────────────────────────────────────────────────
+
+export interface ApplicationCreateBody {
+  brand:        string;
+  company:      string;
+  category:     string;
+  start_date:   string;   // "YYYY-MM-DD"
+  end_date:     string;   // "YYYY-MM-DD"
+  start_time:   string;   // "HH:MM"
+  end_time:     string;   // "HH:MM"
+  slot_configs: { adLength: number | null; slots: { length: number | null; mine: boolean }[] }[];
+  placement:    "indoor" | "outdoor";
+  addresses:    { addr: string; label: string }[];
+  age:          string;   // 단일 값 (예: "20-29") 또는 "all"
+  gender:       "all" | "m" | "f";
+  name:         string;
+  phone:        string;
+  email:        string;
+}
+
+export interface ApplicationResponse {
+  id:         string;
+  name:       string;
+  status:     string;
+  created_at: string;
+}
+
+export async function submitApplication(
+  body: ApplicationCreateBody,
+  token: string,
+): Promise<ApplicationResponse> {
+  const res = await fetch(`${BASE}/applications/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "신청 제출 실패");
+  return data;
+}
