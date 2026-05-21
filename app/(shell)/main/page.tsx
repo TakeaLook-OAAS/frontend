@@ -292,38 +292,8 @@ function MapCard() {
         </div>
       </div>
 
-      <div style={{ position: "relative", height: 420, background: `linear-gradient(135deg, ${t.blueGhost} 0%, ${t.blueMist} 100%)` }}>
-        <svg width="100%" height="100%" style={{ position: "absolute", inset: 0 }}>
-          <defs>
-            <pattern id="mgrid" width="40" height="40" patternUnits="userSpaceOnUse">
-              <path d="M40 0H0V40" fill="none" stroke={t.line} strokeWidth="0.7" opacity="0.55" />
-            </pattern>
-            <pattern id="mgridLg" width="200" height="200" patternUnits="userSpaceOnUse">
-              <path d="M200 0H0V200" fill="none" stroke={t.line} strokeWidth="1.1" opacity="0.6" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#mgrid)" />
-          <rect width="100%" height="100%" fill="url(#mgridLg)" />
-          <path d="M -50 280 C 200 240, 380 320, 600 270 C 820 220, 1000 300, 1300 260"
-            fill="none" stroke="#C8D6F2" strokeWidth="44" strokeLinecap="round" opacity="0.55" />
-          <path d="M -50 280 C 200 240, 380 320, 600 270 C 820 220, 1000 300, 1300 260"
-            fill="none" stroke="#A8BCE8" strokeWidth="1.5" strokeDasharray="6 5" opacity="0.5" />
-        </svg>
+      <div style={{ position: "relative", height: 420, background: "#F0F2F5" }}>
 
-        {[
-          { left: "10%", top: "26%", l: "마포구" },
-          { left: "40%", top: "18%", l: "종로구" },
-          { left: "62%", top: "30%", l: "성동구" },
-          { left: "22%", top: "76%", l: "영등포구" },
-          { left: "50%", top: "70%", l: "서초·강남" },
-          { left: "74%", top: "62%", l: "송파구" },
-        ].map((d, i) => (
-          <div key={i} style={{
-            position: "absolute", left: d.left, top: d.top, transform: "translate(-50%,-50%)",
-            fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em",
-            textTransform: "uppercase", pointerEvents: "none",
-          }}>{d.l}</div>
-        ))}
 
         {MAP_PINS.map(p => {
           const color = pinColor(p.tone);
@@ -402,17 +372,6 @@ function MapCard() {
 
       <div style={{ padding: "14px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: `1px solid ${t.lineSoft}`, background: t.bgWarm }}>
         <div style={{ display: "flex", gap: 28 }}>
-          {[
-            { l: "지역", v: "8", c: t.ink },
-            { l: "디바이스", v: "13", c: t.ink },
-            { l: "온라인", v: "12", c: t.green },
-            { l: "점검", v: "1", c: t.amber },
-          ].map((s, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "baseline", gap: 6 }}>
-              <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9.5, color: t.mono, letterSpacing: "0.14em" }}>{s.l}</span>
-              <span style={{ fontFamily: "Inter, sans-serif", fontSize: 16, fontWeight: 800, color: s.c, letterSpacing: "-0.02em" }}>{s.v}</span>
-            </div>
-          ))}
         </div>
         <a href="#" style={{ fontSize: 12, color: t.blue, fontWeight: 700, textDecoration: "none" }}>
           전체 지도에서 보기 →
