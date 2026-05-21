@@ -13,16 +13,17 @@ import DbscanChart from "@/components/DbscanChart";
 import DailyMetricsChart, { DailyChartPoint } from "@/components/DailyMetricsChart";
 import HourlyAudienceChart from "@/components/HourlyAudienceChart";
 import DailyEffectsChart, { DayPoint } from "@/components/DailyEffectsChart";
-import FixationHistogram from "@/components/FixationHistogram";
+import FixationHistogram, { HistogramBin } from "@/components/FixationHistogram";
 import CampaignSelector from "@/components/CampaignSelector";
+import type { SelectorValue } from "@/components/CampaignSelector";
 
 import {
-  getCampaignAggs,
+  getCampaigns,
   getGoldenZone,
   getRangeStats,
-  getEvents,
+  getDistribution,
   buildExportUrl,
-  AggResult,
+  CampaignItem,
   GoldenZoneResponse,
   RangeStatsResponse,
 } from "@/lib/api";
@@ -44,16 +45,13 @@ export default function AnalyticsPage() {
   const [token, setToken] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [goldenZone, setGoldenZone] = useState<GoldenZoneResponse | undefined>();
-  const [options, setOptions] = useState<AggResult[]>([]);
-  const [selected, setSelected] = useState<AggResult | null>(null);
+  const [options, setOptions] = useState<CampaignItem[]>([]);
+  const [selected, setSelected] = useState<SelectorValue | null>(null);
   const [rangeStats, setRangeStats] = useState<RangeStatsResponse | null>(null);
   const [advChartData, setAdvChartData] = useState<DayPoint[]>([]);
   const [perDayLoading, setPerDayLoading] = useState(false);
-  const [dwellMs, setDwellMs] = useState<number[]>([]);
-  const [fixationMs, setFixationMs] = useState<number[]>([]);
+  const [histBins, setHistBins] = useState<HistogramBin[]>([]);
   const [histLoading, setHistLoading] = useState(false);
-  const [exposureMsPerDay, setExposureMsPerDay] = useState<Record<string, number>>({});
-  const [lookMsPerDay, setLookMsPerDay] = useState<Record<string, number>>({});
 
   const campaignId = selected?.campaign_id;
   const deviceId = selected?.device_id;
@@ -66,10 +64,11 @@ export default function AnalyticsPage() {
   useEffect(() => {
     const t = localStorage.getItem("access_token") ?? "";
     setToken(t);
-    getCampaignAggs(undefined, t)
+    getCampaigns(t)
       .then(({ results }) => {
         setOptions(results);
-        if (results.length > 0) setSelected(results[0]);
+        if (results.length > 0)
+          setSelected({ campaign_id: results[0].id, device_id: results[0].devices[0]?.id ?? "" });
       })
       .catch(() => { });
   }, []);
@@ -124,43 +123,18 @@ export default function AnalyticsPage() {
       .finally(() => setPerDayLoading(false));
   }, [startDate, endDate, campaignId, deviceId, token]);
 
+
   useEffect(() => {
     if (!startDate || !campaignId || !deviceId) {
-      setDwellMs([]);
-      setFixationMs([]);
-      setExposureMsPerDay({});
-      setLookMsPerDay({});
+      setHistBins([]);
       return;
     }
     setHistLoading(true);
-    getEvents({ campaign_id: campaignId, device_id: deviceId, limit: 1000 }, token)
-      .then(({ events }) => {
-        const filtered = events.filter((e) => {
-          const kstDate = new Date(new Date(e.ts).getTime() + 9 * 3600 * 1000)
-            .toISOString()
-            .slice(0, 10);
-          return kstDate >= startDate! && kstDate <= endDate!;
-        });
-        setDwellMs(filtered.map((e) => e.exposure_ms).filter((ms) => ms >= 0));
-        setFixationMs(
-          filtered
-            .filter((e) => e.look_times.length > 0)
-            .map((e) => e.look_times[0].start_ms - e.exposure_start_ms)
-            .filter((ms) => ms >= 0)
-        );
-        const expPerDay: Record<string, number> = {};
-        const lookPerDay: Record<string, number> = {};
-        filtered.forEach((e) => {
-          const kstDate = new Date(new Date(e.ts).getTime() + 9 * 3600 * 1000)
-            .toISOString()
-            .slice(0, 10);
-          expPerDay[kstDate] = (expPerDay[kstDate] ?? 0) + e.exposure_ms / 1000;
-          lookPerDay[kstDate] = (lookPerDay[kstDate] ?? 0) + e.total_look_duration_ms / 1000;
-        });
-        setExposureMsPerDay(expPerDay);
-        setLookMsPerDay(lookPerDay);
-      })
-      .catch(() => { setDwellMs([]); setFixationMs([]); setExposureMsPerDay({}); setLookMsPerDay({}); })
+    getDistribution({ start_date: startDate, end_date: endDate!, campaign_id: campaignId, device_id: deviceId }, token)
+      .then(({ buckets }) =>
+        setHistBins(buckets.map((b) => ({ label: b.bucket, dwell: b.dwell_count, fixation: b.fixation_count })))
+      )
+      .catch(() => setHistBins([]))
       .finally(() => setHistLoading(false));
   }, [startDate, endDate, campaignId, deviceId, token]);
 
@@ -199,19 +173,21 @@ export default function AnalyticsPage() {
   ] : undefined;
 
   const dailyMetricsData: DailyChartPoint[] = (() => {
-    if (!startDate) return [];
-    let days = eachDayOfInterval({ start: parseISO(startDate), end: parseISO(endDate!) })
-      .map((d) => format(d, "yyyy-MM-dd"));
-    return days.map((day) => {
-      const expSec = parseFloat((exposureMsPerDay[day] ?? 0).toFixed(1));
-      const lookSec = parseFloat((lookMsPerDay[day] ?? 0).toFixed(1));
-      return {
-        label: day.slice(5),
-        exposureTimes: expSec,
-        lookTimes: lookSec,
-        attentionRate: expSec > 0 ? parseFloat(((lookSec / expSec) * 100).toFixed(1)) : 0,
-      };
-    });
+    if (!startDate || !rangeStats) return [];
+    const trendMap = Object.fromEntries(rangeStats.daily_trend.map((d) => [d.date, d]));
+    return eachDayOfInterval({ start: parseISO(startDate), end: parseISO(endDate!) })
+      .map((d) => format(d, "yyyy-MM-dd"))
+      .map((day) => {
+        const row = trendMap[day];
+        const expSec  = parseFloat(((row?.total_dwell_ms    ?? 0) / 1000).toFixed(1));
+        const lookSec = parseFloat(((row?.total_attention_ms ?? 0) / 1000).toFixed(1));
+        return {
+          label: day.slice(5),
+          exposureTimes: expSec,
+          lookTimes: lookSec,
+          attentionRate: expSec > 0 ? parseFloat(((lookSec / expSec) * 100).toFixed(1)) : 0,
+        };
+      });
   })();
 
   const hourlyAudienceData = rangeStats
@@ -320,13 +296,12 @@ export default function AnalyticsPage() {
         <CampaignSelector
           options={options}
           selected={selected}
-          onChange={(agg) => {
-            setSelected(agg);
+          onChange={(val) => {
+            setSelected(val);
             setRangeStats(null);
             setGoldenZone(undefined);
             setAdvChartData([]);
-            setDwellMs([]);
-            setFixationMs([]);
+            setHistBins([]);
           }}
         />
 
@@ -493,8 +468,7 @@ export default function AnalyticsPage() {
           <GenderChart data={genderData} />
           <AgeChart data={ageData} />
           <FixationHistogram
-            dwellMs={dwellMs}
-            fixationMs={fixationMs}
+            bins={histBins}
             loading={histLoading}
             hasRange={hasRange}
           />

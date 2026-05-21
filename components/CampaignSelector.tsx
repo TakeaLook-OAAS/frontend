@@ -1,12 +1,17 @@
 "use client";
 
-import { useMemo, useRef } from "react";
-import { AggResult } from "@/lib/api";
+import { useRef } from "react";
+import { CampaignItem } from "@/lib/api";
+
+export interface SelectorValue {
+  campaign_id: string;
+  device_id: string;
+}
 
 interface Props {
-  options: AggResult[];
-  selected: AggResult | null;
-  onChange: (agg: AggResult) => void;
+  options: CampaignItem[];
+  selected: SelectorValue | null;
+  onChange: (value: SelectorValue) => void;
 }
 
 const t = {
@@ -22,30 +27,12 @@ const t = {
   mono: "#8893AB",
 };
 
-/**
- * 캠페인 + 디바이스 칩 가로 스크롤 셀렉터.
- *
- * 동일 캠페인(campaign_id) 내 여러 디바이스가 있으면, 캠페인 칩을 선택한
- * 다음 디바이스 칩 줄에서 디바이스를 고를 수 있습니다.
- *
- * onChange 는 기존 시그니처(AggResult) 그대로 유지.
- */
 export default function CampaignSelector({ options, selected, onChange }: Props) {
-  const campaigns = useMemo(() => {
-    const map = new Map<string, AggResult[]>();
-    for (const o of options) {
-      const arr = map.get(o.campaign_id) ?? [];
-      arr.push(o);
-      map.set(o.campaign_id, arr);
-    }
-    return [...map.entries()].map(([campaign_id, devs]) => ({ campaign_id, devs }));
-  }, [options]);
-
   const devicesForSelected =
-    campaigns.find((c) => c.campaign_id === selected?.campaign_id)?.devs ?? [];
+    options.find((c) => c.id === selected?.campaign_id)?.devices ?? [];
 
   const campRowRef = useRef<HTMLDivElement>(null);
-  const devRowRef = useRef<HTMLDivElement>(null);
+  const devRowRef  = useRef<HTMLDivElement>(null);
 
   function scroll(ref: React.RefObject<HTMLDivElement | null>, dir: 1 | -1) {
     ref.current?.scrollBy({ left: dir * 320, behavior: "smooth" });
@@ -85,14 +72,14 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
         onLeft={() => scroll(campRowRef, -1)}
         onRight={() => scroll(campRowRef, 1)}
       >
-        {campaigns.map(({ campaign_id, devs }) => {
-          const active = selected?.campaign_id === campaign_id;
+        {options.map((campaign) => {
+          const active = selected?.campaign_id === campaign.id;
           return (
             <Chip
-              key={campaign_id}
+              key={campaign.id}
               active={active}
-              onClick={() => onChange(devs[0])}
-              title={`캠페인 ${campaign_id}`}
+              onClick={() => onChange({ campaign_id: campaign.id, device_id: campaign.devices[0]?.id ?? "" })}
+              title={campaign.name}
             >
               <span
                 style={{
@@ -105,7 +92,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
                 CMP
               </span>
               <span style={{ fontWeight: 700, fontSize: 13 }}>
-                {campaign_id.slice(0, 8)}…
+                {campaign.name}
               </span>
               <span
                 style={{
@@ -118,7 +105,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
                   fontWeight: 700,
                 }}
               >
-                {devs.length}
+                {campaign.devices.length}
               </span>
             </Chip>
           );
@@ -134,13 +121,13 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
         style={{ marginTop: 10 }}
       >
         {devicesForSelected.map((d) => {
-          const active = selected?.device_id === d.device_id;
+          const active = selected?.device_id === d.id;
           return (
             <Chip
               key={d.id}
               active={active}
-              onClick={() => onChange(d)}
-              title={`디바이스 ${d.device_id}`}
+              onClick={() => onChange({ campaign_id: selected!.campaign_id, device_id: d.id })}
+              title={d.name}
               variant="device"
             >
               <span
@@ -158,7 +145,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
                   fontWeight: 600,
                 }}
               >
-                {d.device_id.slice(0, 8)}…
+                {d.name}
               </span>
             </Chip>
           );
