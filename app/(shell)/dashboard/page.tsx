@@ -5,17 +5,17 @@ import { format, eachDayOfInterval, parseISO, subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Users, Clock, Eye, TrendingUp, Target, Download, UserCheck } from "lucide-react";
 
-import GenderChart from "@/components/GenderChart";
-import AgeChart from "@/components/AgeChart";
-import DateRangePicker from "@/components/DateRangePicker";
-import SimpleCard from "@/components/Simplecard";
-import DbscanChart from "@/components/DbscanChart";
-import DailyMetricsChart, { DailyChartPoint } from "@/components/DailyMetricsChart";
-import HourlyAudienceChart from "@/components/HourlyAudienceChart";
-import DailyEffectsChart, { DayPoint } from "@/components/DailyEffectsChart";
-import FixationHistogram from "@/components/FixationHistogram";
-import CampaignSelector from "@/components/CampaignSelector";
-import type { SelectorValue } from "@/components/CampaignSelector";
+import GenderChart from "@/components/dashboard/GenderChart";
+import AgeChart from "@/components/dashboard/AgeChart";
+import DateRangePicker from "@/components/dashboard/DateRangePicker";
+import SimpleCard from "@/components/dashboard/Simplecard";
+import DbscanChart from "@/components/dashboard/DbscanChart";
+import DailyMetricsChart, { DailyChartPoint } from "@/components/dashboard/DailyMetricsChart";
+import HourlyAudienceChart from "@/components/dashboard/HourlyAudienceChart";
+import DailyEffectsChart, { DayPoint } from "@/components/dashboard/DailyEffectsChart";
+import FixationHistogram from "@/components/dashboard/FixationHistogram";
+import CampaignSelector from "@/components/dashboard/CampaignSelector";
+import type { SelectorValue } from "@/components/dashboard/CampaignSelector";
 
 import {
   getCampaigns,
