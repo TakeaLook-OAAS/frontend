@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 
@@ -292,6 +293,93 @@ function SectionHead({ eyebrow, title, desc, step }: {
   );
 }
 
+// ─── Category dropdown ────────────────────────────────────────────────────────
+function CategoryDropdown({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [open, setOpen] = useState(false);
+  const [rect, setRect] = useState<DOMRect | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const selected = CATEGORY_LIST.find(c => c.id === value);
+
+  useEffect(() => {
+    function onOutside(e: MouseEvent) {
+      const target = e.target as Node;
+      if (
+        containerRef.current?.contains(target) ||
+        dropdownRef.current?.contains(target)
+      ) return;
+      setOpen(false);
+    }
+    function onScroll() { setOpen(false); }
+    if (open) {
+      document.addEventListener("mousedown", onOutside);
+      window.addEventListener("scroll", onScroll, true);
+    }
+    return () => {
+      document.removeEventListener("mousedown", onOutside);
+      window.removeEventListener("scroll", onScroll, true);
+    };
+  }, [open]);
+
+  function handleToggle() {
+    if (!open && containerRef.current) setRect(containerRef.current.getBoundingClientRect());
+    setOpen(o => !o);
+  }
+
+  return (
+    <div ref={containerRef}>
+      <button
+        type="button"
+        onClick={handleToggle}
+        className={`w-full h-11 px-[14px] bg-white border rounded-[10px] text-[14px] outline-none transition-all flex items-center justify-between cursor-pointer ${
+          open ? "border-[#0c1424] shadow-[0_0_0_4px_rgba(12,20,36,0.06)]" : "border-[#d7dce5] hover:border-[#8a93a6]"
+        }`}
+      >
+        {selected ? (
+          <span className="flex items-center gap-[10px]">
+            <span className="w-6 h-6 rounded-[6px] flex items-center justify-center font-mono text-[10px] font-bold bg-[#f7f9fc] border border-[#e6e9ef] text-[#475066] shrink-0">
+              {selected.glyph}
+            </span>
+            <span className="text-[#0c1424] font-semibold">{selected.label}</span>
+          </span>
+        ) : (
+          <span className="text-[#b3bac8]">카테고리를 선택해 주세요</span>
+        )}
+        <span className={`text-[#8a93a6] transition-transform duration-150 ${open ? "rotate-180" : ""}`}>
+          <CaretIcon />
+        </span>
+      </button>
+
+      {open && rect && createPortal(
+        <div
+          ref={dropdownRef}
+          style={{ position: "fixed", top: rect.bottom + 6, left: rect.left, width: rect.width, zIndex: 9999 }}
+          className="bg-white border border-[#d7dce5] rounded-[12px] shadow-[0_8px_24px_-8px_rgba(12,20,36,0.18)] overflow-hidden"
+        >
+          {CATEGORY_LIST.map((c, i) => (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => { onChange(c.id); setOpen(false); }}
+              className={`w-full flex items-center gap-[10px] px-[14px] py-[10px] text-left cursor-pointer transition-colors ${
+                i > 0 ? "border-t border-[#f0f2f6]" : ""
+              } ${value === c.id ? "bg-[#0c1424] text-white" : "bg-white hover:bg-[#f7f9fc]"}`}
+            >
+              <span className={`w-7 h-7 rounded-[8px] flex items-center justify-center font-mono text-[11px] font-bold shrink-0 ${
+                value === c.id ? "bg-white/10 border border-white/20 text-white" : "bg-[#f7f9fc] border border-[#e6e9ef] text-[#475066]"
+              }`}>
+                {c.glyph}
+              </span>
+              <span className="text-[13px] font-semibold">{c.label}</span>
+            </button>
+          ))}
+        </div>,
+        document.body
+      )}
+    </div>
+  );
+}
+
 // ─── Section 01: 브랜드 정보 ───────────────────────────────────────────────────
 function SectionBrand({ data, set }: { data: FormData; set: SetFn }) {
   return (
@@ -310,29 +398,7 @@ function SectionBrand({ data, set }: { data: FormData; set: SetFn }) {
         </div>
         <div className="col-span-12">
           <Field label="광고 카테고리" required hint="하나만 선택할 수 있습니다. 카테고리에 따라 노출 가능한 디바이스가 달라질 수 있어요.">
-            <div className="grid grid-cols-4 gap-[10px]">
-              {CATEGORY_LIST.map(c => (
-                <button
-                  key={c.id}
-                  type="button"
-                  onClick={() => set("category", c.id)}
-                  className={`flex items-center gap-[10px] px-[14px] py-3 border rounded-[12px] cursor-pointer transition-all text-left ${
-                    data.category === c.id
-                      ? "border-[#0c1424] bg-[#0c1424] text-white"
-                      : "border-[#d7dce5] bg-white hover:border-[#8a93a6]"
-                  }`}
-                >
-                  <span className={`w-7 h-7 rounded-[8px] flex items-center justify-center font-mono text-[11px] font-bold shrink-0 ${
-                    data.category === c.id
-                      ? "bg-white/10 border border-white/20 text-white"
-                      : "bg-[#f7f9fc] border border-[#e6e9ef] text-[#475066]"
-                  }`}>
-                    {c.glyph}
-                  </span>
-                  <span className="text-[13px] font-semibold">{c.label}</span>
-                </button>
-              ))}
-            </div>
+            <CategoryDropdown value={data.category} onChange={v => set("category", v)} />
           </Field>
         </div>
       </div>
@@ -428,7 +494,7 @@ function SectionCampaign({ data, set }: { data: FormData; set: SetFn }) {
           >
             <div className="flex flex-col gap-[14px]">
               {/* controls */}
-              <div className="flex gap-3 items-end flex-wrap">
+              <div className="flex gap-5 items-end flex-wrap">
                 <div className="flex flex-col gap-1.5">
                   <span className="text-[13px] font-semibold text-[#0c1424]">총 슬롯 수</span>
                   <span className="text-[12px] text-[#8a93a6]">한 사이클에 포함되는 광고 개수입니다.</span>
@@ -440,7 +506,7 @@ function SectionCampaign({ data, set }: { data: FormData; set: SetFn }) {
                     >
                       <MinusIcon />
                     </button>
-                    <span className="min-w-[42px] text-center font-mono font-semibold text-[14px]">{data.slots.length}</span>
+                    <span className="flex-1 text-center font-mono font-semibold text-[14px]">{data.slots.length}</span>
                     <button
                       type="button"
                       onClick={() => setSlotCount(Math.min(8, data.slots.length + 1))}
