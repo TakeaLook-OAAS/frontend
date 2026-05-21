@@ -68,6 +68,7 @@ export interface RangeStatsResponse {
   count_female: number;
   hourly_trend: HourlyTrendPoint[];
   daily_trend: { date: string; exposure_count: number; interested_count: number; total_dwell_ms: number; total_attention_ms: number }[];
+  distribution: DistributionBucket[];
   // 고급 분석 지표
   avg_revisit_count:       number;
   avg_fixation_latency_ms: number | null;
@@ -277,39 +278,12 @@ export async function apiSuspendUser(token: string, userId: string): Promise<Use
   return data;
 }
 
-// ── 분포 집계 조회 ────────────────────────────────────────────────────────────
+// ── 분포 집계 타입 ────────────────────────────────────────────────────────────
 
 export interface DistributionBucket {
   bucket:         string;
   dwell_count:    number;
   fixation_count: number;
-}
-
-export interface DistributionResponse {
-  buckets: DistributionBucket[];
-}
-
-export async function getDistribution(params: {
-  start_date:  string;
-  end_date:    string;
-  device_id:   string;
-  campaign_id: string;
-  age_group?:  string;
-  gender?:     string;
-}, token?: string): Promise<DistributionResponse> {
-  const url = new URL(`${BASE}/stats/distribution/`);
-  url.searchParams.set("start_date",  params.start_date);
-  url.searchParams.set("end_date",    params.end_date);
-  url.searchParams.set("device_id",   params.device_id);
-  url.searchParams.set("campaign_id", params.campaign_id);
-  if (params.age_group) url.searchParams.set("age_group", params.age_group);
-  if (params.gender)    url.searchParams.set("gender",    params.gender);
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new Error(`/stats/distribution/ 오류: ${res.status}`);
-  return res.json();
 }
 
 // ── Raw Events 조회 ───────────────────────────────────────────────────────────

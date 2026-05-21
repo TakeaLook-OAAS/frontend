@@ -46,24 +46,13 @@ export default function HourlyAudienceChart({ data }: Props) {
         overflow: "hidden",
       }}
     >
-      <span
-        style={{
-          position: "absolute",
-          left: 0, top: 0, width: "100%", height: 3,
-          background: `linear-gradient(90deg, ${C.blue}, ${C.green}, ${C.amber})`,
-          opacity: 0.85,
-        }}
-      />
       <div style={{ marginBottom: 12 }}>
-        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.blue, letterSpacing: "0.14em", fontWeight: 700 }}>
+        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
           HOURLY · AUDIENCE
         </div>
         <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
           시간대별 노출 인구·관심 인구·포착 관심도
         </h3>
-        <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
-          노출 인구(명) · 관심 인구(명) · 포착 관심도(%)
-        </p>
       </div>
 
       {data.length === 0 ? (

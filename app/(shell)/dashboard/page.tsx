@@ -13,7 +13,7 @@ import DbscanChart from "@/components/DbscanChart";
 import DailyMetricsChart, { DailyChartPoint } from "@/components/DailyMetricsChart";
 import HourlyAudienceChart from "@/components/HourlyAudienceChart";
 import DailyEffectsChart, { DayPoint } from "@/components/DailyEffectsChart";
-import FixationHistogram, { HistogramBin } from "@/components/FixationHistogram";
+import FixationHistogram from "@/components/FixationHistogram";
 import CampaignSelector from "@/components/CampaignSelector";
 import type { SelectorValue } from "@/components/CampaignSelector";
 
@@ -21,7 +21,6 @@ import {
   getCampaigns,
   getGoldenZone,
   getRangeStats,
-  getDistribution,
   buildExportUrl,
   CampaignItem,
   GoldenZoneResponse,
@@ -50,8 +49,6 @@ export default function AnalyticsPage() {
   const [rangeStats, setRangeStats] = useState<RangeStatsResponse | null>(null);
   const [advChartData, setAdvChartData] = useState<DayPoint[]>([]);
   const [perDayLoading, setPerDayLoading] = useState(false);
-  const [histBins, setHistBins] = useState<HistogramBin[]>([]);
-  const [histLoading, setHistLoading] = useState(false);
 
   const campaignId = selected?.campaign_id;
   const deviceId = selected?.device_id;
@@ -124,19 +121,6 @@ export default function AnalyticsPage() {
   }, [startDate, endDate, campaignId, deviceId, token]);
 
 
-  useEffect(() => {
-    if (!startDate || !campaignId || !deviceId) {
-      setHistBins([]);
-      return;
-    }
-    setHistLoading(true);
-    getDistribution({ start_date: startDate, end_date: endDate!, campaign_id: campaignId, device_id: deviceId }, token)
-      .then(({ buckets }) =>
-        setHistBins(buckets.map((b) => ({ label: b.bucket, dwell: b.dwell_count, fixation: b.fixation_count })))
-      )
-      .catch(() => setHistBins([]))
-      .finally(() => setHistLoading(false));
-  }, [startDate, endDate, campaignId, deviceId, token]);
 
   /* ------------------------------------------------------------------ */
   /* 파생값                                                              */
@@ -301,7 +285,6 @@ export default function AnalyticsPage() {
             setRangeStats(null);
             setGoldenZone(undefined);
             setAdvChartData([]);
-            setHistBins([]);
           }}
         />
 
@@ -468,8 +451,8 @@ export default function AnalyticsPage() {
           <GenderChart data={genderData} />
           <AgeChart data={ageData} />
           <FixationHistogram
-            bins={histBins}
-            loading={histLoading}
+            bins={(rangeStats?.distribution ?? []).map((b) => ({ label: b.bucket, dwell: b.dwell_count, fixation: b.fixation_count }))}
+            loading={perDayLoading}
             hasRange={hasRange}
           />
         </section>
@@ -485,7 +468,6 @@ export default function AnalyticsPage() {
           <HourlyAudienceChart data={hourlyAudienceData} />
           <DailyMetricsChart
             data={dailyMetricsData}
-            dateLabel={dateLabel}
             loading={hasRange && !rangeStats}
             hasRange={hasRange}
           />
