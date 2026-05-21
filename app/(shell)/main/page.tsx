@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { getCampaigns, CampaignItem } from "@/lib/api";
 
 /* ---------------------------------------------------------------- */
@@ -509,39 +510,10 @@ function CampaignsSection({ campaigns }: { campaigns: Campaign[] }) {
 /* ---------------------------------------------------------------- */
 /* page                                                               */
 /* ---------------------------------------------------------------- */
-function NewCampaignModal({ onClose }: { onClose: () => void }) {
-  return (
-    <div style={{
-      position: "fixed", inset: 0, zIndex: 100,
-      background: "rgba(10,26,53,0.45)", backdropFilter: "blur(4px)",
-      display: "flex", alignItems: "center", justifyContent: "center",
-    }} onClick={onClose}>
-      <div style={{
-        width: 640, minHeight: 400, background: "#fff",
-        borderRadius: 18, boxShadow: "0 24px 60px -12px rgba(10,26,53,0.35)",
-        display: "flex", flexDirection: "column",
-        position: "relative",
-      }} onClick={e => e.stopPropagation()}>
-        <div style={{ flex: 1 }} />
-        <div style={{ padding: "20px 24px", display: "flex", justifyContent: "flex-end", borderTop: `1px solid ${t.lineSoft}` }}>
-          <button onClick={onClose} style={{
-            padding: "9px 20px", borderRadius: 9,
-            border: `1px solid ${t.line}`, background: "#fff",
-            color: t.ink, fontWeight: 600, fontFamily: "inherit",
-            fontSize: 13, cursor: "pointer",
-          }}>
-            닫기
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
 export default function MainPage() {
+  const router = useRouter();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [userEmail, setUserEmail] = useState("");
-  const [showModal, setShowModal] = useState(false);
 
   function fetchCampaigns() {
     const token = localStorage.getItem("access_token") ?? undefined;
@@ -557,8 +529,7 @@ export default function MainPage() {
 
   return (
     <>
-      {showModal && <NewCampaignModal onClose={() => setShowModal(false)} />}
-      <TopHeader campaigns={campaigns} userEmail={userEmail} onRefresh={fetchCampaigns} onNewCampaign={() => setShowModal(true)} />
+      <TopHeader campaigns={campaigns} userEmail={userEmail} onRefresh={fetchCampaigns} onNewCampaign={() => router.push("/apply")} />
       <div style={{ padding: "26px 36px 60px", display: "flex", flexDirection: "column", gap: 22 }}>
         <CampaignsSection campaigns={campaigns} />
         <MapCard />
