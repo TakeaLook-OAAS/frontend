@@ -8,6 +8,8 @@ import type { ReactNode } from "react";
 // ─── Types ────────────────────────────────────────────────────────────────────
 interface SlotItem { length: number | null; mine: boolean; }
 interface AddressItem { addr: string; label: string; }
+interface SlotConfig { adLength: number | null; slots: SlotItem[]; }
+
 interface FormData {
   brand: string;
   company: string;
@@ -16,8 +18,7 @@ interface FormData {
   endDate: string;
   startTime: string;
   endTime: string;
-  adLength: number | null;
-  slots: SlotItem[];
+  slotConfigs: SlotConfig[];
   placement: "indoor" | "outdoor";
   addresses: AddressItem[];
   ages: string[];
@@ -31,7 +32,7 @@ type SetFn = <K extends keyof FormData>(k: K, v: FormData[K]) => void;
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const CATEGORY_LIST = [
-  { id: "fnb",     label: "식음료",        glyph: "FB" },
+  { id: "fnb",     label: "식료품",        glyph: "FB" },
   { id: "fashion", label: "패션·의류",     glyph: "FS" },
   { id: "beauty",  label: "뷰티·화장품",   glyph: "BT" },
   { id: "it",      label: "IT·전자",       glyph: "IT" },
@@ -56,8 +57,7 @@ const INITIAL: FormData = {
   brand: "", company: "", category: "",
   startDate: "", endDate: "",
   startTime: "07:00", endTime: "22:00",
-  adLength: 15,
-  slots: [{ length: 15, mine: true }],
+  slotConfigs: [{ adLength: 15, slots: [{ length: 15, mine: true }] }],
   placement: "indoor",
   addresses: [{ addr: "", label: "" }],
   ages: [], gender: "all",
@@ -114,11 +114,6 @@ const CheckIcon = () => (
   </svg>
 );
 
-const RefreshIcon = () => (
-  <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-    <path d="M13 4.5a5.5 5.5 0 1 0 1.4 5.5M13 2v3h-3" />
-  </svg>
-);
 
 // ─── Shared class strings ─────────────────────────────────────────────────────
 const inputCls = [
@@ -388,16 +383,16 @@ function SectionBrand({ data, set }: { data: FormData; set: SetFn }) {
       <div className="px-7 pt-[22px] pb-[26px] grid grid-cols-12 gap-x-5 gap-y-[18px]">
         <div className="col-span-6">
           <Field label="브랜드 명" required hint="대시보드와 송출 화면에 노출되는 이름입니다.">
-            <TextInput value={data.brand} onChange={v => set("brand", v)} placeholder="예: NOON 커피랩" maxLength={40} />
+            <TextInput value={data.brand} onChange={v => set("brand", v)} placeholder="예: OAAS (Offline Advertisement Analsis Service)" maxLength={40} />
           </Field>
         </div>
         <div className="col-span-6">
           <Field label="회사 명" required hint="사업자 등록 상의 정식 회사명을 적어 주세요.">
-            <TextInput value={data.company} onChange={v => set("company", v)} placeholder="예: 주식회사 누온" maxLength={60} />
+            <TextInput value={data.company} onChange={v => set("company", v)} placeholder="예: Take A Look" maxLength={60} />
           </Field>
         </div>
         <div className="col-span-12">
-          <Field label="광고 카테고리" required hint="하나만 선택할 수 있습니다. 카테고리에 따라 노출 가능한 디바이스가 달라질 수 있어요.">
+          <Field label="광고 카테고리">
             <CategoryDropdown value={data.category} onChange={v => set("category", v)} />
           </Field>
         </div>
@@ -406,200 +401,11 @@ function SectionBrand({ data, set }: { data: FormData; set: SetFn }) {
   );
 }
 
-// ─── Section 02: 광고 정보 ────────────────────────────────────────────────────
-function SectionCampaign({ data, set }: { data: FormData; set: SetFn }) {
-  const myIdx = data.slots.findIndex(s => s.mine);
-  const totalLoop = data.slots.reduce((a, b) => a + (Number(b.length) || 0), 0);
-
-  function setSlotCount(n: number) {
-    const next = [...data.slots];
-    while (next.length < n) next.push({ length: 15, mine: false });
-    while (next.length > n) next.pop();
-    if (!next.some(s => s.mine)) next[0].mine = true;
-    set("slots", next);
-  }
-
-  function chooseMine(i: number) {
-    set("slots", data.slots.map((s, k) => ({ ...s, mine: k === i })));
-  }
-
-  function setSlotLen(i: number, v: number | null) {
-    const next = data.slots.map((s, k) => k === i ? { ...s, length: v } : s);
-    set("slots", next);
-    if (next[i].mine) set("adLength", v);
-  }
-
-  return (
-    <section className={sectionCls}>
-      <SectionHead
-        eyebrow="SECTION · CAMPAIGN"
-        title="광고 정보"
-        desc="송출 기간, 시간대, 슬롯 구성을 설정합니다. 슬롯의 위치는 시선 데이터 수집 구간과 직접 연결돼요."
-        step="STEP 02 / 04"
-      />
-      <div className="px-7 pt-[22px] pb-[26px] grid grid-cols-12 gap-x-5 gap-y-[18px]">
-        {/* 기간 */}
-        <div className="col-span-12">
-          <Field label="광고 게재 기간" required hint="시작일·종료일을 모두 선택해 주세요. 종료일 24:00에 자동 종료됩니다.">
-            <div className="grid gap-[10px] items-center" style={{ gridTemplateColumns: "1fr auto 1fr" }}>
-              <DateInput value={data.startDate} onChange={v => set("startDate", v)} />
-              <span className="text-[#b3bac8]"><ArrowIcon /></span>
-              <DateInput value={data.endDate} onChange={v => set("endDate", v)} />
-            </div>
-          </Field>
-        </div>
-
-        {/* 시간대 */}
-        <div className="col-span-6">
-          <Field label="광고 송출 시간" required hint="이 시간대에만 송출됩니다. (디바이스 운영 시간 내에서 적용)">
-            <div className="grid gap-[10px] items-center" style={{ gridTemplateColumns: "1fr auto 1fr" }}>
-              <TimeInput value={data.startTime} onChange={v => set("startTime", v)} />
-              <span className="text-[#b3bac8]"><ArrowIcon /></span>
-              <TimeInput value={data.endTime} onChange={v => set("endTime", v)} />
-            </div>
-          </Field>
-        </div>
-
-        {/* 광고 길이 */}
-        <div className="col-span-6">
-          <Field label="광고 길이" required hint="프리셋을 누르거나 직접 입력할 수 있어요. 선택한 슬롯의 길이가 함께 갱신됩니다.">
-            <div className="flex items-center gap-[10px] flex-wrap">
-              <div className="flex gap-2">
-                {[15, 30, 60].map(s => (
-                  <Chip key={s} active={Number(data.adLength) === s} onClick={() => {
-                    set("adLength", s);
-                    if (myIdx >= 0) set("slots", data.slots.map((sl, k) => k === myIdx ? { ...sl, length: s } : sl));
-                  }}>{s}초</Chip>
-                ))}
-              </div>
-              <div className="w-[140px]">
-                <NumberInput value={data.adLength} onChange={v => {
-                  set("adLength", v);
-                  if (myIdx >= 0 && v != null) set("slots", data.slots.map((sl, k) => k === myIdx ? { ...sl, length: v } : sl));
-                }} min={5} max={300} suffix="초" />
-              </div>
-            </div>
-          </Field>
-        </div>
-
-        {/* divider */}
-        <div className="col-span-12 h-px bg-[#e6e9ef] my-1" />
-
-        {/* 슬롯 구성 */}
-        <div className="col-span-12">
-          <Field
-            label="광고 송출 주기 · 슬롯 구성"
-            required
-            hint="한 디바이스에서 여러 광고가 번갈아 송출될 때, 우리 광고의 순서를 지정합니다. 선택된 슬롯의 시간대에만 시선 데이터를 수집해요."
-          >
-            <div className="flex flex-col gap-[14px]">
-              {/* controls */}
-              <div className="flex gap-5 items-end flex-wrap">
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[13px] font-semibold text-[#0c1424]">총 슬롯 수</span>
-                  <span className="text-[12px] text-[#8a93a6]">한 사이클에 포함되는 광고 개수입니다.</span>
-                  <div className="inline-flex items-center h-11 border border-[#d7dce5] rounded-[10px] overflow-hidden bg-white">
-                    <button
-                      type="button"
-                      onClick={() => setSlotCount(Math.max(1, data.slots.length - 1))}
-                      className="w-[42px] h-full border-0 bg-transparent text-[#475066] cursor-pointer flex items-center justify-center hover:bg-[#f7f9fc] hover:text-[#0c1424] transition-colors"
-                    >
-                      <MinusIcon />
-                    </button>
-                    <span className="flex-1 text-center font-mono font-semibold text-[14px]">{data.slots.length}</span>
-                    <button
-                      type="button"
-                      onClick={() => setSlotCount(Math.min(8, data.slots.length + 1))}
-                      className="w-[42px] h-full border-0 bg-transparent text-[#475066] cursor-pointer flex items-center justify-center hover:bg-[#f7f9fc] hover:text-[#0c1424] transition-colors"
-                    >
-                      <PlusIcon />
-                    </button>
-                  </div>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <span className="text-[13px] font-semibold text-[#0c1424]">내 광고 순서</span>
-                  <span className="text-[12px] text-[#8a93a6]">슬롯을 직접 눌러서 지정할 수도 있어요.</span>
-                  <SelectInput
-                    value={String(myIdx + 1)}
-                    onChange={v => chooseMine(Number(v) - 1)}
-                    options={data.slots.map((_, i) => ({ value: String(i + 1), label: `${i + 1}번째 슬롯` }))}
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5 min-w-[200px]">
-                  <span className="text-[13px] font-semibold text-[#0c1424]">한 사이클 총 길이</span>
-                  <span className="text-[12px] text-[#8a93a6] invisible">placeholder</span>
-                  <div className="h-11 px-[14px] bg-white border border-[#d7dce5] rounded-[10px] flex items-center font-mono font-semibold text-[14px]">
-                    {totalLoop}초
-                    <span className="ml-2 font-normal font-sans text-[#8a93a6] text-[12px]">
-                      · 약 {Math.round((3600 / Math.max(1, totalLoop)) * 10) / 10}회 / 시간
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* slot track */}
-              <div className="flex gap-[10px] p-[18px] bg-[#f7f9fc] border border-dashed border-[#d7dce5] rounded-[14px] overflow-x-auto">
-                {data.slots.map((s, i) => (
-                  <div
-                    key={i}
-                    role="button"
-                    onClick={() => chooseMine(i)}
-                    className={`flex-1 min-w-[120px] rounded-[12px] p-[14px] cursor-pointer relative transition-all flex flex-col gap-2 ${
-                      s.mine
-                        ? "bg-[#0c1424] border border-[#0c1424] shadow-[0_8px_20px_-10px_rgba(12,20,36,0.45)]"
-                        : "bg-white border border-[#d7dce5] hover:border-[#8a93a6]"
-                    }`}
-                  >
-                    {s.mine && (
-                      <span className="absolute -top-2 right-[10px] bg-[#2A6FDB] text-white font-mono text-[10px] tracking-[0.08em] px-2 py-0.5 rounded-[4px] font-bold">
-                        MY AD
-                      </span>
-                    )}
-                    <span className={`font-mono text-[11px] tracking-[0.08em] uppercase ${s.mine ? "text-white/60" : "text-[#8a93a6]"}`}>
-                      SLOT {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className={`text-[13px] ${s.mine ? "text-white font-bold" : "text-[#475066] font-medium"}`}>
-                      {s.mine ? (data.brand || "내 광고") : "다른 광고"}
-                    </span>
-                    <div onClick={e => e.stopPropagation()} className="flex items-center gap-1">
-                      <input
-                        type="number"
-                        value={s.length ?? ""}
-                        onChange={e => setSlotLen(i, e.target.value === "" ? null : Number(e.target.value))}
-                        min={5} max={300}
-                        className={`w-full border-0 bg-transparent p-0 font-mono text-[13px] font-semibold outline-none ${s.mine ? "text-white" : "text-[#475066]"}`}
-                      />
-                      <span className={`font-mono text-[12px] ${s.mine ? "text-white/80" : "text-[#475066]"}`}>초</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* legend */}
-              <div className="flex gap-[18px] text-[#8a93a6] text-[12px]">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-[3px] bg-[#0c1424] border border-[#0c1424] shrink-0" />
-                  내 광고 슬롯 — 이 구간만 시선 데이터를 DB에 저장합니다
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="w-3 h-3 rounded-[3px] bg-white border border-[#d7dce5] shrink-0" />
-                  다른 광고 — 데이터 미수집
-                </span>
-              </div>
-            </div>
-          </Field>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Section 03: 매체·타겟 정보 ───────────────────────────────────────────────
+// ─── Section 02: 매체·타겟 정보 ───────────────────────────────────────────────
 function SectionMediaTarget({ data, set }: { data: FormData; set: SetFn }) {
   function addAddr() {
     set("addresses", [...data.addresses, { addr: "", label: "" }]);
+    set("slotConfigs", [...data.slotConfigs, { adLength: 15, slots: [{ length: 15, mine: true }] }]);
   }
   function setAddr(i: number, key: keyof AddressItem, v: string) {
     set("addresses", data.addresses.map((a, k) => k === i ? { ...a, [key]: v } : a));
@@ -607,6 +413,7 @@ function SectionMediaTarget({ data, set }: { data: FormData; set: SetFn }) {
   function delAddr(i: number) {
     if (data.addresses.length === 1) return;
     set("addresses", data.addresses.filter((_, k) => k !== i));
+    set("slotConfigs", data.slotConfigs.filter((_, k) => k !== i));
   }
   function toggleAge(a: string) {
     const has = data.ages.includes(a);
@@ -618,13 +425,13 @@ function SectionMediaTarget({ data, set }: { data: FormData; set: SetFn }) {
       <SectionHead
         eyebrow="SECTION · MEDIA & TARGET"
         title="매체 · 타겟 정보"
-        desc="디바이스가 설치된 위치와, 광고를 보여 주고 싶은 타겟군을 설정합니다."
-        step="STEP 03 / 04"
+        desc="디바이스가 설치된 위치와 광고를 보여 주고 싶은 타겟군을 설정합니다."
+        step="STEP 02 / 04"
       />
       <div className="px-7 pt-[22px] pb-[26px] grid grid-cols-12 gap-x-5 gap-y-[18px]">
         {/* 위치 */}
         <div className="col-span-12">
-          <Field label="광고 위치" required hint="실내·실외에 따라 노출 환경, 시선 추적 정확도, 단가가 달라집니다.">
+          <Field label="광고 위치" required>
             <div className="grid grid-cols-2 gap-3">
               {([
                 { id: "indoor" as const, label: "실내 INDOOR", desc: "카페·로비·매장 등 실내 설치 디바이스", Icon: IndoorIcon },
@@ -743,6 +550,227 @@ function SectionMediaTarget({ data, set }: { data: FormData; set: SetFn }) {
   );
 }
 
+// ─── SlotBuilder (주소 1개에 대응하는 슬롯 구성 블록) ──────────────────────────
+function SlotBuilder({ config, addrIdx, addrLabel, brandName, onUpdate }: {
+  config: SlotConfig;
+  addrIdx: number;
+  addrLabel: string;
+  brandName: string;
+  onUpdate: (updated: SlotConfig) => void;
+}) {
+  const myIdx = config.slots.findIndex(s => s.mine);
+  const totalLoop = config.slots.reduce((a, b) => a + (Number(b.length) || 0), 0);
+
+  function setSlotCount(n: number) {
+    const next = [...config.slots];
+    while (next.length < n) next.push({ length: 15, mine: false });
+    while (next.length > n) next.pop();
+    if (!next.some(s => s.mine)) next[0].mine = true;
+    onUpdate({ ...config, slots: next });
+  }
+
+  function chooseMine(i: number) {
+    onUpdate({ ...config, slots: config.slots.map((s, k) => ({ ...s, mine: k === i })) });
+  }
+
+  function setSlotLen(i: number, v: number | null) {
+    const next = config.slots.map((s, k) => k === i ? { ...s, length: v } : s);
+    const newAdLength = next[i].mine ? v : config.adLength;
+    onUpdate({ adLength: newAdLength, slots: next });
+  }
+
+  function setAdLength(v: number | null) {
+    const next = myIdx >= 0
+      ? config.slots.map((s, k) => k === myIdx ? { ...s, length: v } : s)
+      : config.slots;
+    onUpdate({ adLength: v, slots: next });
+  }
+
+  return (
+    <div className="flex flex-col gap-[14px]">
+      {/* 주소 레이블 */}
+      <div className="flex items-center gap-3">
+        <span className="font-mono text-[11px] font-bold tracking-[0.1em] text-[#8a93a6] uppercase">
+          ADDR {String(addrIdx + 1).padStart(2, "0")}
+        </span>
+        {addrLabel && (
+          <span className="text-[12px] text-[#475066] font-medium truncate max-w-[320px]">{addrLabel}</span>
+        )}
+      </div>
+
+      {/* 광고 길이 */}
+      <div className="flex items-center gap-[10px] flex-wrap">
+        <span className="text-[13px] font-semibold text-[#0c1424] shrink-0">광고 길이</span>
+        <div className="flex gap-2">
+          {[15, 30, 60].map(s => (
+            <Chip key={s} active={Number(config.adLength) === s} onClick={() => setAdLength(s)}>{s}초</Chip>
+          ))}
+        </div>
+        <div className="w-[130px]">
+          <NumberInput value={config.adLength} onChange={setAdLength} min={5} max={300} suffix="초" />
+        </div>
+      </div>
+
+      {/* controls */}
+      <div className="flex gap-5 items-end flex-wrap">
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px] font-semibold text-[#0c1424]">총 슬롯 수</span>
+          <span className="text-[12px] text-[#8a93a6]">한 사이클에 포함되는 광고 개수입니다.</span>
+          <div className="inline-flex items-center h-11 border border-[#d7dce5] rounded-[10px] overflow-hidden bg-white">
+            <button
+              type="button"
+              onClick={() => setSlotCount(Math.max(1, config.slots.length - 1))}
+              className="w-[42px] h-full border-0 bg-transparent text-[#475066] cursor-pointer flex items-center justify-center hover:bg-[#f7f9fc] hover:text-[#0c1424] transition-colors"
+            >
+              <MinusIcon />
+            </button>
+            <span className="flex-1 text-center font-mono font-semibold text-[14px]">{config.slots.length}</span>
+            <button
+              type="button"
+              onClick={() => setSlotCount(Math.min(8, config.slots.length + 1))}
+              className="w-[42px] h-full border-0 bg-transparent text-[#475066] cursor-pointer flex items-center justify-center hover:bg-[#f7f9fc] hover:text-[#0c1424] transition-colors"
+            >
+              <PlusIcon />
+            </button>
+          </div>
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[13px] font-semibold text-[#0c1424]">내 광고 순서</span>
+          <span className="text-[12px] text-[#8a93a6]">슬롯을 직접 눌러서 지정할 수도 있어요.</span>
+          <SelectInput
+            value={String(myIdx + 1)}
+            onChange={v => chooseMine(Number(v) - 1)}
+            options={config.slots.map((_, i) => ({ value: String(i + 1), label: `${i + 1}번째 슬롯` }))}
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5 min-w-[200px]">
+          <span className="text-[13px] font-semibold text-[#0c1424]">한 사이클 총 길이</span>
+          <span className="text-[12px] text-[#8a93a6] invisible">placeholder</span>
+          <div className="h-11 px-[14px] bg-white border border-[#d7dce5] rounded-[10px] flex items-center font-mono font-semibold text-[14px]">
+            {totalLoop}초
+            <span className="ml-2 font-normal font-sans text-[#8a93a6] text-[12px]">
+              · 약 {Math.round((3600 / Math.max(1, totalLoop)) * 10) / 10}회 / 시간
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* slot track */}
+      <div className="flex gap-[10px] p-[18px] bg-[#f7f9fc] border border-dashed border-[#d7dce5] rounded-[14px] overflow-x-auto">
+        {config.slots.map((s, i) => (
+          <div
+            key={i}
+            role="button"
+            onClick={() => chooseMine(i)}
+            className={`flex-1 min-w-[120px] rounded-[12px] p-[14px] cursor-pointer relative transition-all flex flex-col gap-2 ${
+              s.mine
+                ? "bg-[#0c1424] border border-[#0c1424] shadow-[0_8px_20px_-10px_rgba(12,20,36,0.45)]"
+                : "bg-white border border-[#d7dce5] hover:border-[#8a93a6]"
+            }`}
+          >
+            {s.mine && (
+              <span className="absolute -top-2 right-[10px] bg-[#2A6FDB] text-white font-mono text-[10px] tracking-[0.08em] px-2 py-0.5 rounded-[4px] font-bold">
+                MY AD
+              </span>
+            )}
+            <span className={`font-mono text-[11px] tracking-[0.08em] uppercase ${s.mine ? "text-white/60" : "text-[#8a93a6]"}`}>
+              SLOT {String(i + 1).padStart(2, "0")}
+            </span>
+            <span className={`text-[13px] ${s.mine ? "text-white font-bold" : "text-[#475066] font-medium"}`}>
+              {s.mine ? (brandName || "내 광고") : "다른 광고"}
+            </span>
+            <div onClick={e => e.stopPropagation()} className="flex items-center gap-1">
+              <input
+                type="number"
+                value={s.length ?? ""}
+                onChange={e => setSlotLen(i, e.target.value === "" ? null : Number(e.target.value))}
+                min={5} max={300}
+                className={`w-full border-0 bg-transparent p-0 font-mono text-[13px] font-semibold outline-none ${s.mine ? "text-white" : "text-[#475066]"}`}
+              />
+              <span className={`font-mono text-[12px] ${s.mine ? "text-white/80" : "text-[#475066]"}`}>초</span>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* legend */}
+      <div className="flex gap-[18px] text-[#8a93a6] text-[12px]">
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-[3px] bg-[#0c1424] border border-[#0c1424] shrink-0" />
+          내 광고 슬롯 — 이 구간만 시선 데이터를 DB에 저장합니다
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="w-3 h-3 rounded-[3px] bg-white border border-[#d7dce5] shrink-0" />
+          다른 광고 — 데이터 미수집
+        </span>
+      </div>
+    </div>
+  );
+}
+
+// ─── Section 03: 광고 정보 ────────────────────────────────────────────────────
+function SectionCampaign({ data, set }: { data: FormData; set: SetFn }) {
+  function updateSlotConfig(i: number, updated: SlotConfig) {
+    set("slotConfigs", data.slotConfigs.map((c, k) => k === i ? updated : c));
+  }
+
+  return (
+    <section className={sectionCls}>
+      <SectionHead
+        eyebrow="SECTION · CAMPAIGN"
+        title="광고 정보"
+        desc="송출 기간, 시간대, 슬롯 구성을 설정합니다. 슬롯의 위치는 시선 데이터 수집 구간과 직접 연결돼요."
+        step="STEP 03 / 04"
+      />
+      <div className="px-7 pt-[22px] pb-[26px] grid grid-cols-12 gap-x-5 gap-y-[18px]">
+        {/* 기간 */}
+        <div className="col-span-12">
+          <Field label="광고 게재 기간" required hint="시작일·종료일을 모두 선택해 주세요. 종료일 24:00에 자동 종료됩니다.">
+            <div className="grid gap-[10px] items-center" style={{ gridTemplateColumns: "1fr auto 1fr" }}>
+              <DateInput value={data.startDate} onChange={v => set("startDate", v)} />
+              <span className="text-[#b3bac8]"><ArrowIcon /></span>
+              <DateInput value={data.endDate} onChange={v => set("endDate", v)} />
+            </div>
+          </Field>
+        </div>
+
+        {/* 시간대 */}
+        <div className="col-span-6">
+          <Field label="광고 송출 시간" required hint="이 시간대에만 송출됩니다. (디바이스 운영 시간 내에서 적용)">
+            <div className="grid gap-[10px] items-center" style={{ gridTemplateColumns: "1fr auto 1fr" }}>
+              <TimeInput value={data.startTime} onChange={v => set("startTime", v)} />
+              <span className="text-[#b3bac8]"><ArrowIcon /></span>
+              <TimeInput value={data.endTime} onChange={v => set("endTime", v)} />
+            </div>
+          </Field>
+        </div>
+
+        {/* 슬롯 구성 — 주소별 1개씩 */}
+        {data.slotConfigs.map((config, i) => (
+          <div key={i} className="col-span-12">
+            {i > 0 && <div className="h-px bg-[#e6e9ef] mb-[18px]" />}
+            <Field
+              label={i === 0 ? "광고 송출 주기 · 슬롯 구성" : undefined}
+              required={i === 0}
+              hint={i === 0 ? "한 디바이스에서 여러 광고가 번갈아 송출될 때 광고의 순서를 지정합니다. 선택된 슬롯의 시간대에만 시선 데이터를 수집해요." : undefined}
+            >
+              <SlotBuilder
+                config={config}
+                addrIdx={i}
+                addrLabel={data.addresses[i]?.label || data.addresses[i]?.addr || ""}
+                brandName={data.brand}
+                onUpdate={updated => updateSlotConfig(i, updated)}
+              />
+            </Field>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 // ─── Section 04: 담당자 정보 ───────────────────────────────────────────────────
 function SectionContact({ data, set }: { data: FormData; set: SetFn }) {
   return (
@@ -760,13 +788,13 @@ function SectionContact({ data, set }: { data: FormData; set: SetFn }) {
           </Field>
         </div>
         <div className="col-span-4">
-          <Field label="연락처" required hint="'-' 없이 숫자만 입력해도 자동 포맷됩니다.">
+          <Field label="연락처" required hint="'-'를 넣어 입력해주세요">
             <TextInput value={data.phone} onChange={v => set("phone", v)} placeholder="010-0000-0000" />
           </Field>
         </div>
         <div className="col-span-4">
           <Field label="이메일" required hint="검토 결과와 인보이스가 발송됩니다.">
-            <TextInput value={data.email} onChange={v => set("email", v)} placeholder="name@company.com" type="email" />
+            <TextInput value={data.email} onChange={v => set("email", v)} placeholder="teamtakealook@naver.com" type="email" />
           </Field>
         </div>
       </div>
@@ -802,8 +830,9 @@ function Summary({ data }: { data: FormData }) {
     ? (data.ages.includes("all") ? "전체 연령" : data.ages.filter(a => a !== "all").map(a => a === "70" ? "70대+" : a + "대").join(", "))
     : null;
   const genderLabel = { all: "전체", m: "남성", f: "여성" }[data.gender];
-  const myIdx = data.slots.findIndex(s => s.mine);
-  const totalLoop = data.slots.reduce((a, b) => a + (Number(b.length) || 0), 0);
+  const firstConfig = data.slotConfigs[0];
+  const myIdx = firstConfig?.slots.findIndex(s => s.mine) ?? -1;
+  const totalLoop = firstConfig?.slots.reduce((a, b) => a + (Number(b.length) || 0), 0) ?? 0;
   const period = (data.startDate && data.endDate)
     ? `${formatDate(data.startDate)} → ${formatDate(data.endDate)}`
     : null;
@@ -815,7 +844,7 @@ function Summary({ data }: { data: FormData }) {
   const checks = [
     !!data.brand, !!data.company, !!data.category,
     !!data.startDate, !!data.endDate, !!data.startTime, !!data.endTime,
-    !!data.adLength, !!data.placement, addrs.length > 0,
+    !!firstConfig?.adLength, !!data.placement, addrs.length > 0,
     !!data.ages.length, !!data.gender, !!data.name, !!data.phone, !!data.email,
   ];
   const filled = checks.filter(Boolean).length;
@@ -844,8 +873,8 @@ function Summary({ data }: { data: FormData }) {
         />
         <SummaryRow
           k="AD LENGTH"
-          v={data.adLength ? `${data.adLength}초` : null}
-          sub={myIdx >= 0 ? `${data.slots.length}개 슬롯 중 ${myIdx + 1}번째` : null}
+          v={firstConfig?.adLength ? `${firstConfig.adLength}초` : null}
+          sub={myIdx >= 0 ? `${firstConfig?.slots.length ?? 1}개 슬롯 중 ${myIdx + 1}번째` : null}
           placeholder="광고 길이 미설정"
         />
         <SummaryRow
@@ -928,12 +957,6 @@ export default function ApplyPage() {
         <div className="flex gap-[10px] shrink-0">
           <button
             type="button"
-            className="inline-flex items-center gap-2 h-11 px-[18px] rounded-[10px] border border-[#d7dce5] bg-white text-[14px] font-semibold text-[#0c1424] cursor-pointer hover:border-[#8a93a6] transition-all"
-          >
-            <RefreshIcon /> 임시 저장
-          </button>
-          <button
-            type="button"
             onClick={() => router.push("/main")}
             className="inline-flex items-center gap-2 h-11 px-[18px] rounded-[10px] border border-[#e6e9ef] bg-transparent text-[14px] font-semibold text-[#0c1424] cursor-pointer hover:border-[#8a93a6] transition-all"
           >
@@ -946,8 +969,8 @@ export default function ApplyPage() {
       <div className="grid gap-7 items-start" style={{ gridTemplateColumns: "minmax(0, 1fr) 380px" }}>
         <div className="flex flex-col gap-5 min-w-0">
           <SectionBrand data={data} set={set} />
-          <SectionCampaign data={data} set={set} />
           <SectionMediaTarget data={data} set={set} />
+          <SectionCampaign data={data} set={set} />
           <SectionContact data={data} set={set} />
 
           {/* Form footer */}
@@ -956,12 +979,6 @@ export default function ApplyPage() {
               모든 항목은 신청 후에도 운영팀에 요청해 수정할 수 있어요.
             </div>
             <div className="flex gap-[10px] shrink-0">
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 h-11 px-[18px] rounded-[10px] border border-[#d7dce5] bg-white text-[14px] font-semibold text-[#0c1424] cursor-pointer hover:border-[#8a93a6] transition-all"
-              >
-                임시 저장
-              </button>
               <button
                 type="button"
                 className="inline-flex items-center gap-2 h-11 px-[18px] rounded-[10px] border-0 bg-[#0c1424] text-[14px] font-semibold text-white cursor-pointer hover:bg-[#1a2236] transition-all"
