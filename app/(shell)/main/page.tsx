@@ -180,7 +180,6 @@ function CampaignRow({ c, expanded, onToggle }: { c: Campaign; expanded: boolean
         <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) auto 32px", gap: 24, alignItems: "center" }}>
           <div style={{ minWidth: 0 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.12em" }}>{c.id}</span>
               <StatusPill status={c.status} />
             </div>
             <div style={{ fontSize: 15.5, fontWeight: 700, color: t.ink, letterSpacing: "-0.018em", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -223,12 +222,11 @@ function CampaignRow({ c, expanded, onToggle }: { c: Campaign; expanded: boolean
             <div style={{ background: "#fff", border: `1px solid ${t.lineSoft}`, borderRadius: 10, overflow: "hidden" }}>
               <div style={{
                 display: "grid",
-                gridTemplateColumns: "120px minmax(0,1.6fr) 1fr 110px 120px",
+                gridTemplateColumns: "minmax(0,1.6fr) 1fr 110px 120px",
                 padding: "10px 16px", fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono,
                 letterSpacing: "0.12em", background: t.bgWarm,
                 borderBottom: `1px solid ${t.lineSoft}`,
               }}>
-                <span>DEVICE ID</span>
                 <span>위치</span>
                 <span>매체 유형</span>
                 <span>상태</span>
@@ -237,12 +235,11 @@ function CampaignRow({ c, expanded, onToggle }: { c: Campaign; expanded: boolean
               {c.devicesList.map((d, i) => (
                 <div key={d.id + i} style={{
                   display: "grid",
-                  gridTemplateColumns: "120px minmax(0,1.6fr) 1fr 110px 120px",
+                  gridTemplateColumns: "minmax(0,1.6fr) 1fr 110px 120px",
                   padding: "13px 16px", fontSize: 12.5, alignItems: "center",
                   borderTop: i === 0 ? "none" : `1px solid ${t.lineSoft}`,
                   color: t.inkSoft,
                 }}>
-                  <span style={{ fontFamily: "JetBrains Mono, monospace", color: t.blue, fontWeight: 600 }}>{d.id}</span>
                   <span style={{ color: t.ink, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 12 }}>{d.name}</span>
                   <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.muted, letterSpacing: "0.06em" }}>{d.type}</span>
                   <span><StatusPill status={d.status} /></span>

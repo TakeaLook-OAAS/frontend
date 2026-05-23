@@ -157,6 +157,26 @@ export async function getGoldenZone(
   return res.json();
 }
 
+export async function getRawPoints(
+  campaign_id: string,
+  device_id: string,
+  start_date?: string,
+  end_date?: string,
+  token?: string,
+): Promise<GoldenZoneResponse> {
+  const url = new URL(`${BASE}/stats/raw-points/`);
+  url.searchParams.set("campaign_id", campaign_id);
+  url.searchParams.set("device_id", device_id);
+  if (start_date) url.searchParams.set("start_date", start_date);
+  if (end_date)   url.searchParams.set("end_date",   end_date);
+  const res = await fetch(url.toString(), {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new Error(`/stats/raw-points/ 오류: ${res.status}`);
+  return res.json();
+}
+
 // ── 캠페인 목록 ───────────────────────────────────────────────────────────────
 
 export interface DeviceSimple {
