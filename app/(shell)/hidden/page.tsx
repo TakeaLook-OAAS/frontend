@@ -7,14 +7,14 @@
 //   /hidden?campaign_id=<UUID>&device_id=<UUID>&start_date=YYYY-MM-DD&end_date=YYYY-MM-DD
 //
 // 예시:
-//   /hidden?campaign_id=aaaaaaaa-0000-0000-0000-000000000001&device_id=dddddddd-0000-0000-0000-000000000001&start_date=2026-04-30&end_date=2026-05-14
+//   /hidden?campaign_id=cccccccc-0000-0000-0000-000000000001&device_id=dddddddd-0000-0000-0000-000000000001&start_date=2026-04-30&end_date=2026-05-14
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import DbscanChart from "@/components/dashboard/DbscanChart";
 import { getRawPoints, GoldenZoneResponse } from "@/lib/api";
 
-export default function HiddenPage() {
+function HiddenContent() {
   const searchParams = useSearchParams();
   const [data, setData] = useState<GoldenZoneResponse | undefined>();
   const [error, setError] = useState<string | null>(null);
@@ -57,5 +57,13 @@ export default function HiddenPage() {
       {error   && <p style={{ color: "#D7563D", fontSize: 13 }}>{error}</p>}
       <DbscanChart goldenZone={data} />
     </div>
+  );
+}
+
+export default function HiddenPage() {
+  return (
+    <Suspense>
+      <HiddenContent />
+    </Suspense>
   );
 }
