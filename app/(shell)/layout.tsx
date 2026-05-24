@@ -100,7 +100,7 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
             display: "flex", alignItems: "center", justifyContent: "center",
           }}>FC</div>
           <div style={{ minWidth: 0, flex: 1 }}>
-            <div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-0.01em" }}>aaaaaaaaaaaa</div>
+            {/*<div style={{ fontSize: 13, fontWeight: 700, letterSpacing: "-0.01em" }}>aaaaaaaaaaaa</div>*/}
             <div style={{ fontSize: 11, color: "#A8B4C9", marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{email}</div>
           </div>
         </div>
