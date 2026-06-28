@@ -94,12 +94,16 @@ export async function getRangeStats(params: {
   end_date: string;
   device_id: string;
   campaign_id: string;
+  gender?: string;
+  age_group?: string;
 }, token?: string): Promise<RangeStatsResponse> {
   const url = new URL(`${BASE}/stats/range/`);
   url.searchParams.set("start_date", params.start_date);
   url.searchParams.set("end_date",   params.end_date);
   url.searchParams.set("device_id",   params.device_id);
   url.searchParams.set("campaign_id", params.campaign_id);
+  if (params.gender)    url.searchParams.set("gender",    params.gender);
+  if (params.age_group) url.searchParams.set("age_group", params.age_group);
   const res = await fetch(url.toString(), {
     cache: "no-store",
     headers: token ? { Authorization: `Bearer ${token}` } : {},

@@ -45,6 +45,8 @@ export default function AnalyticsPage() {
   const [rangeStats, setRangeStats] = useState<RangeStatsResponse | null>(null);
   const [advChartData, setAdvChartData] = useState<DayPoint[]>([]);
   const [perDayLoading, setPerDayLoading] = useState(false);
+  const [selectedGender, setSelectedGender] = useState<string | undefined>();
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState<string | undefined>();
 
   const campaignId = selected?.campaign_id;
   const deviceId = selected?.device_id;
@@ -72,11 +74,11 @@ export default function AnalyticsPage() {
       return;
     }
     if (campaignId && deviceId) {
-      getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId }, token)
+      getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId, gender: selectedGender, age_group: selectedAgeGroup }, token)
         .then(setRangeStats)
         .catch(() => setRangeStats(null));
     }
-  }, [startDate, endDate, hasRange, campaignId, deviceId, token]);
+  }, [startDate, endDate, hasRange, campaignId, deviceId, token, selectedGender, selectedAgeGroup]);
 
   useEffect(() => {
     if (!startDate || !campaignId || !deviceId) {
@@ -91,7 +93,7 @@ export default function AnalyticsPage() {
 
     Promise.all(
       days.map((day) =>
-        getRangeStats({ start_date: day, end_date: day, device_id: deviceId, campaign_id: campaignId }, token)
+        getRangeStats({ start_date: day, end_date: day, device_id: deviceId, campaign_id: campaignId, gender: selectedGender, age_group: selectedAgeGroup }, token)
           .then((res) => ({
             date: day,
             avg_attention_time: res.exposure_count > 0 ? parseFloat((res.avg_attention_time_ms / 1000).toFixed(2)) : null,
@@ -110,7 +112,7 @@ export default function AnalyticsPage() {
         setAdvChartData(results.map(r => ({ date: r.date, avg_attention_time: r.avg_attention_time, attention_rate_tracks: r.attention_rate_tracks, viewability_score: r.viewability_score })));
       })
       .finally(() => setPerDayLoading(false));
-  }, [startDate, endDate, campaignId, deviceId, token]);
+  }, [startDate, endDate, campaignId, deviceId, token, selectedGender, selectedAgeGroup]);
 
 
 
@@ -400,6 +402,95 @@ export default function AnalyticsPage() {
               <span style={{ width: 6, height: 6, borderRadius: "50%", background: hasRange ? t.green : t.mono }} />
               {hasRange ? "기간 선택 완료" : "기간을 선택해 주세요"}
             </span>
+          </div>
+        </div>
+
+        {/* ---------------- gender / age filter row ---------------- */}
+        <div
+          style={{
+            background: "#fff",
+            border: `1px solid ${t.lineSoft}`,
+            borderRadius: 14,
+            boxShadow: "0 1px 2px rgba(13,42,92,0.03)",
+            padding: "14px 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: 24,
+            flexWrap: "wrap",
+          }}
+        >
+          {/* 성별 */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 58 }}>
+              GENDER
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {([{ id: undefined, l: "전체" }, { id: "male", l: "남성" }, { id: "female", l: "여성" }] as const).map((g) => {
+                const active = selectedGender === g.id;
+                return (
+                  <button
+                    key={String(g.id)}
+                    type="button"
+                    onClick={() => setSelectedGender(g.id)}
+                    style={{
+                      padding: "7px 14px",
+                      borderRadius: 8,
+                      border: active ? "none" : `1px solid ${t.line}`,
+                      background: active ? t.ink : "#fff",
+                      color: active ? "#fff" : t.inkSoft,
+                      fontSize: 12.5,
+                      fontFamily: "inherit",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {g.l}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <span style={{ width: 1, height: 22, background: t.lineSoft }} />
+
+          {/* 나이대 */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 38 }}>
+              AGE
+            </div>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {([
+                { id: undefined, l: "전체" },
+                { id: "10-19", l: "10대" },
+                { id: "20-29", l: "20대" },
+                { id: "30-39", l: "30대" },
+                { id: "40-49", l: "40대" },
+                { id: "50-59", l: "50대" },
+                { id: "60+",   l: "60대+" },
+              ] as const).map((a) => {
+                const active = selectedAgeGroup === a.id;
+                return (
+                  <button
+                    key={String(a.id)}
+                    type="button"
+                    onClick={() => setSelectedAgeGroup(a.id)}
+                    style={{
+                      padding: "7px 14px",
+                      borderRadius: 8,
+                      border: active ? "none" : `1px solid ${t.line}`,
+                      background: active ? t.ink : "#fff",
+                      color: active ? "#fff" : t.inkSoft,
+                      fontSize: 12.5,
+                      fontFamily: "inherit",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {a.l}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
 
