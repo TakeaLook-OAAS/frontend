@@ -9,7 +9,6 @@ import GenderChart from "@/components/dashboard/GenderChart";
 import AgeChart from "@/components/dashboard/AgeChart";
 import DateRangePicker from "@/components/dashboard/DateRangePicker";
 import SimpleCard from "@/components/dashboard/Simplecard";
-import DbscanChart from "@/components/dashboard/DbscanChart";
 import DailyMetricsChart, { DailyChartPoint } from "@/components/dashboard/DailyMetricsChart";
 import HourlyAudienceChart from "@/components/dashboard/HourlyAudienceChart";
 import DailyEffectsChart, { DayPoint } from "@/components/dashboard/DailyEffectsChart";
@@ -19,11 +18,9 @@ import type { SelectorValue } from "@/components/dashboard/CampaignSelector";
 
 import {
   getCampaigns,
-  getGoldenZone,
   getRangeStats,
   buildExportUrl,
   CampaignItem,
-  GoldenZoneResponse,
   RangeStatsResponse,
 } from "@/lib/api";
 
@@ -43,7 +40,6 @@ const t = {
 export default function AnalyticsPage() {
   const [token, setToken] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [goldenZone, setGoldenZone] = useState<GoldenZoneResponse | undefined>();
   const [options, setOptions] = useState<CampaignItem[]>([]);
   const [selected, setSelected] = useState<SelectorValue | null>(null);
   const [rangeStats, setRangeStats] = useState<RangeStatsResponse | null>(null);
@@ -73,16 +69,12 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (!hasRange) {
       setRangeStats(null);
-      setGoldenZone(undefined);
       return;
     }
     if (campaignId && deviceId) {
       getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId }, token)
         .then(setRangeStats)
         .catch(() => setRangeStats(null));
-      getGoldenZone(campaignId, deviceId, startDate, endDate, token)
-        .then(setGoldenZone)
-        .catch(() => setGoldenZone(undefined));
     }
   }, [startDate, endDate, hasRange, campaignId, deviceId, token]);
 
@@ -283,7 +275,6 @@ export default function AnalyticsPage() {
           onChange={(val) => {
             setSelected(val);
             setRangeStats(null);
-            setGoldenZone(undefined);
             setAdvChartData([]);
           }}
         />
@@ -473,7 +464,7 @@ export default function AnalyticsPage() {
           />
         </section>
 
-        {/* ---------------- Row 3: DBSCAN / Daily Metrics ---------------- */}
+        {/* ---------------- Row 3: Daily Metrics ---------------- */}
         <section
           style={{
             display: "grid",
@@ -482,7 +473,6 @@ export default function AnalyticsPage() {
           }}
         >
           <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
-          <DbscanChart goldenZone={goldenZone} />
         </section>
       </div>
     </>
