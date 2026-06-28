@@ -148,6 +148,30 @@ export default function AnalyticsPage() {
     { age: "60대+", value: totalAge > 0 ? Math.round((count60 / totalAge) * 100) : 0 },
   ] : undefined;
 
+  const intMale = rangeStats?.interested_count_male ?? 0;
+  const intFemale = rangeStats?.interested_count_female ?? 0;
+  const totalIntGender = intMale + intFemale;
+  const interestedGenderData = hasRange && rangeStats ? [
+    { name: "남성", value: totalIntGender > 0 ? Math.round((intMale / totalIntGender) * 100) : 0, color: t.blue },
+    { name: "여성", value: totalIntGender > 0 ? Math.round((intFemale / totalIntGender) * 100) : 0, color: "#EC4899" },
+  ] : undefined;
+
+  const int10 = rangeStats?.interested_count_10s ?? 0;
+  const int20 = rangeStats?.interested_count_20s ?? 0;
+  const int30 = rangeStats?.interested_count_30s ?? 0;
+  const int40 = rangeStats?.interested_count_40s ?? 0;
+  const int50 = rangeStats?.interested_count_50s_plus ?? 0;
+  const int60 = rangeStats?.interested_count_60s_plus ?? 0;
+  const totalIntAge = int10 + int20 + int30 + int40 + int50 + int60;
+  const interestedAgeData = hasRange && rangeStats ? [
+    { age: "10대", value: totalIntAge > 0 ? Math.round((int10 / totalIntAge) * 100) : 0 },
+    { age: "20대", value: totalIntAge > 0 ? Math.round((int20 / totalIntAge) * 100) : 0 },
+    { age: "30대", value: totalIntAge > 0 ? Math.round((int30 / totalIntAge) * 100) : 0 },
+    { age: "40대", value: totalIntAge > 0 ? Math.round((int40 / totalIntAge) * 100) : 0 },
+    { age: "50대", value: totalIntAge > 0 ? Math.round((int50 / totalIntAge) * 100) : 0 },
+    { age: "60대+", value: totalIntAge > 0 ? Math.round((int60 / totalIntAge) * 100) : 0 },
+  ] : undefined;
+
   const dailyMetricsData: DailyChartPoint[] = (() => {
     if (!startDate || !rangeStats) return [];
     const trendMap = Object.fromEntries(rangeStats.daily_trend.map((d) => [d.date, d]));
@@ -431,24 +455,53 @@ export default function AnalyticsPage() {
           />
         </section>
 
-        {/* ---------------- Row 1: Gender / Age / Fixation ---------------- */}
+        {/* ---------------- Row 1: Gender / Age × 노출·관심 4박스 ---------------- */}
         <section
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
             gap: 16,
           }}
         >
-          <GenderChart data={genderData} />
-          <AgeChart data={ageData} />
+          <GenderChart
+            data={genderData}
+            title="노출 인구 성별 분포"
+            subtitle="POPULATION · GENDER SPLIT"
+          />
+          <AgeChart
+            data={ageData}
+            title="노출 인구 연령대 분포"
+            subtitle="POPULATION · AGE"
+          />
+          <GenderChart
+            data={interestedGenderData}
+            title="관심 인구 성별 분포"
+            subtitle="INTERESTED · GENDER SPLIT"
+          />
+          <AgeChart
+            data={interestedAgeData}
+            title="관심 인구 연령대 분포"
+            subtitle="INTERESTED · AGE"
+          />
+        </section>
+
+        {/* ---------------- Row 2: Fixation / Hourly ---------------- */}
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: 16,
+          }}
+        >
           <FixationHistogram
             bins={(rangeStats?.distribution ?? []).map((b) => ({ label: b.bucket, dwell: b.dwell_count, fixation: b.fixation_count }))}
             loading={perDayLoading}
             hasRange={hasRange}
           />
+          <HourlyAudienceChart data={hourlyAudienceData} />
         </section>
 
-        {/* ---------------- Row 2: DailyEffects / Hourly ---------------- */}
+        {/* ---------------- Row 3: Daily Metrics / Daily Effects ---------------- */}
         <section
           style={{
             display: "grid",
@@ -456,22 +509,11 @@ export default function AnalyticsPage() {
             gap: 16,
           }}
         >
-          <HourlyAudienceChart data={hourlyAudienceData} />
           <DailyMetricsChart
             data={dailyMetricsData}
             loading={hasRange && !rangeStats}
             hasRange={hasRange}
           />
-        </section>
-
-        {/* ---------------- Row 3: Daily Metrics ---------------- */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: 16,
-          }}
-        >
           <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
         </section>
       </div>

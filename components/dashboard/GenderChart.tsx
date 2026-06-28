@@ -25,7 +25,15 @@ const C = {
   accent: "#1E5BFF",
 };
 
-export default function GenderChart({ data }: { data?: GenderData[] }) {
+export default function GenderChart({
+  data,
+  title,
+  subtitle,
+}: {
+  data?: GenderData[];
+  title: string;
+  subtitle: string;
+}) {
   // 외부에서 color 안 넣어줘도 의미 통일이 되도록 보정
   const normalized = data?.map((d) =>
     d.name === "여성"
@@ -35,8 +43,8 @@ export default function GenderChart({ data }: { data?: GenderData[] }) {
 
   return (
     <ChartShell
-      title="노출 인구 성별 분포"
-      subtitle="POPULATION · GENDER SPLIT"
+      title={title}
+      subtitle={subtitle}
     >
       {!normalized || normalized.every((d) => d.value === 0) ? (
         <EmptyState height={300} />

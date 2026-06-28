@@ -66,6 +66,14 @@ export interface RangeStatsResponse {
   count_60s_plus: number;
   count_male: number;
   count_female: number;
+  interested_count_male: number;
+  interested_count_female: number;
+  interested_count_10s: number;
+  interested_count_20s: number;
+  interested_count_30s: number;
+  interested_count_40s: number;
+  interested_count_50s_plus: number;
+  interested_count_60s_plus: number;
   hourly_trend: HourlyTrendPoint[];
   daily_trend: { date: string; exposure_count: number; interested_count: number; total_dwell_ms: number; total_attention_ms: number }[];
   distribution: DistributionBucket[];
