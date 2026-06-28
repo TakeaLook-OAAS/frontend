@@ -78,28 +78,6 @@ export interface RangeStatsResponse {
   target_match_rate:       number | null;
 }
 
-// ── 골든존 타입 ───────────────────────────────────────────────────────────────
-
-export interface GoldenZoneCluster {
-  label: number;
-  point_count: number;
-  points: [number, number][] | null;
-}
-
-export interface GoldenZoneResponse {
-  campaign_id: string;
-  device_id: string;
-  computed_at: string;
-  point_count: number;
-  event_count: number;
-  dbscan: {
-    eps: number;
-    min_samples: number;
-    cluster_count: number;
-    noise_count: number;
-  };
-  clusters: GoldenZoneCluster[];
-}
 
 // ── fetch 함수 ────────────────────────────────────────────────────────────────
 
@@ -134,46 +112,6 @@ export async function getCampaignAggs(params?: {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   if (!res.ok) throw new Error(`/stats/campaign/ 오류: ${res.status}`);
-  return res.json();
-}
-
-export async function getGoldenZone(
-  campaign_id: string,
-  device_id: string,
-  start_date?: string,
-  end_date?: string,
-  token?: string,
-): Promise<GoldenZoneResponse> {
-  const url = new URL(`${BASE}/stats/golden-zone/`);
-  url.searchParams.set("campaign_id", campaign_id);
-  url.searchParams.set("device_id", device_id);
-  if (start_date) url.searchParams.set("start_date", start_date);
-  if (end_date)   url.searchParams.set("end_date",   end_date);
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new Error(`/stats/golden-zone/ 오류: ${res.status}`);
-  return res.json();
-}
-
-export async function getRawPoints(
-  campaign_id: string,
-  device_id: string,
-  start_date?: string,
-  end_date?: string,
-  token?: string,
-): Promise<GoldenZoneResponse> {
-  const url = new URL(`${BASE}/stats/raw-points/`);
-  url.searchParams.set("campaign_id", campaign_id);
-  url.searchParams.set("device_id", device_id);
-  if (start_date) url.searchParams.set("start_date", start_date);
-  if (end_date)   url.searchParams.set("end_date",   end_date);
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new Error(`/stats/raw-points/ 오류: ${res.status}`);
   return res.json();
 }
 
