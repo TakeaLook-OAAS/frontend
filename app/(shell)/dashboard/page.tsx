@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { format, eachDayOfInterval, parseISO, subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Users, Clock, Eye, TrendingUp, Target, Download, UserCheck } from "lucide-react";
@@ -38,6 +39,10 @@ const t = {
 };
 
 export default function AnalyticsPage() {
+  const searchParams = useSearchParams();
+  const initCampaignId = searchParams.get("campaign_id");
+  const didAutoSelect = useRef(false);
+
   const [token, setToken] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [options, setOptions] = useState<CampaignItem[]>([]);
@@ -62,8 +67,16 @@ export default function AnalyticsPage() {
     getCampaigns(t)
       .then(({ results }) => {
         setOptions(results);
-        if (results.length > 0)
-          setSelected({ campaign_id: results[0].id, device_id: results[0].devices[0]?.id ?? "" });
+        if (results.length === 0) return;
+        if (!didAutoSelect.current && initCampaignId) {
+          const match = results.find(c => c.id === initCampaignId);
+          if (match) {
+            setSelected({ campaign_id: match.id, device_id: match.devices[0]?.id ?? "" });
+            didAutoSelect.current = true;
+            return;
+          }
+        }
+        setSelected({ campaign_id: results[0].id, device_id: results[0].devices[0]?.id ?? "" });
       })
       .catch(() => { });
   }, []);
