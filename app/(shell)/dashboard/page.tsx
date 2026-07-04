@@ -38,7 +38,9 @@ const t = {
   muted: "#5B6786", mono: "#8893AB",
 };
 
-export default function AnalyticsPage() {
+import { Suspense } from "react";
+
+function DashboardInner() {
   const searchParams = useSearchParams();
   const initCampaignId = searchParams.get("campaign_id");
   const didAutoSelect = useRef(false);
@@ -622,5 +624,13 @@ export default function AnalyticsPage() {
         </section>
       </div>
     </>
+  );
+}
+
+export default function AnalyticsPage() {
+  return (
+    <Suspense>
+      <DashboardInner />
+    </Suspense>
   );
 }
