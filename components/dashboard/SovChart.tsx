@@ -35,8 +35,21 @@ interface DailyTrendItem {
 interface Props {
   sov:        number | null;
   dailyTrend: DailyTrendItem[];
+  startDate?: string;
+  endDate?:   string;
   hasRange?:  boolean;
   loading?:   boolean;
+}
+
+function getDateRange(start: string, end: string): string[] {
+  const dates: string[] = [];
+  const cur = new Date(start);
+  const last = new Date(end);
+  while (cur <= last) {
+    dates.push(cur.toISOString().slice(0, 10));
+    cur.setDate(cur.getDate() + 1);
+  }
+  return dates;
 }
 
 interface BarEntry {
@@ -67,20 +80,27 @@ function CustomTooltip({ active, payload, label, sovPct }: TooltipProps) {
   );
 }
 
-export default function SovChart({ sov, dailyTrend, hasRange, loading }: Props) {
+export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange, loading }: Props) {
   const sovPct = sov != null ? parseFloat((sov * 100).toFixed(2)) : null;
 
-  const data: BarEntry[] = dailyTrend.map((d) => {
-    const track = d.exposure_count > 0
+  const allDates = startDate && endDate
+    ? getDateRange(startDate, endDate)
+    : dailyTrend.map((d) => d.date);
+
+  const trendMap = Object.fromEntries(dailyTrend.map((d) => [d.date, d]));
+
+  const data: BarEntry[] = allDates.map((date) => {
+    const d = trendMap[date];
+    const track = d && d.exposure_count > 0
       ? parseFloat(((d.interested_count / d.exposure_count) * 100).toFixed(2))
       : 0;
-    const time = d.total_dwell_ms > 0
+    const time = d && d.total_dwell_ms > 0
       ? parseFloat(((d.total_attention_ms / d.total_dwell_ms) * 100).toFixed(2))
       : 0;
     const low  = Math.min(track, time);
     const high = Math.max(track, time);
     return {
-      date:  d.date.slice(5),
+      date:  date.slice(5),
       track,
       time,
       base:  parseFloat(low.toFixed(2)),
@@ -91,7 +111,7 @@ export default function SovChart({ sov, dailyTrend, hasRange, loading }: Props) 
   const getColor = (d: BarEntry) => d.track >= d.time ? C.green : C.blue;
 
   const empty = (
-    <div style={{ height: 280, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
+    <div style={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
       {loading ? "불러오는 중..." : "기간을 선택하면 차트가 표시됩니다"}
     </div>
   );
@@ -129,7 +149,7 @@ export default function SovChart({ sov, dailyTrend, hasRange, loading }: Props) 
         <>
           <div style={{ overflowX: scrollable ? "auto" : "visible" }}>
             <div style={{ width: scrollable ? data.length * 52 : "100%" }}>
-              <ResponsiveContainer width="100%" height={280}>
+              <ResponsiveContainer width="100%" height={400}>
                 <ComposedChart data={data} margin={{ top: 6, right: 52, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false} />
                   <XAxis
@@ -179,7 +199,7 @@ export default function SovChart({ sov, dailyTrend, hasRange, loading }: Props) 
             ).map(({ color, label, dashed }) => (
               <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, color: C.muted }}>
                 {dashed ? (
-                  <svg width="16" height="10"><line x1="0" y1="5" x2="16" y2="5" stroke={color} strokeWidth="2" strokeDasharray="4 2" /></svg>
+                  <span style={{ display: "inline-block", width: 16, height: 2, background: `repeating-linear-gradient(90deg, ${color} 0, ${color} 4px, transparent 4px, transparent 6px)` }} />
                 ) : (
                   <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: color }} />
                 )}
