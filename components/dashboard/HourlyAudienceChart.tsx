@@ -97,8 +97,8 @@ export default function HourlyAudienceChart({ data }: Props) {
                     return [`${n.toLocaleString()}명`, String(name)];
                   }}
                 />
-                <Bar yAxisId="left" dataKey="exposure" name="노출인구" fill={C.blue} radius={[4, 4, 0, 0]} barSize={9} />
-                <Bar yAxisId="left" dataKey="interested" name="관심인구" fill={C.green} radius={[4, 4, 0, 0]} barSize={9} />
+                <Bar yAxisId="left" dataKey="exposure" name="노출인구" fill={C.blue} radius={0} barSize={16} />
+                <Bar yAxisId="left" dataKey="interested" name="관심인구" fill={C.green} radius={0} barSize={16} />
                 <Line yAxisId="right" type="monotone" dataKey="attentionRate" name="포착관심도" stroke={C.amber} strokeWidth={2.2} dot={false} activeDot={{ r: 6, fill: C.amber }} />
               </ComposedChart>
             </ResponsiveContainer>

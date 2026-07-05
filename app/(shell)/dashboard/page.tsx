@@ -6,8 +6,7 @@ import { format, eachDayOfInterval, parseISO, subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Users, Clock, Eye, TrendingUp, Target, Download, UserCheck } from "lucide-react";
 
-import GenderChart from "@/components/dashboard/GenderChart";
-import AgeChart from "@/components/dashboard/AgeChart";
+import AgeGenderChart from "@/components/dashboard/AgeGenderChart";
 import DateRangePicker from "@/components/dashboard/DateRangePicker";
 import SimpleCard from "@/components/dashboard/Simplecard";
 import DailyMetricsChart, { DailyChartPoint } from "@/components/dashboard/DailyMetricsChart";
@@ -16,6 +15,7 @@ import DailyEffectsChart, { DayPoint } from "@/components/dashboard/DailyEffects
 import FixationHistogram from "@/components/dashboard/FixationHistogram";
 import CampaignSelector from "@/components/dashboard/CampaignSelector";
 import type { SelectorValue } from "@/components/dashboard/CampaignSelector";
+import SovChart from "@/components/dashboard/SovChart";
 
 import {
   getCampaigns,
@@ -143,51 +143,21 @@ function DashboardInner() {
 
   const totalMale = rangeStats?.count_male ?? 0;
   const totalFemale = rangeStats?.count_female ?? 0;
-  const totalGender = totalMale + totalFemale;
-  const genderData = hasRange && rangeStats ? [
-    { name: "남성", value: totalGender > 0 ? Math.round((totalMale / totalGender) * 100) : 0, color: t.blue },
-    { name: "여성", value: totalGender > 0 ? Math.round((totalFemale / totalGender) * 100) : 0, color: "#EC4899" },
-  ] : undefined;
-
   const count10 = rangeStats?.count_10s ?? 0;
   const count20 = rangeStats?.count_20s ?? 0;
   const count30 = rangeStats?.count_30s ?? 0;
   const count40 = rangeStats?.count_40s ?? 0;
   const count50 = rangeStats?.count_50s_plus ?? 0;
   const count60 = rangeStats?.count_60s_plus ?? 0;
-  const totalAge = count10 + count20 + count30 + count40 + count50 + count60;
-  const ageData = hasRange && rangeStats ? [
-    { age: "10대", value: totalAge > 0 ? Math.round((count10 / totalAge) * 100) : 0 },
-    { age: "20대", value: totalAge > 0 ? Math.round((count20 / totalAge) * 100) : 0 },
-    { age: "30대", value: totalAge > 0 ? Math.round((count30 / totalAge) * 100) : 0 },
-    { age: "40대", value: totalAge > 0 ? Math.round((count40 / totalAge) * 100) : 0 },
-    { age: "50대", value: totalAge > 0 ? Math.round((count50 / totalAge) * 100) : 0 },
-    { age: "60대+", value: totalAge > 0 ? Math.round((count60 / totalAge) * 100) : 0 },
-  ] : undefined;
 
   const intMale = rangeStats?.interested_count_male ?? 0;
   const intFemale = rangeStats?.interested_count_female ?? 0;
-  const totalIntGender = intMale + intFemale;
-  const interestedGenderData = hasRange && rangeStats ? [
-    { name: "남성", value: totalIntGender > 0 ? Math.round((intMale / totalIntGender) * 100) : 0, color: t.blue },
-    { name: "여성", value: totalIntGender > 0 ? Math.round((intFemale / totalIntGender) * 100) : 0, color: "#EC4899" },
-  ] : undefined;
-
   const int10 = rangeStats?.interested_count_10s ?? 0;
   const int20 = rangeStats?.interested_count_20s ?? 0;
   const int30 = rangeStats?.interested_count_30s ?? 0;
   const int40 = rangeStats?.interested_count_40s ?? 0;
   const int50 = rangeStats?.interested_count_50s_plus ?? 0;
   const int60 = rangeStats?.interested_count_60s_plus ?? 0;
-  const totalIntAge = int10 + int20 + int30 + int40 + int50 + int60;
-  const interestedAgeData = hasRange && rangeStats ? [
-    { age: "10대", value: totalIntAge > 0 ? Math.round((int10 / totalIntAge) * 100) : 0 },
-    { age: "20대", value: totalIntAge > 0 ? Math.round((int20 / totalIntAge) * 100) : 0 },
-    { age: "30대", value: totalIntAge > 0 ? Math.round((int30 / totalIntAge) * 100) : 0 },
-    { age: "40대", value: totalIntAge > 0 ? Math.round((int40 / totalIntAge) * 100) : 0 },
-    { age: "50대", value: totalIntAge > 0 ? Math.round((int50 / totalIntAge) * 100) : 0 },
-    { age: "60대+", value: totalIntAge > 0 ? Math.round((int60 / totalIntAge) * 100) : 0 },
-  ] : undefined;
 
   const dailyMetricsData: DailyChartPoint[] = (() => {
     if (!startDate || !rangeStats) return [];
@@ -561,53 +531,46 @@ function DashboardInner() {
           />
         </section>
 
-        {/* ---------------- Row 1: Gender / Age × 노출·관심 4박스 ---------------- */}
+        {/* ---------------- Row 1: 성별·연령 통합 파이차트 (노출·관심) / Fixation ---------------- */}
         <section
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
             gap: 16,
           }}
         >
-          <GenderChart
-            data={genderData}
-            title="노출 인구 성별 분포"
-            subtitle="POPULATION · GENDER SPLIT"
+          <AgeGenderChart
+            male={totalMale}
+            female={totalFemale}
+            age10={count10}
+            age20={count20}
+            age30={count30}
+            age40={count40}
+            age50={count50}
+            age60={count60}
+            title="노출 인구 성별·연령 분포"
+            subtitle="POPULATION · GENDER × AGE"
           />
-          <AgeChart
-            data={ageData}
-            title="노출 인구 연령대 분포"
-            subtitle="POPULATION · AGE"
+          <AgeGenderChart
+            male={intMale}
+            female={intFemale}
+            age10={int10}
+            age20={int20}
+            age30={int30}
+            age40={int40}
+            age50={int50}
+            age60={int60}
+            title="관심 인구 성별·연령 분포"
+            subtitle="INTERESTED · GENDER × AGE"
           />
-          <GenderChart
-            data={interestedGenderData}
-            title="관심 인구 성별 분포"
-            subtitle="INTERESTED · GENDER SPLIT"
-          />
-          <AgeChart
-            data={interestedAgeData}
-            title="관심 인구 연령대 분포"
-            subtitle="INTERESTED · AGE"
-          />
-        </section>
-
-        {/* ---------------- Row 2: Fixation / Hourly ---------------- */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: 16,
-          }}
-        >
           <FixationHistogram
             bins={(rangeStats?.distribution ?? []).map((b) => ({ label: b.bucket, dwell: b.dwell_count, fixation: b.fixation_count }))}
             loading={perDayLoading}
             hasRange={hasRange}
           />
-          <HourlyAudienceChart data={hourlyAudienceData} />
         </section>
 
-        {/* ---------------- Row 3: Daily Metrics / Daily Effects ---------------- */}
+        {/* ---------------- Row 2: Daily Metrics / Hourly ---------------- */}
         <section
           style={{
             display: "grid",
@@ -615,12 +578,33 @@ function DashboardInner() {
             gap: 16,
           }}
         >
+          <HourlyAudienceChart data={hourlyAudienceData}
+          />
           <DailyMetricsChart
             data={dailyMetricsData}
             loading={hasRange && !rangeStats}
             hasRange={hasRange}
           />
-          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
+        </section>
+
+        {/* ---------------- Row 3: Daily Effects / SOV ---------------- */}
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: 16,
+          }}
+        >
+          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} 
+          />
+          <SovChart
+            sov={rangeStats?.sov ?? null}
+            dailyTrend={rangeStats?.daily_trend ?? []}
+            startDate={startDate}
+            endDate={endDate}
+            hasRange={hasRange}
+            loading={hasRange && !rangeStats}
+          />
         </section>
       </div>
     </>

@@ -22,6 +22,11 @@ const C = {
 
 export type HistogramBin = { label: string; dwell: number; fixation: number };
 
+const ALL_BUCKETS: string[] = [
+  ...Array.from({ length: 25 }, (_, i) => `${i}~${i + 1}s`),
+  "25s+",
+];
+
 type Props = {
   bins: HistogramBin[];
   loading: boolean;
@@ -29,6 +34,13 @@ type Props = {
 };
 
 export default function FixationHistogram({ bins, loading, hasRange }: Props) {
+  const binMap = Object.fromEntries(bins.map((b) => [b.label, b]));
+  const filledBins: HistogramBin[] = ALL_BUCKETS.map((label) => ({
+    label,
+    dwell:    binMap[label]?.dwell    ?? 0,
+    fixation: binMap[label]?.fixation ?? 0,
+  }));
+
   const isEmpty = bins.length === 0 || bins.every((b) => b.dwell === 0 && b.fixation === 0);
 
   return (
@@ -78,7 +90,7 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
         <>
           <div style={{ height: 400, width: "100%" }}>
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={bins} margin={{ top: 6, right: 12, left: 0, bottom: 5 }}>
+            <ComposedChart data={filledBins} margin={{ top: 6, right: 12, left: 0, bottom: 5 }}>
               <defs>
                 <linearGradient id="dwellGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={C.blue} stopOpacity={0.55} />
