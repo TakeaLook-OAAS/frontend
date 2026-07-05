@@ -11,7 +11,7 @@ const t = {
   amber: "#E89B2A",
 };
 
-type NavKind = "home" | "dash" | "ads" | "guide" | "patch";
+type NavKind = "home" | "dash" | "ads" | "guide" | "patch" | "admin";
 
 function NavIcon({ kind }: { kind: NavKind }) {
   const common = { width: 18, height: 18, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.7, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
@@ -26,15 +26,19 @@ function NavIcon({ kind }: { kind: NavKind }) {
       return (<svg {...common}><path d="M4 5a2 2 0 0 1 2-2h9l5 5v13a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" /><path d="M14 3v6h6" /><path d="M8 13h8M8 17h5" /></svg>);
     case "patch":
       return (<svg {...common}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>);
+    case "admin":
+      return (<svg {...common}><path d="M12 2l3 7h7l-5.5 4 2 7L12 16l-6.5 4 2-7L2 9h7z" /></svg>);
   }
 }
 
 function Sidebar({ current = "home" }: { current?: NavKind }) {
   const [email, setEmail] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
     setEmail(localStorage.getItem("user_email") ?? "");
+    setIsAdmin(localStorage.getItem("user_role") === "ADMIN");
     setCollapsed(localStorage.getItem("sidebar_collapsed") === "true");
   }, []);
 
@@ -45,13 +49,15 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
     });
   }
 
-  const items: { id: NavKind; label: string; icon: NavKind; href: string }[] = [
-    { id: "home", label: "메인 페이지", icon: "home", href: "/main" },
-    { id: "dash", label: "대시보드", icon: "dash", href: "/dashboard" },
-    { id: "ads", label: "내 광고 관리", icon: "ads", href: "/analytics" },
-    { id: "guide", label: "이용 방법", icon: "guide", href: "/guide" },
-    { id: "patch", label: "패치 노트", icon: "patch", href: "/changelog" },
+  const allItems: { id: NavKind; label: string; icon: NavKind; href: string; adminOnly?: boolean }[] = [
+    { id: "home",  label: "메인 페이지",    icon: "home",  href: "/main" },
+    { id: "dash",  label: "대시보드",       icon: "dash",  href: "/dashboard" },
+    { id: "ads",   label: "내 광고 관리",   icon: "ads",   href: "/analytics" },
+    { id: "guide", label: "이용 방법",      icon: "guide", href: "/guide" },
+    { id: "patch", label: "패치 노트",      icon: "patch", href: "/changelog" },
+    { id: "admin", label: "변경 요청 관리", icon: "admin", href: "/admin/requests", adminOnly: true },
   ];
+  const items = allItems.filter(it => !it.adminOnly || isAdmin);
 
   return (
     <aside style={{
@@ -214,6 +220,7 @@ const PATH_TO_NAV: Record<string, NavKind> = {
   "/analytics": "ads",
   "/guide": "guide",
   "/changelog": "patch",
+  "/admin/requests": "admin",
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
