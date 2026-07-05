@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { getCampaigns, buildExportUrl, type CampaignItem } from "@/lib/api";
+import { getCampaigns, buildExportUrl, apiCreateChangeRequest, type CampaignItem } from "@/lib/api";
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const tk = {
@@ -97,6 +97,17 @@ export default function MyAdsPage() {
   const [modal, setModal] = useState<ModalType>(null);
   const [selectedId, setSelectedId] = useState<string>("");
 
+  // Change request state
+  const [crGender, setCrGender] = useState("");
+  const [crAgeGroup, setCrAgeGroup] = useState("");
+  const [crStartDate, setCrStartDate] = useState("");
+  const [crEndDate, setCrEndDate] = useState("");
+  const [crBroadcastStart, setCrBroadcastStart] = useState("09:00");
+  const [crBroadcastEnd, setCrBroadcastEnd] = useState("22:00");
+  const [crReason, setCrReason] = useState("");
+  const [crLoading, setCrLoading] = useState(false);
+  const [crError, setCrError] = useState<string | null>(null);
+
   // CSV state
   const [csvCampaignId, setCsvCampaignId] = useState("");
   const [csvDeviceId, setCsvDeviceId] = useState("");
@@ -131,7 +142,42 @@ export default function MyAdsPage() {
   const totalDevices  = campaigns.reduce((n, c) => n + c.devices.length, 0);
 
   function openDetail(id: string) { setSelectedId(id); setModal("detail"); }
-  function openChange(id: string) { setSelectedId(id); setModal("change"); }
+  function openChange(id: string) {
+    setSelectedId(id);
+    const c = campaigns.find(x => x.id === id);
+    setCrGender("");
+    setCrAgeGroup("");
+    setCrStartDate(c?.start_date ?? "");
+    setCrEndDate(c?.end_date ?? "");
+    setCrBroadcastStart("09:00");
+    setCrBroadcastEnd("22:00");
+    setCrReason("");
+    setCrError(null);
+    setModal("change");
+  }
+
+  async function submitChangeRequest() {
+    if (!selectedId) return;
+    setCrLoading(true);
+    setCrError(null);
+    try {
+      await apiCreateChangeRequest({
+        campaign_id:      selectedId,
+        target_gender:    crGender || undefined,
+        target_age_group: crAgeGroup || undefined,
+        start_date:       crStartDate || undefined,
+        end_date:         crEndDate || undefined,
+        broadcast_start:  crBroadcastStart || undefined,
+        broadcast_end:    crBroadcastEnd || undefined,
+        reason:           crReason || undefined,
+      }, token);
+      closeModal();
+    } catch (e) {
+      setCrError(e instanceof Error ? e.message : "요청 제출에 실패했습니다.");
+    } finally {
+      setCrLoading(false);
+    }
+  }
   function openCsv(id?: string) {
     const cid = id ?? selectedId ?? campaigns[0]?.id ?? "";
     const c = campaigns.find(x => x.id === cid);
@@ -497,14 +543,22 @@ export default function MyAdsPage() {
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
                 <div>
                   <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: tk.inkSoft, marginBottom: 7 }}>타겟 성별</label>
-                  <select style={{ width: "100%", padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }}>
-                    <option>전체</option><option>여성 중심</option><option>남성 중심</option>
+                  <select value={crGender} onChange={e => setCrGender(e.target.value)} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }}>
+                    <option value="">전체</option>
+                    <option value="female">여성 중심</option>
+                    <option value="male">남성 중심</option>
                   </select>
                 </div>
                 <div>
                   <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: tk.inkSoft, marginBottom: 7 }}>타겟 연령대</label>
-                  <select style={{ width: "100%", padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }}>
-                    <option>20 – 39세</option><option>18 – 29세</option><option>30 – 49세</option><option>전 연령</option>
+                  <select value={crAgeGroup} onChange={e => setCrAgeGroup(e.target.value)} style={{ width: "100%", padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }}>
+                    <option value="">전 연령</option>
+                    <option value="10-19">10대</option>
+                    <option value="20-29">20대</option>
+                    <option value="30-39">30대</option>
+                    <option value="40-49">40대</option>
+                    <option value="50-59">50대</option>
+                    <option value="60+">60대+</option>
                   </select>
                 </div>
               </div>
@@ -512,31 +566,39 @@ export default function MyAdsPage() {
               <div>
                 <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: tk.inkSoft, marginBottom: 7 }}>광고 게재 기간</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <input type="date" defaultValue={selected?.start_date} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
+                  <input type="date" value={crStartDate} onChange={e => setCrStartDate(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
                   <span style={{ color: tk.mono, fontSize: 15 }}>→</span>
-                  <input type="date" defaultValue={selected?.end_date} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
+                  <input type="date" value={crEndDate} onChange={e => setCrEndDate(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
                 </div>
               </div>
 
               <div>
                 <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: tk.inkSoft, marginBottom: 7 }}>광고 송출 시간</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <input type="time" defaultValue="09:00" style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
+                  <input type="time" value={crBroadcastStart} onChange={e => setCrBroadcastStart(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
                   <span style={{ color: tk.mono, fontSize: 15 }}>→</span>
-                  <input type="time" defaultValue="22:00" style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
+                  <input type="time" value={crBroadcastEnd} onChange={e => setCrBroadcastEnd(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
                 </div>
               </div>
 
               <div>
                 <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: tk.inkSoft, marginBottom: 7 }}>요청 사유</label>
-                <textarea rows={3} placeholder="변경이 필요한 이유를 입력해 주세요." style={{ width: "100%", padding: "10px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none", resize: "vertical", lineHeight: 1.5, fontFamily: "inherit", boxSizing: "border-box" }} />
+                <textarea rows={3} value={crReason} onChange={e => setCrReason(e.target.value)} placeholder="변경이 필요한 이유를 입력해 주세요." style={{ width: "100%", padding: "10px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none", resize: "vertical", lineHeight: 1.5, fontFamily: "inherit", boxSizing: "border-box" }} />
               </div>
+
+              {crError && (
+                <div style={{ padding: "10px 14px", borderRadius: 9, background: "#FEF2F2", border: "1px solid #FECACA", fontSize: 12.5, color: "#D7563D", fontWeight: 500 }}>
+                  {crError}
+                </div>
+              )}
             </div>
           </div>
 
           <div style={{ display: "flex", justifyContent: "flex-end", gap: 10, padding: "16px 24px", borderTop: `1px solid ${tk.lineSoft}` }}>
-            <button onClick={closeModal} style={{ padding: "10px 18px", borderRadius: 11, fontSize: 13.5, fontWeight: 600, background: "#fff", color: tk.inkSoft, border: `1px solid ${tk.line}`, cursor: "pointer" }}>취소</button>
-            <button onClick={closeModal} style={{ padding: "10px 18px", borderRadius: 11, fontSize: 13.5, fontWeight: 600, background: tk.ink, color: "#fff", border: `1px solid ${tk.ink}`, cursor: "pointer" }}>요청 제출</button>
+            <button onClick={closeModal} disabled={crLoading} style={{ padding: "10px 18px", borderRadius: 11, fontSize: 13.5, fontWeight: 600, background: "#fff", color: tk.inkSoft, border: `1px solid ${tk.line}`, cursor: "pointer" }}>취소</button>
+            <button onClick={submitChangeRequest} disabled={crLoading} style={{ padding: "10px 18px", borderRadius: 11, fontSize: 13.5, fontWeight: 600, background: tk.ink, color: "#fff", border: `1px solid ${tk.ink}`, cursor: crLoading ? "not-allowed" : "pointer", opacity: crLoading ? 0.7 : 1 }}>
+              {crLoading ? "제출 중…" : "요청 제출"}
+            </button>
           </div>
         </ModalShell>
       )}
