@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import {
   ComposedChart,
   Area,
@@ -40,6 +40,14 @@ interface Props {
   loading?:   boolean;
 }
 
+type Period = "day" | "week" | "month";
+
+interface ChartEntry {
+  date:  string;
+  track: number;
+  time:  number;
+}
+
 function getDateRange(start: string, end: string): string[] {
   const dates: string[] = [];
   const cur = new Date(start);
@@ -51,13 +59,47 @@ function getDateRange(start: string, end: string): string[] {
   return dates;
 }
 
-interface ChartEntry {
-  date:  string;
-  track: number;
-  time:  number;
+function aggregateEntries(items: ChartEntry[], period: Period): ChartEntry[] {
+  if (period === "day") return items;
+  if (period === "week") {
+    const result: ChartEntry[] = [];
+    for (let i = 0; i < items.length; i += 7) {
+      const chunk = items.slice(i, i + 7);
+      const n = chunk.length;
+      result.push({
+        date: chunk[0].date,
+        track: parseFloat((chunk.reduce((s, d) => s + d.track, 0) / n).toFixed(3)),
+        time:  parseFloat((chunk.reduce((s, d) => s + d.time,  0) / n).toFixed(3)),
+      });
+    }
+    return result;
+  }
+  // month: date is "MM-DD", group by "MM" prefix
+  const map = new Map<string, { track: number; time: number; count: number }>();
+  const order: string[] = [];
+  for (const d of items) {
+    const key = `${parseInt(d.date.slice(0, 2))}월`;
+    if (!map.has(key)) { map.set(key, { track: 0, time: 0, count: 0 }); order.push(key); }
+    const cur = map.get(key)!;
+    cur.track += d.track;
+    cur.time  += d.time;
+    cur.count++;
+  }
+  return order.map((key) => {
+    const { track, time, count } = map.get(key)!;
+    return {
+      date:  key,
+      track: parseFloat((track / count).toFixed(3)),
+      time:  parseFloat((time  / count).toFixed(3)),
+    };
+  });
 }
 
+const PERIOD_KO: Record<Period, string> = { day: "일", week: "주", month: "월" };
+const TOOLTIP_PREFIX: Record<Period, string> = { day: "날짜", week: "주간", month: "월간" };
+
 export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange, loading }: Props) {
+  const [period, setPeriod] = useState<Period>("day");
   const sovPct = sov != null ? parseFloat((sov * 100).toFixed(2)) : null;
 
   const allDates = startDate && endDate
@@ -66,7 +108,7 @@ export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange
 
   const trendMap = Object.fromEntries(dailyTrend.map((d) => [d.date, d]));
 
-  const data: ChartEntry[] = allDates.map((date) => {
+  const rawData: ChartEntry[] = allDates.map((date) => {
     const d = trendMap[date];
     const trackPct = d && d.exposure_count > 0
       ? (d.interested_count / d.exposure_count) * 100
@@ -74,11 +116,12 @@ export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange
     const timePct = d && d.total_dwell_ms > 0
       ? (d.total_attention_ms / d.total_dwell_ms) * 100
       : 0;
-    // ratio = 관심도 / SOV (SOV=1 기준선)
     const track = sovPct && sovPct > 0 ? parseFloat((trackPct / sovPct).toFixed(3)) : 0;
     const time  = sovPct && sovPct > 0 ? parseFloat((timePct  / sovPct).toFixed(3)) : 0;
     return { date: date.slice(5), track, time };
   });
+
+  const data = aggregateEntries(rawData, period);
 
   const maxRatio = Math.max(0, ...data.map((d) => d.track), ...data.map((d) => d.time));
   const sharedDomain: [number, number] = [0, parseFloat((maxRatio * 1.5).toFixed(3))];
@@ -107,6 +150,22 @@ export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange
     </span>
   ) : null;
 
+  const toggle = (
+    <div style={{ display: "flex", gap: 2, background: C.grid, borderRadius: 8, padding: 2 }}>
+      {(["day", "week", "month"] as Period[]).map((p) => (
+        <button key={p} onClick={() => setPeriod(p)} style={{
+          padding: "3px 10px", fontSize: 11, fontWeight: 600, border: "none", borderRadius: 6,
+          cursor: "pointer", transition: "all 0.15s",
+          background: period === p ? "#fff" : "transparent",
+          color: period === p ? C.ink : C.muted,
+          boxShadow: period === p ? "0 1px 3px rgba(0,0,0,0.1)" : "none",
+        }}>
+          {PERIOD_KO[p]}
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <div
       style={{
@@ -125,13 +184,16 @@ export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange
 
       {/* upper: 포착 관심도 */}
       <div>
-        <div style={{ marginBottom: 10 }}>
-          <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
-            포착 관심도 대비 SOV
-          </h3>
-          <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
-            포착 관심도 / SOV
-          </p>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
+          <div>
+            <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
+              포착 관심도 대비 SOV
+            </h3>
+            <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
+              포착 관심도 / SOV
+            </p>
+          </div>
+          {toggle}
         </div>
 
         {loading || !hasRange || data.length === 0 ? empty(260) : (
@@ -162,7 +224,7 @@ export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange
                     <Tooltip
                       contentStyle={tooltipStyle}
                       formatter={(value) => [`${Number(value).toFixed(2)}`, "포착 관심도 / SOV"]}
-                      labelFormatter={(label) => `날짜: ${label}`}
+                      labelFormatter={(label) => `${TOOLTIP_PREFIX[period]}: ${label}`}
                     />
                     <Area type="monotone" dataKey="track" name="포착 관심도" stroke={C.green} strokeWidth={2} fill="url(#trackGrad)" dot={false} activeDot={{ r: 6, fill: C.green }} connectNulls />
                   </ComposedChart>
@@ -219,7 +281,7 @@ export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange
                     <Tooltip
                       contentStyle={tooltipStyle}
                       formatter={(value) => [`${Number(value).toFixed(2)}`, "심층 관심도 / SOV"]}
-                      labelFormatter={(label) => `날짜: ${label}`}
+                      labelFormatter={(label) => `${TOOLTIP_PREFIX[period]}: ${label}`}
                     />
                     <Area type="monotone" dataKey="time" name="심층 관심도" stroke={C.blue} strokeWidth={2} fill="url(#timeGrad)" dot={false} activeDot={{ r: 6, fill: C.blue }} connectNulls />
                   </ComposedChart>
