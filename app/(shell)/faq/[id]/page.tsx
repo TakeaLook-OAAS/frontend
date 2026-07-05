@@ -229,7 +229,7 @@ export default async function FaqDetailPage({
               fontSize: 11.5,
             }}
           >
-            <span>등록일 {faq.date}</span>
+            <span>등록햣일 {faq.date}</span>
             <span>조회수 {faq.views.toLocaleString()}</span>
           </div>
         </div>
