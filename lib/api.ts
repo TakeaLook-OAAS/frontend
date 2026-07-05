@@ -312,6 +312,80 @@ export function buildExportUrl(params: {
   return url.toString();
 }
 
+// ── 설정 변경 요청 ────────────────────────────────────────────────────────────
+
+export interface ChangeRequestItem {
+  id:              string;
+  campaign_id:     string;
+  campaign_name:   string;
+  status:          string; // PENDING | APPROVED | REJECTED
+  target_gender:   string | null;
+  target_age_group: string | null;
+  start_date:      string | null;
+  end_date:        string | null;
+  broadcast_start: string | null;
+  broadcast_end:   string | null;
+  reason:          string | null;
+  created_at:      string;
+  reviewed_at:     string | null;
+}
+
+export interface ChangeRequestListResponse {
+  results: ChangeRequestItem[];
+  total:   number;
+}
+
+export async function apiCreateChangeRequest(body: {
+  campaign_id:      string;
+  target_gender?:   string;
+  target_age_group?: string;
+  start_date?:      string;
+  end_date?:        string;
+  broadcast_start?: string;
+  broadcast_end?:   string;
+  reason?:          string;
+}, token: string): Promise<ChangeRequestItem> {
+  const res = await fetch(`${BASE}/change-requests/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+    cache: "no-store",
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "요청 제출 실패");
+  return data;
+}
+
+export async function apiGetChangeRequests(token: string): Promise<ChangeRequestListResponse> {
+  const res = await fetch(`${BASE}/change-requests/`, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "변경 요청 목록 조회 실패");
+  return data;
+}
+
+export async function apiApproveChangeRequest(token: string, id: string): Promise<ChangeRequestItem> {
+  const res = await fetch(`${BASE}/change-requests/${id}/approve`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "승인 실패");
+  return data;
+}
+
+export async function apiRejectChangeRequest(token: string, id: string): Promise<ChangeRequestItem> {
+  const res = await fetch(`${BASE}/change-requests/${id}/reject`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.detail ?? "거절 실패");
+  return data;
+}
+
 // ── 광고 신청 (Apply) ──────────────────────────────────────────────────────────
 
 export interface ApplicationCreateBody {
