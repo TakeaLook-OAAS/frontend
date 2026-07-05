@@ -16,6 +16,7 @@ import DailyEffectsChart, { DayPoint } from "@/components/dashboard/DailyEffects
 import FixationHistogram from "@/components/dashboard/FixationHistogram";
 import CampaignSelector from "@/components/dashboard/CampaignSelector";
 import type { SelectorValue } from "@/components/dashboard/CampaignSelector";
+import SovChart from "@/components/dashboard/SovChart";
 
 import {
   getCampaigns,
@@ -560,6 +561,14 @@ function DashboardInner() {
             tone="amber"
           />
         </section>
+
+        {/* ---------------- SOV 분석 ---------------- */}
+        <SovChart
+          sov={rangeStats?.sov ?? null}
+          dailyTrend={rangeStats?.daily_trend ?? []}
+          hasRange={hasRange}
+          loading={hasRange && !rangeStats}
+        />
 
         {/* ---------------- Row 1: Gender / Age × 노출·관심 4박스 ---------------- */}
         <section
