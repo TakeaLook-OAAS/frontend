@@ -112,9 +112,11 @@ function WindowFrame({
           <span />
           <span />
         </div>
+
         <span className={styles.windowLabel}>{label}</span>
         <span className={styles.windowSpacer} />
       </div>
+
       <div className={styles.windowBody}>{children}</div>
     </div>
   );
@@ -130,29 +132,43 @@ function ApplicationPreview() {
             <h3>브랜드 정보</h3>
             <p>캠페인을 게시할 브랜드와 광고주 회사를 입력해 주세요.</p>
           </div>
+
           <span className={styles.stepBadge}>STEP 01 / 04</span>
         </div>
+
         <div className={styles.fakeFields}>
           <div>
-            <label>브랜드 명 <b>*</b></label>
+            <label>
+              브랜드 명 <b>*</b>
+            </label>
             <span>OAAS</span>
           </div>
+
           <div>
-            <label>광고주 회사 <b>*</b></label>
+            <label>
+              광고주 회사 <b>*</b>
+            </label>
             <span>Take a Look</span>
           </div>
         </div>
+
         <div className={styles.fakeCategory}>
           <span className={styles.fakeLabel}>업종 카테고리</span>
+
           <div>
             <span className={styles.selectedCategory}>IT · 테크</span>
             <span>교육</span>
             <span>공공 · 캠페인</span>
           </div>
         </div>
+
         <div className={styles.completion}>
           <span>COMPLETION</span>
-          <div><i style={{ width: "25%" }} /></div>
+
+          <div>
+            <i style={{ width: "25%" }} />
+          </div>
+
           <b>01 / 04</b>
         </div>
       </div>
@@ -165,35 +181,58 @@ function ReviewPreview() {
     <WindowFrame label="신청 검토 현황">
       <div className={styles.reviewPreview}>
         <div className={styles.reviewTitle}>
-          <span className={styles.iconBox}><FileCheck2 size={18} /></span>
+          <span className={styles.iconBox}>
+            <FileCheck2 size={18} />
+          </span>
+
           <div>
             <span className={styles.miniEyebrow}>APPLICATION REVIEW</span>
             <h3>캠페인 송출 준비</h3>
           </div>
+
           <span className={styles.reviewPill}>검토 중</span>
         </div>
+
         <div className={styles.reviewFlow}>
           <div className={styles.doneNode}>
-            <span><Check size={14} /></span>
+            <span>
+              <Check size={14} />
+            </span>
             <b>신청 완료</b>
             <small>정보 제출</small>
           </div>
+
           <i />
+
           <div className={styles.activeNode}>
-            <span><Clock3 size={14} /></span>
+            <span>
+              <Clock3 size={14} />
+            </span>
             <b>내용 검토</b>
             <small>24시간 이내</small>
           </div>
+
           <i />
+
           <div>
-            <span><MonitorCheck size={14} /></span>
+            <span>
+              <MonitorCheck size={14} />
+            </span>
             <b>디바이스 연동</b>
             <small>송출 준비</small>
           </div>
         </div>
+
         <div className={styles.notice}>
-          <span><Check size={15} /></span>
-          <p><b>신청서가 정상적으로 접수되었습니다.</b><br />검토 결과는 입력한 담당자 연락처로 안내해 드립니다.</p>
+          <span>
+            <Check size={15} />
+          </span>
+
+          <p>
+            <b>신청서가 정상적으로 접수되었습니다.</b>
+            <br />
+            검토 결과는 입력한 담당자 연락처로 안내해 드립니다.
+          </p>
         </div>
       </div>
     </WindowFrame>
@@ -209,25 +248,51 @@ function CampaignPreview() {
             <span className={styles.miniEyebrow}>MY CAMPAIGNS</span>
             <h3>자신이 신청한 광고</h3>
           </div>
-          <div className={styles.tabs}><b>전체 3</b><span>진행 중 1</span><span>예정 1</span></div>
+
+          <div className={styles.tabs}>
+            <b>전체 3</b>
+            <span>진행 중 1</span>
+            <span>예정 1</span>
+          </div>
         </div>
+
         <div className={styles.campaignCard}>
           <div className={styles.campaignRow}>
             <div>
-              <span className={styles.livePill}><i /> 진행 중</span>
+              <span className={styles.livePill}>
+                <i /> 진행 중
+              </span>
               <b>여름 시즌 브랜드 캠페인</b>
             </div>
-            <div><small>DEVICES</small><strong>2<em>대</em></strong></div>
-            <span className={styles.chevron}><ChevronDown size={16} /></span>
+
+            <div>
+              <small>DEVICES</small>
+              <strong>
+                2<em>대</em>
+              </strong>
+            </div>
+
+            <span className={styles.chevron}>
+              <ChevronDown size={16} />
+            </span>
           </div>
+
           <div className={styles.deviceList}>
             <span className={styles.miniEyebrow}>DEVICES · 2대 연동</span>
+
             <div>
-              <span><MonitorCheck size={16} /><b>강남역 미디어월</b></span>
+              <span>
+                <MonitorCheck size={16} />
+                <b>강남역 미디어월</b>
+              </span>
               <span className={styles.online}>온라인</span>
             </div>
+
             <div>
-              <span><MapPin size={16} /><b>성수 팝업 스크린</b></span>
+              <span>
+                <MapPin size={16} />
+                <b>성수 팝업 스크린</b>
+              </span>
               <span className={styles.online}>온라인</span>
             </div>
           </div>
@@ -239,17 +304,33 @@ function CampaignPreview() {
 
 function DashboardPreview() {
   const metrics = [
-    { name: "노출 인구", value: "12,480", icon: <Users size={15} /> },
-    { name: "관심 인구", value: "7,932", icon: <Eye size={15} /> },
-    { name: "포착 관심도", value: "63.6%", icon: <Target size={15} /> },
+    {
+      name: "노출 인구",
+      value: "12,480",
+      icon: <Users size={15} />,
+    },
+    {
+      name: "관심 인구",
+      value: "7,932",
+      icon: <Eye size={15} />,
+    },
+    {
+      name: "포착 관심도",
+      value: "63.6%",
+      icon: <Target size={15} />,
+    },
   ];
+
   return (
     <WindowFrame label="캠페인 성과 분석">
       <div className={styles.dashboardPreview}>
         <div className={styles.filters}>
-          <span>CAMPAIGN</span><b>여름 시즌 브랜드 캠페인</b>
-          <span>PERIOD</span><b>지난 30일</b>
+          <span>CAMPAIGN</span>
+          <b>여름 시즌 브랜드 캠페인</b>
+          <span>PERIOD</span>
+          <b>지난 30일</b>
         </div>
+
         <div className={styles.metricGrid}>
           {metrics.map((metric) => (
             <div key={metric.name}>
@@ -259,15 +340,19 @@ function DashboardPreview() {
             </div>
           ))}
         </div>
+
         <div className={styles.chartCard}>
           <div>
             <span className={styles.miniEyebrow}>DAILY PERFORMANCE</span>
             <b>일별 노출·관심 추이</b>
           </div>
+
           <div className={styles.chart}>
-            {[42, 58, 47, 70, 64, 82, 76, 91, 73, 88, 95, 84].map((height, index) => (
-              <i key={index} style={{ height: `${height}%` }} />
-            ))}
+            {[42, 58, 47, 70, 64, 82, 76, 91, 73, 88, 95, 84].map(
+              (height, index) => (
+                <i key={index} style={{ height: `${height}%` }} />
+              ),
+            )}
           </div>
         </div>
       </div>
@@ -276,9 +361,18 @@ function DashboardPreview() {
 }
 
 function Preview({ type }: { type: PreviewType }) {
-  if (type === "application") return <ApplicationPreview />;
-  if (type === "review") return <ReviewPreview />;
-  if (type === "campaign") return <CampaignPreview />;
+  if (type === "application") {
+    return <ApplicationPreview />;
+  }
+
+  if (type === "review") {
+    return <ReviewPreview />;
+  }
+
+  if (type === "campaign") {
+    return <CampaignPreview />;
+  }
+
   return <DashboardPreview />;
 }
 
@@ -287,19 +381,50 @@ export default function GuidePage() {
     <div className={styles.page}>
       <header className={styles.hero}>
         <div className={styles.heroGlow} />
+
         <div className={styles.breadcrumb}>
-          <span>GUIDE</span><i>/</i><b>GETTING STARTED</b>
+          <span>GUIDE</span>
+          <i>/</i>
+          <b>GETTING STARTED</b>
         </div>
+
         <div className={styles.heroContent}>
           <div>
             <span className={styles.heroKicker}>OAAS USER GUIDE</span>
-            <h1>처음이어도, 순서대로<br />쉽게 시작할 수 있어요.</h1>
-            <p>캠페인 신청부터 광고 성과 확인까지<br className={styles.desktopBreak} /> OAAS의 전체 이용 과정을 안내합니다.</p>
+
+            <h1>
+              처음이어도, 순서대로
+              <br />
+              쉽게 시작할 수 있어요.
+            </h1>
+
+            <p>
+              캠페인 신청부터 광고 성과 확인까지
+              <br className={styles.desktopBreak} /> OAAS의 전체 이용 과정을
+              안내합니다.
+            </p>
           </div>
+
           <div className={styles.heroGraphic}>
-            <div className={styles.orbit}><Megaphone size={30} /></div>
-            <div className={styles.floatCardA}><BarChart3 size={17} /><span><b>성과 분석</b><small>실시간 데이터 확인</small></span></div>
-            <div className={styles.floatCardB}><MonitorCheck size={17} /><span><b>송출 중</b><small>디바이스 정상 연결</small></span></div>
+            <div className={styles.orbit}>
+              <Megaphone size={30} />
+            </div>
+
+            <div className={styles.floatCardA}>
+              <BarChart3 size={17} />
+              <span>
+                <b>성과 분석</b>
+                <small>실시간 데이터 확인</small>
+              </span>
+            </div>
+
+            <div className={styles.floatCardB}>
+              <MonitorCheck size={17} />
+              <span>
+                <b>송출 중</b>
+                <small>디바이스 정상 연결</small>
+              </span>
+            </div>
           </div>
         </div>
       </header>
@@ -309,6 +434,7 @@ export default function GuidePage() {
           <a href={`#step-${step.number}`} key={step.number}>
             <span>{step.number}</span>
             <b>{step.short}</b>
+
             {index < steps.length - 1 && <ArrowRight size={16} />}
           </a>
         ))}
@@ -324,7 +450,9 @@ export default function GuidePage() {
         <div className={styles.stepList}>
           {steps.map((step, index) => (
             <section
-              className={`${styles.stepSection} ${index % 2 === 1 ? styles.reverse : ""}`}
+              className={`${styles.stepSection} ${
+                index % 2 === 1 ? styles.reverse : ""
+              }`}
               id={`step-${step.number}`}
               key={step.number}
             >
@@ -332,21 +460,31 @@ export default function GuidePage() {
                 <span>STEP</span>
                 <b>{step.number}</b>
               </div>
+
               <div className={styles.stepCopy}>
                 <span className={styles.copyEyebrow}>{step.eyebrow}</span>
                 <h2>{step.title}</h2>
                 <p>{step.description}</p>
+
                 <ul>
                   {step.bullets.map((bullet) => (
-                    <li key={bullet}><span><Check size={13} /></span>{bullet}</li>
+                    <li key={bullet}>
+                      <span>
+                        <Check size={13} />
+                      </span>
+                      {bullet}
+                    </li>
                   ))}
                 </ul>
+
                 {step.link && (
                   <Link href={step.link} className={styles.textLink}>
-                    {step.linkLabel}<ArrowRight size={15} />
+                    {step.linkLabel}
+                    <ArrowRight size={15} />
                   </Link>
                 )}
               </div>
+
               <div className={styles.previewWrap}>
                 <Preview type={step.preview} />
               </div>
@@ -359,9 +497,16 @@ export default function GuidePage() {
         <div>
           <span>READY TO START?</span>
           <h2>이제 첫 캠페인을 시작해 보세요.</h2>
-          <p>신청서를 작성하면 OAAS 운영팀이 확인 후 송출 일정을 안내해 드립니다.</p>
+          <p>
+            신청서를 작성하면 OAAS 운영팀이 확인 후 송출 일정을 안내해
+            드립니다.
+          </p>
         </div>
-        <Link href="/apply">새 캠페인 신청<ArrowRight size={17} /></Link>
+
+        <Link href="/apply">
+          새 캠페인 신청
+          <ArrowRight size={17} />
+        </Link>
       </section>
     </div>
   );

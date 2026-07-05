@@ -27,7 +27,15 @@ const C = {
 };
 
 /** 연령대 비율 (보조 인구통계 — violet) */
-export default function AgeChart({ data }: { data?: AgeData[] }) {
+export default function AgeChart({
+  data,
+  title,
+  subtitle,
+}: {
+  data?: AgeData[];
+  title: string;
+  subtitle: string;
+}) {
   const accent = C.violet;
   const empty = !data || data.every((d) => d.value === 0);
 
@@ -56,7 +64,7 @@ export default function AgeChart({ data }: { data?: AgeData[] }) {
             fontWeight: 700,
           }}
         >
-          POPULATION · AGE
+          {subtitle}
         </div>
         <h3
           style={{
@@ -67,7 +75,7 @@ export default function AgeChart({ data }: { data?: AgeData[] }) {
             letterSpacing: "-0.015em",
           }}
         >
-          노출 인구 연령대 분포
+          {title}
         </h3>
       </div>
 

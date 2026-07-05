@@ -9,7 +9,6 @@ import GenderChart from "@/components/dashboard/GenderChart";
 import AgeChart from "@/components/dashboard/AgeChart";
 import DateRangePicker from "@/components/dashboard/DateRangePicker";
 import SimpleCard from "@/components/dashboard/Simplecard";
-import DbscanChart from "@/components/dashboard/DbscanChart";
 import DailyMetricsChart, { DailyChartPoint } from "@/components/dashboard/DailyMetricsChart";
 import HourlyAudienceChart from "@/components/dashboard/HourlyAudienceChart";
 import DailyEffectsChart, { DayPoint } from "@/components/dashboard/DailyEffectsChart";
@@ -19,11 +18,9 @@ import type { SelectorValue } from "@/components/dashboard/CampaignSelector";
 
 import {
   getCampaigns,
-  getGoldenZone,
   getRangeStats,
   buildExportUrl,
   CampaignItem,
-  GoldenZoneResponse,
   RangeStatsResponse,
 } from "@/lib/api";
 
@@ -43,12 +40,13 @@ const t = {
 export default function AnalyticsPage() {
   const [token, setToken] = useState("");
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
-  const [goldenZone, setGoldenZone] = useState<GoldenZoneResponse | undefined>();
   const [options, setOptions] = useState<CampaignItem[]>([]);
   const [selected, setSelected] = useState<SelectorValue | null>(null);
   const [rangeStats, setRangeStats] = useState<RangeStatsResponse | null>(null);
   const [advChartData, setAdvChartData] = useState<DayPoint[]>([]);
   const [perDayLoading, setPerDayLoading] = useState(false);
+  const [selectedGender, setSelectedGender] = useState<string | undefined>();
+  const [selectedAgeGroup, setSelectedAgeGroup] = useState<string | undefined>();
 
   const campaignId = selected?.campaign_id;
   const deviceId = selected?.device_id;
@@ -73,18 +71,14 @@ export default function AnalyticsPage() {
   useEffect(() => {
     if (!hasRange) {
       setRangeStats(null);
-      setGoldenZone(undefined);
       return;
     }
     if (campaignId && deviceId) {
-      getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId }, token)
+      getRangeStats({ start_date: startDate!, end_date: endDate!, device_id: deviceId, campaign_id: campaignId, gender: selectedGender, age_group: selectedAgeGroup }, token)
         .then(setRangeStats)
         .catch(() => setRangeStats(null));
-      getGoldenZone(campaignId, deviceId, startDate, endDate, token)
-        .then(setGoldenZone)
-        .catch(() => setGoldenZone(undefined));
     }
-  }, [startDate, endDate, hasRange, campaignId, deviceId, token]);
+  }, [startDate, endDate, hasRange, campaignId, deviceId, token, selectedGender, selectedAgeGroup]);
 
   useEffect(() => {
     if (!startDate || !campaignId || !deviceId) {
@@ -99,7 +93,7 @@ export default function AnalyticsPage() {
 
     Promise.all(
       days.map((day) =>
-        getRangeStats({ start_date: day, end_date: day, device_id: deviceId, campaign_id: campaignId }, token)
+        getRangeStats({ start_date: day, end_date: day, device_id: deviceId, campaign_id: campaignId, gender: selectedGender, age_group: selectedAgeGroup }, token)
           .then((res) => ({
             date: day,
             avg_attention_time: res.exposure_count > 0 ? parseFloat((res.avg_attention_time_ms / 1000).toFixed(2)) : null,
@@ -118,7 +112,7 @@ export default function AnalyticsPage() {
         setAdvChartData(results.map(r => ({ date: r.date, avg_attention_time: r.avg_attention_time, attention_rate_tracks: r.attention_rate_tracks, viewability_score: r.viewability_score })));
       })
       .finally(() => setPerDayLoading(false));
-  }, [startDate, endDate, campaignId, deviceId, token]);
+  }, [startDate, endDate, campaignId, deviceId, token, selectedGender, selectedAgeGroup]);
 
 
 
@@ -154,6 +148,30 @@ export default function AnalyticsPage() {
     { age: "40대", value: totalAge > 0 ? Math.round((count40 / totalAge) * 100) : 0 },
     { age: "50대", value: totalAge > 0 ? Math.round((count50 / totalAge) * 100) : 0 },
     { age: "60대+", value: totalAge > 0 ? Math.round((count60 / totalAge) * 100) : 0 },
+  ] : undefined;
+
+  const intMale = rangeStats?.interested_count_male ?? 0;
+  const intFemale = rangeStats?.interested_count_female ?? 0;
+  const totalIntGender = intMale + intFemale;
+  const interestedGenderData = hasRange && rangeStats ? [
+    { name: "남성", value: totalIntGender > 0 ? Math.round((intMale / totalIntGender) * 100) : 0, color: t.blue },
+    { name: "여성", value: totalIntGender > 0 ? Math.round((intFemale / totalIntGender) * 100) : 0, color: "#EC4899" },
+  ] : undefined;
+
+  const int10 = rangeStats?.interested_count_10s ?? 0;
+  const int20 = rangeStats?.interested_count_20s ?? 0;
+  const int30 = rangeStats?.interested_count_30s ?? 0;
+  const int40 = rangeStats?.interested_count_40s ?? 0;
+  const int50 = rangeStats?.interested_count_50s_plus ?? 0;
+  const int60 = rangeStats?.interested_count_60s_plus ?? 0;
+  const totalIntAge = int10 + int20 + int30 + int40 + int50 + int60;
+  const interestedAgeData = hasRange && rangeStats ? [
+    { age: "10대", value: totalIntAge > 0 ? Math.round((int10 / totalIntAge) * 100) : 0 },
+    { age: "20대", value: totalIntAge > 0 ? Math.round((int20 / totalIntAge) * 100) : 0 },
+    { age: "30대", value: totalIntAge > 0 ? Math.round((int30 / totalIntAge) * 100) : 0 },
+    { age: "40대", value: totalIntAge > 0 ? Math.round((int40 / totalIntAge) * 100) : 0 },
+    { age: "50대", value: totalIntAge > 0 ? Math.round((int50 / totalIntAge) * 100) : 0 },
+    { age: "60대+", value: totalIntAge > 0 ? Math.round((int60 / totalIntAge) * 100) : 0 },
   ] : undefined;
 
   const dailyMetricsData: DailyChartPoint[] = (() => {
@@ -283,7 +301,6 @@ export default function AnalyticsPage() {
           onChange={(val) => {
             setSelected(val);
             setRangeStats(null);
-            setGoldenZone(undefined);
             setAdvChartData([]);
           }}
         />
@@ -388,6 +405,95 @@ export default function AnalyticsPage() {
           </div>
         </div>
 
+        {/* ---------------- gender / age filter row ---------------- */}
+        <div
+          style={{
+            background: "#fff",
+            border: `1px solid ${t.lineSoft}`,
+            borderRadius: 14,
+            boxShadow: "0 1px 2px rgba(13,42,92,0.03)",
+            padding: "14px 16px",
+            display: "flex",
+            alignItems: "center",
+            gap: 24,
+            flexWrap: "wrap",
+          }}
+        >
+          {/* 성별 */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 58 }}>
+              GENDER
+            </div>
+            <div style={{ display: "flex", gap: 6 }}>
+              {([{ id: undefined, l: "전체" }, { id: "male", l: "남성" }, { id: "female", l: "여성" }] as const).map((g) => {
+                const active = selectedGender === g.id;
+                return (
+                  <button
+                    key={String(g.id)}
+                    type="button"
+                    onClick={() => setSelectedGender(g.id)}
+                    style={{
+                      padding: "7px 14px",
+                      borderRadius: 8,
+                      border: active ? "none" : `1px solid ${t.line}`,
+                      background: active ? t.ink : "#fff",
+                      color: active ? "#fff" : t.inkSoft,
+                      fontSize: 12.5,
+                      fontFamily: "inherit",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {g.l}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <span style={{ width: 1, height: 22, background: t.lineSoft }} />
+
+          {/* 나이대 */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 38 }}>
+              AGE
+            </div>
+            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+              {([
+                { id: undefined, l: "전체" },
+                { id: "10-19", l: "10대" },
+                { id: "20-29", l: "20대" },
+                { id: "30-39", l: "30대" },
+                { id: "40-49", l: "40대" },
+                { id: "50-59", l: "50대" },
+                { id: "60+",   l: "60대+" },
+              ] as const).map((a) => {
+                const active = selectedAgeGroup === a.id;
+                return (
+                  <button
+                    key={String(a.id)}
+                    type="button"
+                    onClick={() => setSelectedAgeGroup(a.id)}
+                    style={{
+                      padding: "7px 14px",
+                      borderRadius: 8,
+                      border: active ? "none" : `1px solid ${t.line}`,
+                      background: active ? t.ink : "#fff",
+                      color: active ? "#fff" : t.inkSoft,
+                      fontSize: 12.5,
+                      fontFamily: "inherit",
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    {a.l}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
         {/* ---------------- KPI 6 cards ---------------- */}
         <section
           style={{
@@ -440,24 +546,53 @@ export default function AnalyticsPage() {
           />
         </section>
 
-        {/* ---------------- Row 1: Gender / Age / Fixation ---------------- */}
+        {/* ---------------- Row 1: Gender / Age × 노출·관심 4박스 ---------------- */}
         <section
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
             gap: 16,
           }}
         >
-          <GenderChart data={genderData} />
-          <AgeChart data={ageData} />
+          <GenderChart
+            data={genderData}
+            title="노출 인구 성별 분포"
+            subtitle="POPULATION · GENDER SPLIT"
+          />
+          <AgeChart
+            data={ageData}
+            title="노출 인구 연령대 분포"
+            subtitle="POPULATION · AGE"
+          />
+          <GenderChart
+            data={interestedGenderData}
+            title="관심 인구 성별 분포"
+            subtitle="INTERESTED · GENDER SPLIT"
+          />
+          <AgeChart
+            data={interestedAgeData}
+            title="관심 인구 연령대 분포"
+            subtitle="INTERESTED · AGE"
+          />
+        </section>
+
+        {/* ---------------- Row 2: Fixation / Hourly ---------------- */}
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: 16,
+          }}
+        >
           <FixationHistogram
             bins={(rangeStats?.distribution ?? []).map((b) => ({ label: b.bucket, dwell: b.dwell_count, fixation: b.fixation_count }))}
             loading={perDayLoading}
             hasRange={hasRange}
           />
+          <HourlyAudienceChart data={hourlyAudienceData} />
         </section>
 
-        {/* ---------------- Row 2: DailyEffects / Hourly ---------------- */}
+        {/* ---------------- Row 3: Daily Metrics / Daily Effects ---------------- */}
         <section
           style={{
             display: "grid",
@@ -465,24 +600,12 @@ export default function AnalyticsPage() {
             gap: 16,
           }}
         >
-          <HourlyAudienceChart data={hourlyAudienceData} />
           <DailyMetricsChart
             data={dailyMetricsData}
             loading={hasRange && !rangeStats}
             hasRange={hasRange}
           />
-        </section>
-
-        {/* ---------------- Row 3: DBSCAN / Daily Metrics ---------------- */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: 16,
-          }}
-        >
           <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
-          <DbscanChart goldenZone={goldenZone} />
         </section>
       </div>
     </>
