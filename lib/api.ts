@@ -66,6 +66,14 @@ export interface RangeStatsResponse {
   count_60s_plus: number;
   count_male: number;
   count_female: number;
+  interested_count_male: number;
+  interested_count_female: number;
+  interested_count_10s: number;
+  interested_count_20s: number;
+  interested_count_30s: number;
+  interested_count_40s: number;
+  interested_count_50s_plus: number;
+  interested_count_60s_plus: number;
   hourly_trend: HourlyTrendPoint[];
   daily_trend: { date: string; exposure_count: number; interested_count: number; total_dwell_ms: number; total_attention_ms: number }[];
   distribution: DistributionBucket[];
@@ -78,28 +86,6 @@ export interface RangeStatsResponse {
   target_match_rate:       number | null;
 }
 
-// ── 골든존 타입 ───────────────────────────────────────────────────────────────
-
-export interface GoldenZoneCluster {
-  label: number;
-  point_count: number;
-  points: [number, number][] | null;
-}
-
-export interface GoldenZoneResponse {
-  campaign_id: string;
-  device_id: string;
-  computed_at: string;
-  point_count: number;
-  event_count: number;
-  dbscan: {
-    eps: number;
-    min_samples: number;
-    cluster_count: number;
-    noise_count: number;
-  };
-  clusters: GoldenZoneCluster[];
-}
 
 // ── fetch 함수 ────────────────────────────────────────────────────────────────
 
@@ -108,12 +94,16 @@ export async function getRangeStats(params: {
   end_date: string;
   device_id: string;
   campaign_id: string;
+  gender?: string;
+  age_group?: string;
 }, token?: string): Promise<RangeStatsResponse> {
   const url = new URL(`${BASE}/stats/range/`);
   url.searchParams.set("start_date", params.start_date);
   url.searchParams.set("end_date",   params.end_date);
   url.searchParams.set("device_id",   params.device_id);
   url.searchParams.set("campaign_id", params.campaign_id);
+  if (params.gender)    url.searchParams.set("gender",    params.gender);
+  if (params.age_group) url.searchParams.set("age_group", params.age_group);
   const res = await fetch(url.toString(), {
     cache: "no-store",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -134,46 +124,6 @@ export async function getCampaignAggs(params?: {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
   if (!res.ok) throw new Error(`/stats/campaign/ 오류: ${res.status}`);
-  return res.json();
-}
-
-export async function getGoldenZone(
-  campaign_id: string,
-  device_id: string,
-  start_date?: string,
-  end_date?: string,
-  token?: string,
-): Promise<GoldenZoneResponse> {
-  const url = new URL(`${BASE}/stats/golden-zone/`);
-  url.searchParams.set("campaign_id", campaign_id);
-  url.searchParams.set("device_id", device_id);
-  if (start_date) url.searchParams.set("start_date", start_date);
-  if (end_date)   url.searchParams.set("end_date",   end_date);
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new Error(`/stats/golden-zone/ 오류: ${res.status}`);
-  return res.json();
-}
-
-export async function getRawPoints(
-  campaign_id: string,
-  device_id: string,
-  start_date?: string,
-  end_date?: string,
-  token?: string,
-): Promise<GoldenZoneResponse> {
-  const url = new URL(`${BASE}/stats/raw-points/`);
-  url.searchParams.set("campaign_id", campaign_id);
-  url.searchParams.set("device_id", device_id);
-  if (start_date) url.searchParams.set("start_date", start_date);
-  if (end_date)   url.searchParams.set("end_date",   end_date);
-  const res = await fetch(url.toString(), {
-    cache: "no-store",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!res.ok) throw new Error(`/stats/raw-points/ 오류: ${res.status}`);
   return res.json();
 }
 

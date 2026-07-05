@@ -76,7 +76,8 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
         <Empty msg="해당 기간에 데이터가 없습니다" />
       ) : (
         <>
-          <ResponsiveContainer width="100%" height={288}>
+          <div style={{ height: 400, width: "100%" }}>
+          <ResponsiveContainer width="100%" height="100%">
             <ComposedChart data={bins} margin={{ top: 6, right: 12, left: 0, bottom: 5 }}>
               <defs>
                 <linearGradient id="dwellGrad" x1="0" y1="0" x2="0" y2="1">
@@ -100,6 +101,7 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
               <Area type="monotone" dataKey="fixation" name="첫 주목 시간 (Fixation)" stroke={C.green} strokeWidth={2} fill="url(#fixationGrad)" />
             </ComposedChart>
           </ResponsiveContainer>
+          </div>
           <div style={fixedLegendStyle}>
             <span style={legendItemStyle}><span style={{ ...legendDot, background: C.blue }} />노출 시간 (Dwell)</span>
             <span style={legendItemStyle}><span style={{ ...legendDot, background: C.green }} />첫 주목 시간 (Fixation)</span>
@@ -112,7 +114,7 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
 
 function Empty({ msg }: { msg: string }) {
   return (
-    <div style={{ height: 288, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
+    <div style={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
       {msg}
     </div>
   );
