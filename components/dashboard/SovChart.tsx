@@ -1,15 +1,15 @@
 "use client";
 
+import { useRef } from "react";
 import {
   ComposedChart,
-  Bar,
+  Area,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ReferenceLine,
   ResponsiveContainer,
-  Cell,
 } from "recharts";
 
 const C = {
@@ -20,7 +20,6 @@ const C = {
   grid:     "#F0F2F8",
   green:    "#0FA968",
   blue:     "#1E5BFF",
-  red:      "#D7563D",
   amber:    "#E89B2A",
 };
 
@@ -52,32 +51,10 @@ function getDateRange(start: string, end: string): string[] {
   return dates;
 }
 
-interface BarEntry {
+interface ChartEntry {
   date:  string;
   track: number;
   time:  number;
-  base:  number;
-  range: number;
-}
-
-interface TooltipProps {
-  active?:  boolean;
-  payload?: { payload: BarEntry }[];
-  label?:   string;
-  sovPct:   number | null;
-}
-
-function CustomTooltip({ active, payload, label, sovPct }: TooltipProps) {
-  if (!active || !payload?.length) return null;
-  const d = payload[0].payload;
-  return (
-    <div style={{ backgroundColor: "#fff", border: "1px solid #E7EAF2", borderRadius: 8, boxShadow: "0 8px 20px -8px rgba(13,42,92,0.18)", padding: "8px 12px", fontSize: 11 }}>
-      <div style={{ fontWeight: 700, marginBottom: 4, color: C.ink }}>{label}</div>
-      <div style={{ color: C.green }}>관심률(인원): {d.track.toFixed(1)}%</div>
-      <div style={{ color: C.blue }}>관심률(시간): {d.time.toFixed(1)}%</div>
-      {sovPct !== null && <div style={{ color: C.amber, marginTop: 4, borderTop: `1px solid #E7EAF2`, paddingTop: 4 }}>SOV 기준: {sovPct.toFixed(1)}%</div>}
-    </div>
-  );
 }
 
 export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange, loading }: Props) {
@@ -89,126 +66,201 @@ export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange
 
   const trendMap = Object.fromEntries(dailyTrend.map((d) => [d.date, d]));
 
-  const data: BarEntry[] = allDates.map((date) => {
+  const data: ChartEntry[] = allDates.map((date) => {
     const d = trendMap[date];
-    const track = d && d.exposure_count > 0
-      ? parseFloat(((d.interested_count / d.exposure_count) * 100).toFixed(2))
+    const trackPct = d && d.exposure_count > 0
+      ? (d.interested_count / d.exposure_count) * 100
       : 0;
-    const time = d && d.total_dwell_ms > 0
-      ? parseFloat(((d.total_attention_ms / d.total_dwell_ms) * 100).toFixed(2))
+    const timePct = d && d.total_dwell_ms > 0
+      ? (d.total_attention_ms / d.total_dwell_ms) * 100
       : 0;
-    const low  = Math.min(track, time);
-    const high = Math.max(track, time);
-    return {
-      date:  date.slice(5),
-      track,
-      time,
-      base:  parseFloat(low.toFixed(2)),
-      range: parseFloat((high - low).toFixed(2)),
-    };
+    // ratio = 관심도 / SOV (SOV=1 기준선)
+    const track = sovPct && sovPct > 0 ? parseFloat((trackPct / sovPct).toFixed(3)) : 0;
+    const time  = sovPct && sovPct > 0 ? parseFloat((timePct  / sovPct).toFixed(3)) : 0;
+    return { date: date.slice(5), track, time };
   });
 
-  const getColor = (d: BarEntry) => d.track >= d.time ? C.green : C.blue;
+  const maxRatio = Math.max(0, ...data.map((d) => d.track), ...data.map((d) => d.time));
+  const sharedDomain: [number, number] = [0, parseFloat((maxRatio * 1.5).toFixed(3))];
 
-  const empty = (
-    <div style={{ height: 400, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
+  const scrollable = data.length > 14;
+  const innerWidth = scrollable ? data.length * 52 : undefined;
+  const topRef = useRef<HTMLDivElement>(null);
+  const botRef = useRef<HTMLDivElement>(null);
+  const syncToBot = (e: { currentTarget: HTMLDivElement }) => {
+    if (botRef.current) botRef.current.scrollLeft = e.currentTarget.scrollLeft;
+  };
+  const syncToTop = (e: { currentTarget: HTMLDivElement }) => {
+    if (topRef.current) topRef.current.scrollLeft = e.currentTarget.scrollLeft;
+  };
+
+  const empty = (h: number) => (
+    <div style={{ height: h, display: "flex", alignItems: "center", justifyContent: "center", color: C.mono, fontSize: 12.5 }}>
       {loading ? "불러오는 중..." : "기간을 선택하면 차트가 표시됩니다"}
     </div>
   );
 
-  const scrollable = data.length > 14;
+  const sovLegend = sovPct !== null ? (
+    <span style={legendItemStyle}>
+      <span style={{ display: "inline-block", width: 16, height: 2, background: `repeating-linear-gradient(90deg, ${C.amber} 0, ${C.amber} 4px, transparent 4px, transparent 6px)` }} />
+      SOV 기준선
+    </span>
+  ) : null;
 
   return (
     <div
       style={{
-        background:   "#fff",
-        borderRadius: 14,
-        border:       `1px solid ${C.lineSoft}`,
-        boxShadow:    "0 1px 2px rgba(13,42,92,0.03)",
-        padding:      20,
+        background:    "#fff",
+        borderRadius:  14,
+        border:        `1px solid ${C.lineSoft}`,
+        boxShadow:     "0 1px 2px rgba(13,42,92,0.03)",
+        padding:       20,
+        position:      "relative",
+        overflow:      "hidden",
+        display:       "flex",
+        flexDirection: "column",
+        gap:           24,
       }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
-        <div>
-          <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
-            SOV · ANALYSIS
-          </div>
+
+      {/* upper: 포착 관심도 */}
+      <div>
+        <div style={{ marginBottom: 10 }}>
           <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
-            광고 점유율 대비 관심도
+            포착 관심도 대비 SOV
           </h3>
+          <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
+            포착 관심도 / SOV
+          </p>
         </div>
-        {sovPct !== null && (
-          <div style={{ textAlign: "right" }}>
-            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9, color: C.muted, letterSpacing: "0.1em" }}>SOV</div>
-            <div style={{ fontSize: 22, fontWeight: 800, color: C.amber, letterSpacing: "-0.03em" }}>{sovPct.toFixed(1)}%</div>
-          </div>
+
+        {loading || !hasRange || data.length === 0 ? empty(260) : (
+          <>
+            <div ref={topRef} onScroll={syncToBot} style={{ overflowX: scrollable ? "hidden" : "visible" }}>
+              <div style={{ width: innerWidth ?? "100%" }}>
+                <ResponsiveContainer width="100%" height={150}>
+                  <ComposedChart data={data} margin={{ top: 6, right: 36, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="trackGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor={C.green} stopOpacity={0.55} />
+                        <stop offset="95%" stopColor={C.green} stopOpacity={0.04} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false} />
+                    <XAxis dataKey="date" tick={{ fontSize: 9, fill: C.muted }} tickLine={false} axisLine={{ stroke: C.lineSoft }} />
+                    <YAxis domain={sharedDomain} tick={{ fontSize: 9, fill: C.muted }} tickFormatter={(v: number) => `${v.toFixed(1)}×`} width={36} axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="ghost" orientation="right" width={32} tick={false} axisLine={false} tickLine={false} />
+                    {sovPct !== null && (
+                      <ReferenceLine
+                        y={1}
+                        stroke={C.amber}
+                        strokeDasharray="5 3"
+                        strokeWidth={2}
+                        label={{ value: "SOV", position: "right", fontSize: 9, fill: C.amber, fontWeight: 700 }}
+                      />
+                    )}
+                    <Tooltip
+                      contentStyle={tooltipStyle}
+                      formatter={(value) => [`${Number(value).toFixed(2)}`, "포착 관심도 / SOV"]}
+                      labelFormatter={(label) => `날짜: ${label}`}
+                    />
+                    <Area type="monotone" dataKey="track" name="포착 관심도" stroke={C.green} strokeWidth={2} fill="url(#trackGrad)" dot={false} activeDot={{ r: 6, fill: C.green }} connectNulls />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div style={fixedLegendStyle}>
+              <span style={legendItemStyle}><span style={{ ...legendDot, background: C.green }} />포착 관심도</span>
+              {sovLegend}
+            </div>
+          </>
         )}
       </div>
 
-      {loading || !hasRange || data.length === 0 ? empty : (
-        <>
-          <div style={{ overflowX: scrollable ? "auto" : "visible" }}>
-            <div style={{ width: scrollable ? data.length * 52 : "100%" }}>
-              <ResponsiveContainer width="100%" height={400}>
-                <ComposedChart data={data} margin={{ top: 6, right: 52, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false} />
-                  <XAxis
-                    dataKey="date"
-                    tick={{ fontSize: 9, fill: C.muted }}
-                    tickLine={false}
-                    axisLine={{ stroke: C.lineSoft }}
-                  />
-                  <YAxis
-                    domain={[0, 100]}
-                    tick={{ fontSize: 9, fill: C.muted }}
-                    tickFormatter={(v: number) => `${v}%`}
-                    width={32}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  {sovPct !== null && (
-                    <ReferenceLine
-                      y={sovPct}
-                      stroke={C.amber}
-                      strokeDasharray="5 3"
-                      strokeWidth={2}
-                      label={{ value: `SOV ${sovPct.toFixed(1)}%`, position: "right", fontSize: 9, fill: C.amber, fontWeight: 700 }}
-                    />
-                  )}
-                  <Tooltip content={<CustomTooltip sovPct={sovPct} />} />
-                  {/* 투명 베이스 바: 봉의 하단 위치 설정 */}
-                  <Bar dataKey="base" stackId="candle" fill="transparent" isAnimationActive={false} />
-                  {/* 봉 본체 */}
-                  <Bar dataKey="range" stackId="candle" radius={[3, 3, 0, 0]} isAnimationActive={false}>
-                    {data.map((d, i) => (
-                      <Cell key={i} fill={getColor(d)} fillOpacity={0.85} />
-                    ))}
-                  </Bar>
-                </ComposedChart>
-              </ResponsiveContainer>
-            </div>
-          </div>
+      {/* divider */}
+      <div style={{ height: 1, background: C.lineSoft, margin: "-4px -4px" }} />
 
-          <div style={{ display: "flex", justifyContent: "center", gap: 16, paddingTop: 8, flexWrap: "wrap" }}>
-            {(
-              [
-                { color: C.green, label: "관심률(인원) > 관심률(시간)", dashed: false },
-                { color: C.blue,  label: "관심률(시간) > 관심률(인원)", dashed: false },
-                { color: C.amber, label: "SOV 기준선",                  dashed: true  },
-              ] as const
-            ).map(({ color, label, dashed }) => (
-              <span key={label} style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 10, color: C.muted }}>
-                {dashed ? (
-                  <span style={{ display: "inline-block", width: 16, height: 2, background: `repeating-linear-gradient(90deg, ${color} 0, ${color} 4px, transparent 4px, transparent 6px)` }} />
-                ) : (
-                  <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: color }} />
-                )}
-                {label}
-              </span>
-            ))}
-          </div>
-        </>
-      )}
+      {/* lower: 심층 관심도 */}
+      <div>
+        <div style={{ marginBottom: 10 }}>
+          <h3 style={{ margin: "4px 0 0", fontSize: 13, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
+            심층 관심도 대비 SOV
+          </h3>
+          <p style={{ margin: "4px 0 0", fontSize: 11, color: C.muted }}>
+            심층 관심도 / SOV
+          </p>
+        </div>
+
+        {loading || !hasRange || data.length === 0 ? empty(220) : (
+          <>
+            <div ref={botRef} onScroll={syncToTop} style={{ overflowX: scrollable ? "auto" : "visible" }}>
+              <div style={{ width: innerWidth ?? "100%" }}>
+                <ResponsiveContainer width="100%" height={150}>
+                  <ComposedChart data={data} margin={{ top: 6, right: 36, left: 0, bottom: 0 }}>
+                    <defs>
+                      <linearGradient id="timeGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%"  stopColor={C.blue} stopOpacity={0.55} />
+                        <stop offset="95%" stopColor={C.blue} stopOpacity={0.04} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false} />
+                    <XAxis dataKey="date" tick={{ fontSize: 9, fill: C.muted }} tickLine={false} axisLine={{ stroke: C.lineSoft }} />
+                    <YAxis domain={sharedDomain} tick={{ fontSize: 9, fill: C.muted }} tickFormatter={(v: number) => `${v.toFixed(1)}×`} width={36} axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="ghost" orientation="right" width={32} tick={false} axisLine={false} tickLine={false} />
+                    {sovPct !== null && (
+                      <ReferenceLine
+                        y={1}
+                        stroke={C.amber}
+                        strokeDasharray="5 3"
+                        strokeWidth={2}
+                        label={{ value: "SOV", position: "right", fontSize: 9, fill: C.amber, fontWeight: 700 }}
+                      />
+                    )}
+                    <Tooltip
+                      contentStyle={tooltipStyle}
+                      formatter={(value) => [`${Number(value).toFixed(2)}`, "심층 관심도 / SOV"]}
+                      labelFormatter={(label) => `날짜: ${label}`}
+                    />
+                    <Area type="monotone" dataKey="time" name="심층 관심도" stroke={C.blue} strokeWidth={2} fill="url(#timeGrad)" dot={false} activeDot={{ r: 6, fill: C.blue }} connectNulls />
+                  </ComposedChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+            <div style={fixedLegendStyle}>
+              <span style={legendItemStyle}><span style={{ ...legendDot, background: C.blue }} />심층 관심도</span>
+              {sovLegend}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
+
+const tooltipStyle = {
+  backgroundColor: "#fff",
+  border: "1px solid #E7EAF2",
+  borderRadius: 8,
+  boxShadow: "0 8px 20px -8px rgba(13,42,92,0.18)",
+  fontSize: 11,
+};
+const fixedLegendStyle = {
+  display: "flex",
+  justifyContent: "center",
+  gap: 16,
+  paddingTop: 8,
+  flexWrap: "wrap",
+};
+const legendItemStyle = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  fontSize: 10,
+  color: "#5B6786",
+};
+const legendDot = {
+  display: "inline-block",
+  width: 10,
+  height: 10,
+  borderRadius: 2,
+};
