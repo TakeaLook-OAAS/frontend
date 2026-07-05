@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   ComposedChart,
   Area,
@@ -299,28 +299,28 @@ export default function SovChart({ sov, dailyTrend, startDate, endDate, hasRange
   );
 }
 
-const tooltipStyle = {
+const tooltipStyle: React.CSSProperties = {
   backgroundColor: "#fff",
   border: "1px solid #E7EAF2",
   borderRadius: 8,
   boxShadow: "0 8px 20px -8px rgba(13,42,92,0.18)",
   fontSize: 11,
 };
-const fixedLegendStyle = {
+const fixedLegendStyle: React.CSSProperties = {
   display: "flex",
   justifyContent: "center",
   gap: 16,
   paddingTop: 8,
   flexWrap: "wrap",
 };
-const legendItemStyle = {
+const legendItemStyle: React.CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   gap: 4,
   fontSize: 10,
   color: "#5B6786",
 };
-const legendDot = {
+const legendDot: React.CSSProperties = {
   display: "inline-block",
   width: 10,
   height: 10,
