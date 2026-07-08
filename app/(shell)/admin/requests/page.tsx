@@ -59,7 +59,7 @@ export default function AdminRequestsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"ALL" | "PENDING" | "APPROVED" | "REJECTED">("ALL");
+  const [filter, setFilter] = useState<"PENDING" | "APPROVED" | "REJECTED">("PENDING");
 
   useEffect(() => {
     const tok = localStorage.getItem("access_token") ?? "";
@@ -94,14 +94,13 @@ export default function AdminRequestsPage() {
     }
   }
 
-  const filtered = filter === "ALL" ? requests : requests.filter(r => r.status === filter);
+  const filtered = requests.filter(r => r.status === filter);
   const pendingCount = requests.filter(r => r.status === "PENDING").length;
 
   const FILTERS = [
-    { key: "ALL" as const,     label: "전체",     count: requests.length },
-    { key: "PENDING" as const, label: "검토 대기", count: pendingCount },
-    { key: "APPROVED" as const, label: "승인됨",  count: requests.filter(r => r.status === "APPROVED").length },
-    { key: "REJECTED" as const, label: "거절됨",  count: requests.filter(r => r.status === "REJECTED").length },
+    { key: "PENDING" as const,  label: "검토 대기", count: pendingCount },
+    { key: "APPROVED" as const, label: "승인됨",    count: requests.filter(r => r.status === "APPROVED").length },
+    { key: "REJECTED" as const, label: "거절됨",    count: requests.filter(r => r.status === "REJECTED").length },
   ];
 
   if (loading) {
