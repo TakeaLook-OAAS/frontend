@@ -354,39 +354,8 @@ const SECTIONS = [
 
 /* ── page ──────────────────────────────────────────────────────── */
 export default function MetricsPage() {
-  const navItems = [
-    { label: "제품",      href: "#" },
-    { label: "지표",      href: "/metrics" },
-    { label: "기술 스택", href: "#" },
-    { label: "워크플로우",href: "#" },
-    { label: "유즈케이스",href: "#" },
-  ];
-
   return (
     <div style={{ fontFamily: "'Pretendard Variable',Pretendard,-apple-system,sans-serif", background: tk.bg, color: tk.ink, minHeight: "100vh", WebkitFontSmoothing: "antialiased" }}>
-
-      {/* NAV */}
-      <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(250,250,247,0.85)", backdropFilter: "blur(14px)", WebkitBackdropFilter: "blur(14px)", borderBottom: `1px solid ${tk.line}` }}>
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "0 clamp(20px,4vw,48px)", display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", height: 56 }}>
-          <Link href="/" style={{ display: "inline-flex", alignItems: "center" }}>
-            <img src="/images/oaas-logo.png" alt="OAAS" style={{ height: 52, width: "auto" }} />
-          </Link>
-          <nav style={{ display: "flex", gap: 2 }}>
-            {navItems.map(item => {
-              const active = item.label === "지표";
-              return (
-                <Link key={item.label} href={item.href} style={{ fontSize: 14, fontWeight: active ? 700 : 500, color: active ? tk.ink : tk.muted, padding: "6px 12px", borderRadius: 8, background: active ? tk.bgsoft : "transparent", textDecoration: "none" }}>
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-          <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-            <Link href="/login" style={{ fontSize: 14, fontWeight: 500, color: tk.muted, padding: "6px 12px", borderRadius: 8, textDecoration: "none" }}>로그인</Link>
-            <Link href="/signup" style={{ display: "inline-flex", alignItems: "center", height: 36, padding: "0 20px", fontSize: 14, fontWeight: 600, borderRadius: 999, background: tk.accent, color: "#fff", textDecoration: "none" }}>회원가입</Link>
-          </div>
-        </div>
-      </header>
 
       {/* HERO */}
       <section style={{ maxWidth: 1240, margin: "0 auto", padding: "clamp(60px,8vw,96px) clamp(20px,4vw,48px) clamp(40px,5vw,60px)", textAlign: "center" }}>

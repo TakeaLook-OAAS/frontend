@@ -24,20 +24,14 @@ export default function LandingPage() {
 
           {/* 가운데: 네비게이션 */}
           <nav className="hidden md:flex justify-center gap-1" aria-label="섹션 이동">
-            {[
-              { label: '제품', href: '#' },
-              { label: '지표', href: '/metrics' },
-              { label: '기술 스택', href: '#' },
-              { label: '워크플로우', href: '#' },
-              { label: '유즈케이스', href: '#' },
-            ].map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
+            {['제품', '지표', '기술 스택', '워크플로우', '유즈케이스'].map((item) => (
+              <a
+                key={item}
+                href="#"
                 className="text-sm text-white/80 px-3 py-2 rounded-lg hover:bg-white/10 hover:text-white transition-colors duration-150"
               >
-                {item.label}
-              </Link>
+                {item}
+              </a>
             ))}
           </nav>
 
