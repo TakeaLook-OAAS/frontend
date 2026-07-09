@@ -369,6 +369,21 @@
 .campaignPreview,
 .dashboardPreview { padding: 28px; }
 
+.dashboardScreenshot {
+  padding: 14px;
+  background: #eef2f8;
+}
+
+.dashboardScreenshot img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: white;
+  box-shadow: 0 14px 34px -24px rgba(13, 42, 92, .45);
+}
+
 .previewHeading,
 .reviewTitle,
 .campaignHead {
@@ -741,6 +756,7 @@
   .reviewPreview,
   .campaignPreview,
   .dashboardPreview { padding: 18px; }
+  .dashboardScreenshot { padding: 10px; }
   .fakeFields { grid-template-columns: 1fr; }
   .fakeCategory > div { flex-wrap: wrap; }
   .metricGrid { grid-template-columns: 1fr; }

@@ -4,8 +4,7 @@ const NAV_ITEMS = [
   { label: '제품', href: '/product' },
   { label: '지표', href: '/metrics' },
   { label: '기술 스택', href: '/techstack' },
-  { label: '워크플로우', href: '/workflow' },
-  { label: '유즈케이스', href: '/usecases' },
+  { label: '이용방법', href: '/how-to-use' },
 ];
 
 export default function Header() {
