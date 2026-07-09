@@ -308,7 +308,7 @@ function DashboardPreview() {
           src="/images/dashboard-guide.png"
           alt="OAAS 대시보드 실제 화면"
           width={1280}
-          height={820}
+          height={1064}
           sizes="(max-width: 860px) 100vw, 54vw"
           priority
         />
