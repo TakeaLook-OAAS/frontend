@@ -32,7 +32,7 @@ const steps: GuideStep[] = [
     number: "01",
     short: "캠페인 신청",
     eyebrow: "CAMPAIGN REQUEST",
-    title: "광고 캠페인 정보를 입력해 주세요",
+    title: "광고 캠페인 정보 입력",
     description:
       "메인 페이지의 ‘새 캠페인 신청’ 버튼을 누르고 브랜드, 매체, 타겟, 송출 정보를 순서대로 작성합니다.",
     bullets: [
@@ -49,7 +49,7 @@ const steps: GuideStep[] = [
     number: "02",
     short: "검토 및 연동",
     eyebrow: "REVIEW & CONNECT",
-    title: "운영팀이 신청 내용을 검토합니다",
+    title: "신청 내용 검토 및 연동",
     description:
       "제출된 신청서는 OAAS 운영팀이 확인합니다. 검토가 끝나면 송출 일정과 견적을 안내하고 캠페인에 디바이스를 연결합니다.",
     bullets: [
@@ -64,7 +64,7 @@ const steps: GuideStep[] = [
     number: "03",
     short: "송출 확인",
     eyebrow: "CAMPAIGN STATUS",
-    title: "메인에서 송출 상태를 확인하세요",
+    title: "송출 상태 확인",
     description:
       "신청한 캠페인의 진행 상태와 연결된 디바이스를 한곳에서 확인할 수 있습니다.",
     bullets: [
@@ -80,7 +80,7 @@ const steps: GuideStep[] = [
     number: "04",
     short: "성과 분석",
     eyebrow: "PERFORMANCE ANALYTICS",
-    title: "대시보드에서 광고 효과를 분석하세요",
+    title: "광고 효과 분석",
     description:
       "캠페인과 기간을 선택하면 노출, 관심, 체류, 시청 데이터를 다양한 기준으로 비교할 수 있습니다.",
     bullets: [
