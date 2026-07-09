@@ -305,7 +305,7 @@ function DashboardPreview() {
     <WindowFrame label="캠페인 성과 분석">
       <div className={styles.dashboardScreenshot}>
         <Image
-          src="/images/dashboard-guide.png"
+          src="/images/dashboard-guide-with-charts.png"
           alt="OAAS 대시보드 실제 화면"
           width={1280}
           height={1064}
