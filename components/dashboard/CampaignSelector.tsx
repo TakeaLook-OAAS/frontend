@@ -83,7 +83,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
             >
               <span
                 style={{
-                  fontFamily: "JetBrains Mono, monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 10.5,
                   color: active ? "rgba(255,255,255,0.7)" : t.mono,
                   letterSpacing: "0.06em",
@@ -96,7 +96,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
               </span>
               <span
                 style={{
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   fontSize: 10.5,
                   padding: "1px 7px",
                   borderRadius: 99,
@@ -140,7 +140,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
               />
               <span
                 style={{
-                  fontFamily: "JetBrains Mono, monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 11.5,
                   fontWeight: 600,
                 }}
@@ -181,7 +181,7 @@ function Row({
         style={{
           width: 78,
           flexShrink: 0,
-          fontFamily: "JetBrains Mono, monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: 10,
           color: t.mono,
           letterSpacing: "0.14em",

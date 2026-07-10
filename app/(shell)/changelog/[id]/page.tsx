@@ -51,7 +51,7 @@ export default async function ChangelogDetailPage({
           alignItems: "center",
           gap: 10,
           marginBottom: 28,
-          fontFamily: "JetBrains Mono, monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: 10.5,
           letterSpacing: "0.14em",
         }}
@@ -104,7 +104,7 @@ export default async function ChangelogDetailPage({
                 borderRadius: 7,
                 background: t.blueSoft,
                 color: t.blue,
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 11,
                 fontWeight: 700,
               }}
@@ -115,7 +115,7 @@ export default async function ChangelogDetailPage({
             <span
               style={{
                 color: t.mono,
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 10.5,
                 letterSpacing: "0.1em",
               }}
@@ -182,7 +182,7 @@ export default async function ChangelogDetailPage({
                 display: "block",
                 marginBottom: 10,
                 color: t.blue,
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 10.5,
                 fontWeight: 700,
                 letterSpacing: "0.12em",

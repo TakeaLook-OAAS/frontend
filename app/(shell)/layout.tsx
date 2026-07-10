@@ -130,7 +130,7 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
       )}
 
       {!collapsed && (
-        <div style={{ padding: "6px 24px 6px", fontFamily: "JetBrains Mono, monospace", fontSize: 9.5, color: "#6E7A98", letterSpacing: "0.14em" }}>NAVIGATION</div>
+        <div style={{ padding: "6px 24px 6px", fontFamily: "var(--font-mono)", fontSize: 9.5, color: "#6E7A98", letterSpacing: "0.14em" }}>NAVIGATION</div>
       )}
 
       <nav style={{ display: "flex", flexDirection: "column", padding: collapsed ? "4px 8px" : "4px 12px", gap: 2 }}>
@@ -158,7 +158,7 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
               </span>
               {!collapsed && <span style={{ flex: 1 }}>{it.label}</span>}
               {!collapsed && it.id === "patch" && (
-                <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9, padding: "2px 6px", borderRadius: 99, background: t.amber, color: "#1a1207", fontWeight: 700, letterSpacing: "0.04em" }}>NEW</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, padding: "2px 6px", borderRadius: 99, background: t.amber, color: "#1a1207", fontWeight: 700, letterSpacing: "0.04em" }}>NEW</span>
               )}
             </a>
           );
@@ -171,7 +171,7 @@ function Sidebar({ current = "home" }: { current?: NavKind }) {
       {!collapsed && (
         <div style={{ margin: "0 16px", padding: 16, background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 12, position: "relative", overflow: "hidden" }}>
           <div style={{ position: "absolute", right: -30, top: -30, width: 80, height: 80, borderRadius: "50%", background: t.blue, opacity: 0.25, filter: "blur(28px)" }} />
-          <div style={{ position: "relative", fontFamily: "JetBrains Mono, monospace", fontSize: 9.5, color: t.blueLight, letterSpacing: "0.14em" }}>NEED HELP?</div>
+          <div style={{ position: "relative", fontFamily: "var(--font-mono)", fontSize: 9.5, color: t.blueLight, letterSpacing: "0.14em" }}>NEED HELP?</div>
           <div style={{ position: "relative", fontSize: 13, fontWeight: 700, marginTop: 6, lineHeight: 1.35 }}>
             궁금하신 점이 있으신가요?
           </div>
@@ -231,7 +231,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div style={{
       display: "flex", minHeight: "100vh",
       background: "#F4F6FB", color: "#0A1A35",
-      fontFamily: '"Pretendard Variable", Pretendard, -apple-system, sans-serif',
+      fontFamily: 'var(--font-sans)',
     }}>
       <Sidebar current={current} />
       <main style={{ flex: 1, minWidth: 0, background: "#F4F6FB" }}>

@@ -153,7 +153,7 @@ export default function FaqPage() {
         >
           <span
             style={{
-              fontFamily: "JetBrains Mono, monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: 10.5,
               color: t.muted,
               letterSpacing: "0.14em",
@@ -166,7 +166,7 @@ export default function FaqPage() {
 
           <span
             style={{
-              fontFamily: "JetBrains Mono, monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: 10.5,
               color: t.ink,
               letterSpacing: "0.14em",
@@ -237,7 +237,7 @@ export default function FaqPage() {
                     width: 80,
                     padding: "13px 16px",
                     textAlign: "center",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -252,7 +252,7 @@ export default function FaqPage() {
                     width: 140,
                     padding: "13px 16px",
                     textAlign: "center",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -266,7 +266,7 @@ export default function FaqPage() {
                   style={{
                     padding: "13px 16px",
                     textAlign: "left",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -281,7 +281,7 @@ export default function FaqPage() {
                     width: 140,
                     padding: "13px 16px",
                     textAlign: "center",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -296,7 +296,7 @@ export default function FaqPage() {
                     width: 90,
                     padding: "13px 16px",
                     textAlign: "center",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -416,7 +416,7 @@ export default function FaqPage() {
                     style={{
                       padding: "16px",
                       textAlign: "center",
-                      fontFamily: "Inter, sans-serif",
+                      fontFamily: "var(--font-sans)",
                       fontSize: 12,
                       color: t.muted,
                     }}
@@ -428,7 +428,7 @@ export default function FaqPage() {
                     style={{
                       padding: "16px",
                       textAlign: "center",
-                      fontFamily: "Inter, sans-serif",
+                      fontFamily: "var(--font-sans)",
                       fontSize: 12,
                       color: t.muted,
                     }}
@@ -554,7 +554,7 @@ export default function FaqPage() {
                 <span
                   style={{
                     color: t.blue,
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 700,
                     letterSpacing: "0.14em",

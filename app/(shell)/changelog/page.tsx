@@ -106,7 +106,7 @@ export default function ChangelogPage() {
         >
           <span
             style={{
-              fontFamily: "JetBrains Mono, monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: 10.5,
               color: t.muted,
               letterSpacing: "0.14em",
@@ -119,7 +119,7 @@ export default function ChangelogPage() {
 
           <span
             style={{
-              fontFamily: "JetBrains Mono, monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: 10.5,
               color: t.ink,
               letterSpacing: "0.14em",
@@ -189,7 +189,7 @@ export default function ChangelogPage() {
                     width: 80,
                     padding: "13px 16px",
                     textAlign: "center",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -204,7 +204,7 @@ export default function ChangelogPage() {
                     width: 120,
                     padding: "13px 16px",
                     textAlign: "center",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -218,7 +218,7 @@ export default function ChangelogPage() {
                   style={{
                     padding: "13px 16px",
                     textAlign: "left",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -233,7 +233,7 @@ export default function ChangelogPage() {
                     width: 140,
                     padding: "13px 16px",
                     textAlign: "center",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -248,7 +248,7 @@ export default function ChangelogPage() {
                     width: 100,
                     padding: "13px 16px",
                     textAlign: "center",
-                    fontFamily: "JetBrains Mono, monospace",
+                    fontFamily: "var(--font-mono)",
                     fontSize: 10,
                     fontWeight: 600,
                     color: t.mono,
@@ -287,7 +287,7 @@ export default function ChangelogPage() {
                     style={{
                       padding: "16px",
                       textAlign: "center",
-                      fontFamily: "JetBrains Mono, monospace",
+                      fontFamily: "var(--font-mono)",
                       fontSize: 11.5,
                       fontWeight: 700,
                       color: t.blue,
@@ -320,7 +320,7 @@ export default function ChangelogPage() {
                     style={{
                       padding: "16px",
                       textAlign: "center",
-                      fontFamily: "Inter, sans-serif",
+                      fontFamily: "var(--font-sans)",
                       fontSize: 12,
                       color: t.muted,
                     }}
@@ -332,7 +332,7 @@ export default function ChangelogPage() {
                     style={{
                       padding: "16px",
                       textAlign: "center",
-                      fontFamily: "Inter, sans-serif",
+                      fontFamily: "var(--font-sans)",
                       fontSize: 12,
                       color: t.muted,
                     }}

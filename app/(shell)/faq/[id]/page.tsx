@@ -70,7 +70,7 @@ export default async function FaqDetailPage({
         >
           <span
             style={{
-              fontFamily: "JetBrains Mono, monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: 10.5,
               color: t.muted,
               letterSpacing: "0.14em",
@@ -83,7 +83,7 @@ export default async function FaqDetailPage({
 
           <span
             style={{
-              fontFamily: "JetBrains Mono, monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: 10.5,
               color: t.muted,
               letterSpacing: "0.14em",
@@ -96,7 +96,7 @@ export default async function FaqDetailPage({
 
           <span
             style={{
-              fontFamily: "JetBrains Mono, monospace",
+              fontFamily: "var(--font-mono)",
               fontSize: 10.5,
               color: t.ink,
               letterSpacing: "0.14em",
@@ -177,7 +177,7 @@ export default async function FaqDetailPage({
 
             <span
               style={{
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 10.5,
                 color: t.mono,
                 letterSpacing: "0.08em",

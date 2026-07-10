@@ -194,7 +194,7 @@ const lookRatio = Math.round((totalLookS / exposureExample.totalS) * 100);
 function TimelinePreview() {
   return (
     <div>
-      <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--mono-text)', letterSpacing: '0.1em', marginBottom: 16, textAlign: 'right' }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--mono-text)', letterSpacing: '0.1em', marginBottom: 16, textAlign: 'right' }}>
         예시 데이터
       </div>
       <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 6 }}>
@@ -218,7 +218,7 @@ function TimelinePreview() {
         })}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--mono-text)', marginTop: 6 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--font-mono)', fontSize: 10, color: 'var(--mono-text)', marginTop: 6 }}>
         {Array.from({ length: exposureExample.totalS / 2 + 1 }, (_, i) => i * 2).map((s) => (
           <span key={s}>{s}s</span>
         ))}

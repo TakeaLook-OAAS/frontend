@@ -58,7 +58,7 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
       <div style={{ marginBottom: 12 }}>
         <div
           style={{
-            fontFamily: "JetBrains Mono, monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: 10,
             color: C.ink,
             letterSpacing: "0.14em",

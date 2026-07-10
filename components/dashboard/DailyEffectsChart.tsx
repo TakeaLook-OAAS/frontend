@@ -151,7 +151,7 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 10 }}>
           <div>
-            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
               {PERIOD_HEADER[period]} · EFFECTS
             </div>
             <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
@@ -206,7 +206,7 @@ export default function DailyEffectsChart({ data, loading, hasRange }: Props) {
       {/* lower: viewability score */}
       <div>
         <div style={{ marginBottom: 10 }}>
-          <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
             VIEWABILITY · SCORE
           </div>
           <h3 style={{ margin: "4px 0 0", fontSize: 13, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>

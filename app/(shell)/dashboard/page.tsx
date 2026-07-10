@@ -240,9 +240,9 @@ function DashboardInner() {
       >
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>DASHBOARD</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>DASHBOARD</span>
             <span style={{ color: t.line }}>/</span>
-            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>ANALYTICS</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>ANALYTICS</span>
           </div>
           <h1 style={{ margin: "6px 0 0", fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", color: t.ink }}>
             캠페인 성과 분석
@@ -308,7 +308,7 @@ function DashboardInner() {
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
             <div
               style={{
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 10,
                 color: t.mono,
                 letterSpacing: "0.14em",
@@ -355,7 +355,7 @@ function DashboardInner() {
             {dateLabel && (
               <span
                 style={{
-                  fontFamily: "JetBrains Mono, monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 11,
                   color: t.muted,
                   padding: "6px 10px",
@@ -372,7 +372,7 @@ function DashboardInner() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
               style={{
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 11,
                 color: t.muted,
                 padding: "8px 12px",
@@ -406,7 +406,7 @@ function DashboardInner() {
         >
           {/* 성별 */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 58 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 58 }}>
               GENDER
             </div>
             <div style={{ display: "flex", gap: 6 }}>
@@ -440,7 +440,7 @@ function DashboardInner() {
 
           {/* 나이대 */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 38 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 38 }}>
               AGE
             </div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>

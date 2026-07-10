@@ -67,7 +67,7 @@ export default function AgeGenderChart({
       <div style={{ marginBottom: 14 }}>
         <div
           style={{
-            fontFamily: "JetBrains Mono, monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: 10,
             color: C.ink,
             letterSpacing: "0.14em",

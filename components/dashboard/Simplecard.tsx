@@ -76,7 +76,7 @@ export default function SimpleCard({
       </div>
       <div
         style={{
-          fontFamily: "Inter, sans-serif",
+          fontFamily: "var(--font-sans)",
           fontSize: 26,
           fontWeight: 800,
           color: "#0A1A35",

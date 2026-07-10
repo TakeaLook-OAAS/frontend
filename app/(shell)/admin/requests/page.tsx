@@ -123,11 +123,11 @@ export default function AdminRequestsPage() {
   }
 
   return (
-    <div style={{ fontFamily: "'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif", color: tk.ink, minHeight: "100vh", background: "#F4F6FB", WebkitFontSmoothing: "antialiased" }}>
+    <div style={{ fontFamily: "var(--font-sans)", color: tk.ink, minHeight: "100vh", background: "#F4F6FB", WebkitFontSmoothing: "antialiased" }}>
       <div style={{ maxWidth: 920, margin: "0 auto", padding: "40px 32px 88px" }}>
 
         {/* Breadcrumb */}
-        <div style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono, marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono, marginBottom: 16 }}>
           <span style={{ cursor: "pointer" }} onClick={() => router.push("/")}>MAIN</span>
           <span style={{ color: "#C7CEDD" }}>/</span>
           <span>ADMIN</span>
@@ -164,7 +164,7 @@ export default function AdminRequestsPage() {
                 style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "7px 13px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", background: active ? tk.ink : "#fff", color: active ? "#fff" : tk.inkSoft, border: active ? `1px solid ${tk.ink}` : `1px solid ${tk.lineSoft}` }}
               >
                 {f.label}
-                <span style={{ fontFamily: "'Inter',sans-serif", fontSize: 11, fontWeight: 700, padding: "1px 6px", borderRadius: 999, background: active ? "rgba(255,255,255,0.16)" : "#F1F4FA", color: active ? "#fff" : tk.muted }}>
+                <span style={{ fontFamily: "var(--font-sans)", fontSize: 11, fontWeight: 700, padding: "1px 6px", borderRadius: 999, background: active ? "rgba(255,255,255,0.16)" : "#F1F4FA", color: active ? "#fff" : tk.muted }}>
                   {f.count}
                 </span>
               </button>
@@ -192,14 +192,14 @@ export default function AdminRequestsPage() {
                   {/* Card header */}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "16px 20px", borderBottom: `1px solid ${tk.lineSoft}` }}>
                     <div style={{ minWidth: 0 }}>
-                      <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono, marginBottom: 6 }}>CAMPAIGN</div>
+                      <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono, marginBottom: 6 }}>CAMPAIGN</div>
                       <div style={{ fontSize: 16, fontWeight: 700, color: tk.ink, letterSpacing: "-0.01em", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
                         {req.campaign_name}
                       </div>
                     </div>
                     <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
                       <StatusPill status={req.status} />
-                      <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10.5, color: tk.mono }}>
+                      <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: tk.mono }}>
                         {new Date(req.created_at).toLocaleDateString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" })}
                       </span>
                     </div>

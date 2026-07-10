@@ -47,7 +47,7 @@ export default function HourlyAudienceChart({ data }: Props) {
       }}
     >
       <div style={{ marginBottom: 12 }}>
-        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
           HOURLY · AUDIENCE
         </div>
         <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>

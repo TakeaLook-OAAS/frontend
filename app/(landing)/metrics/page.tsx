@@ -40,7 +40,7 @@ function KpiCardsMockup() {
       {cards.map(c => (
         <div key={c.label} style={{ background: "#fff", border: `1px solid ${tk.line}`, borderRadius: 12, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 6 }}>
           <span style={{ fontSize: 11, fontWeight: 600, color: tk.muted }}>{c.label}</span>
-          <span style={{ fontSize: 24, fontWeight: 800, color: tk.ink, letterSpacing: "-0.03em", fontFamily: "Inter,sans-serif" }}>
+          <span style={{ fontSize: 24, fontWeight: 800, color: tk.ink, letterSpacing: "-0.03em", fontFamily: "var(--font-sans)" }}>
             {c.value}<span style={{ fontSize: 13, fontWeight: 600, color: c.color, marginLeft: 3 }}>{c.unit}</span>
           </span>
           <div style={{ height: 3, borderRadius: 2, background: c.bg }}>
@@ -199,7 +199,7 @@ function SovChartMockup() {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
         <div>
           <div style={{ fontSize: 11, color: tk.muted, marginBottom: 2 }}>광고 점유율 (SOV)</div>
-          <div style={{ fontSize: 32, fontWeight: 800, color: tk.ink, letterSpacing: "-0.04em", fontFamily: "Inter,sans-serif" }}>
+          <div style={{ fontSize: 32, fontWeight: 800, color: tk.ink, letterSpacing: "-0.04em", fontFamily: "var(--font-sans)" }}>
             34.2<span style={{ fontSize: 16, fontWeight: 600, color: tk.green, marginLeft: 2 }}>%</span>
           </div>
         </div>
@@ -355,11 +355,11 @@ const SECTIONS = [
 /* ── page ──────────────────────────────────────────────────────── */
 export default function MetricsPage() {
   return (
-    <div style={{ fontFamily: "'Pretendard Variable',Pretendard,-apple-system,sans-serif", background: tk.bg, color: tk.ink, minHeight: "100vh", WebkitFontSmoothing: "antialiased" }}>
+    <div style={{ fontFamily: "var(--font-sans)", background: tk.bg, color: tk.ink, minHeight: "100vh", WebkitFontSmoothing: "antialiased" }}>
 
       {/* HERO */}
       <section style={{ maxWidth: 1240, margin: "0 auto", padding: "clamp(60px,8vw,96px) clamp(20px,4vw,48px) clamp(40px,5vw,60px)", textAlign: "center" }}>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 999, background: `${tk.accent}12`, border: `1px solid ${tk.accent}30`, fontSize: 11.5, fontWeight: 700, letterSpacing: "0.1em", color: tk.accent, marginBottom: 28, fontFamily: "'JetBrains Mono',monospace" }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "5px 14px", borderRadius: 999, background: `${tk.accent}12`, border: `1px solid ${tk.accent}30`, fontSize: 11.5, fontWeight: 700, letterSpacing: "0.1em", color: tk.accent, marginBottom: 28, fontFamily: "var(--font-mono)" }}>
           MEASUREMENT METRICS
         </div>
         <h1 style={{ margin: "0 0 18px", fontSize: "clamp(30px,5vw,50px)", fontWeight: 800, letterSpacing: "-0.035em", lineHeight: 1.1, color: tk.ink }}>
@@ -376,7 +376,7 @@ export default function MetricsPage() {
           {METRICS.map(m => (
             <div key={m.tag} style={{ background: "#fff", border: `1px solid ${tk.line}`, borderRadius: 16, padding: "24px 24px 20px", display: "flex", flexDirection: "column", gap: 12 }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: m.color }}>{m.tag}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.12em", color: m.color }}>{m.tag}</span>
                 <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 9px", borderRadius: 999, background: `${m.color}12`, color: m.color }}>{m.stat}</span>
               </div>
               <div>
@@ -395,7 +395,7 @@ export default function MetricsPage() {
       <section style={{ background: "#fff", borderTop: `1px solid ${tk.line}`, borderBottom: `1px solid ${tk.line}` }}>
         <div style={{ maxWidth: 1240, margin: "0 auto", padding: "clamp(60px,7vw,88px) clamp(20px,4vw,48px)" }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
-            <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: tk.accent, marginBottom: 14 }}>DASHBOARD PREVIEW</div>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: tk.accent, marginBottom: 14 }}>DASHBOARD PREVIEW</div>
             <h2 style={{ margin: "0 0 14px", fontSize: "clamp(24px,3.5vw,36px)", fontWeight: 800, letterSpacing: "-0.03em", color: tk.ink }}>대시보드 구성</h2>
             <p style={{ margin: 0, fontSize: 15, color: tk.muted, lineHeight: 1.7 }}>
               측정된 데이터가 실제 대시보드에서 어떻게 표시되는지 확인해보세요.
@@ -415,7 +415,7 @@ export default function MetricsPage() {
                 }}
               >
                 <div style={{ direction: "ltr" }}>
-                  <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, fontWeight: 700, letterSpacing: "0.13em", color: tk.accent, marginBottom: 12 }}>{s.tag}</div>
+                  <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 700, letterSpacing: "0.13em", color: tk.accent, marginBottom: 12 }}>{s.tag}</div>
                   <h3 style={{ margin: "0 0 12px", fontSize: "clamp(18px,2vw,24px)", fontWeight: 800, letterSpacing: "-0.025em", color: tk.ink }}>{s.title}</h3>
                   <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.75, color: tk.muted }}>{s.desc}</p>
                 </div>
