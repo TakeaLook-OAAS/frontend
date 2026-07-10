@@ -38,16 +38,18 @@ export function LoginForm() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col px-6 py-6 bg-[rgba(10,10,15,0.9)] text-white">
+    <div className="min-h-screen flex flex-col px-6 py-6 bg-[var(--color-bg-auth)] text-white">
       <div>
-        <Image
-          src="/images/oaas-logo.png"
-          alt="OAAS Logo"
-          width={800}
-          height={240}
-          className="h-10 w-auto"
-          priority
-        />
+        <Link href="/">
+          <Image
+            src="/images/oaas-logo.png"
+            alt="OAAS Logo"
+            width={800}
+            height={240}
+            className="h-10 w-auto"
+            priority
+          />
+        </Link>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center">
@@ -71,7 +73,7 @@ export function LoginForm() {
                     placeholder="이메일을 입력하세요"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue focus:ring-blue"
                     required
                   />
                 </div>
@@ -89,7 +91,7 @@ export function LoginForm() {
                     placeholder="비밀번호를 입력하세요"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10 pr-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue focus:ring-blue"
                     required
                   />
                   <button
@@ -110,7 +112,7 @@ export function LoginForm() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50"
+                className="w-full h-11 mt-2 bg-blue hover:bg-blue/85 text-white font-medium disabled:opacity-50"
               >
                 {isLoading ? "로그인 중..." : "로그인"}
               </Button>
@@ -118,7 +120,7 @@ export function LoginForm() {
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
               계정이 없으신가요?{" "}
-              <Link href="/signup" className="text-blue-400 font-medium hover:text-blue-300 hover:underline">
+              <Link href="/signup" className="text-blue-light font-medium hover:text-blue-light/80 hover:underline">
                 회원가입
               </Link>
             </div>

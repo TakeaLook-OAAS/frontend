@@ -11,9 +11,10 @@
 }
 
 :root {
-  --accent:   #7B6FF0;
-  --accent-2: #22D3A8;
-  --line:     rgba(10,10,15,0.08);
+  --accent:      #7B6FF0;
+  --accent-2:    #22D3A8;
+  --line:        rgba(10,10,15,0.08);
+  --color-bg-auth: rgba(10,10,15,0.9);
 }
 
 @theme {
