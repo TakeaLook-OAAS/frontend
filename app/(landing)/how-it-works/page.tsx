@@ -1,78 +1,184 @@
+import Link from 'next/link';
+import type { LucideIcon } from 'lucide-react';
 import {
+  ArrowRight,
+  Eye,
+  Target,
   Users,
   ScanFace,
   Fingerprint,
   Compass,
-  Eye,
   Crosshair,
   CheckCircle2,
 } from 'lucide-react';
+import styles from './how-it-works.module.css';
 
-const pipelineSteps = [
+type PreviewType = 'venn' | 'timeline' | 'gaze' | 'shot';
+
+type Step = {
+  number: string;
+  eyebrow: string;
+  tech?: string;
+  title: string;
+  description: string;
+  bullets: string[];
+  preview: PreviewType;
+  shotLabel?: string;
+  icon: LucideIcon;
+};
+
+const steps: Step[] = [
   {
     number: '01',
-    title: '사람 검출 · 추적',
-    tech: 'YOLOv8n + ByteTrack',
-    caption:
-      'COCO 클래스 중 사람(class 0)만 confidence 0.5 이상으로 검출합니다. ByteTrack이 프레임 간 검출 결과를 매칭해 동일 인물에게 같은 track_id를 부여하고, 최대 30프레임까지 미검출되어도 추적을 유지합니다.',
-    shot: 'draw_tracks 출력 — bbox + track_id',
-    icon: Users,
+    eyebrow: 'DEFINITION',
+    icon: Target,
+    title: 'OAAS가 정의하는 ‘유효 시청’',
+    description:
+      '화면 앞을 지나간 사람 수를 세는 것과, 실제로 광고를 본 사람 수를 세는 것은 다릅니다. OAAS는 아래 두 조건을 모두 만족할 때만 ‘유효 시청(Valid View)’으로 집계합니다.',
+    bullets: [
+      '노출(Exposure) — 카메라 프레임 안에 사람이 존재하는 시간',
+      '응시(Notice) — 시선 벡터가 카메라 정면 기준 30° 이내를 0.5초 이상 유지한 시간',
+      '두 조건의 교집합(A ∩ B)만 ‘유효 시청’으로 카운트',
+    ],
+    preview: 'venn',
   },
   {
     number: '02',
-    title: '얼굴 검출',
-    tech: 'OpenVINO face-detection-adas-0001',
-    caption:
-      '검출된 사람 bbox 안에서 얼굴 위치를 confidence 0.5 이상, 최소 30px 크기 기준으로 찾습니다. 얼굴이 이보다 작으면 이후 단계(나이·성별, 머리 방향 등)는 건너뜁니다.',
-    shot: 'draw_crop_bbox 출력 — 얼굴 영역 박스',
-    icon: ScanFace,
+    eyebrow: 'PRESENCE VS. NOTICE',
+    icon: Eye,
+    title: '지나간 사람과 실제로 본 사람은 다릅니다',
+    description:
+      '같은 사람이라도 화면 앞에 머문 시간 전체가 아니라, 실제로 응시한 구간만 잘라내어 별도로 기록합니다.',
+    bullets: [
+      '노출 구간 — 등장부터 퇴장까지 전체 시간',
+      '응시 구간 — 그중 실제로 화면을 바라본 부분만',
+      '예시: 노출 8.0s 중 응시 4.5s(56%)만 유효 시청으로 집계',
+    ],
+    preview: 'timeline',
   },
   {
     number: '03',
-    title: '나이 · 성별 추정',
-    tech: 'MiVOLO',
-    caption:
-      '얼굴 crop뿐 아니라 몸 전체 영역(person crop)까지 함께 활용해 연령대와 성별을 추정합니다. 얼굴이 작거나 가려져도 몸 정보로 보완할 수 있는 게 특징입니다.',
-    shot: 'draw_gender_age 출력 — 성별 / 연령대 라벨',
-    icon: Fingerprint,
+    eyebrow: 'DETECTION & TRACKING',
+    tech: 'YOLOv8n + ByteTrack',
+    icon: Users,
+    title: '사람 검출 · 추적',
+    description:
+      'COCO 클래스 중 사람(class 0)만 confidence 0.5 이상으로 검출합니다.',
+    bullets: [
+      'ByteTrack이 프레임 간 검출 결과를 매칭해 동일 인물에게 같은 track_id를 부여',
+      '최대 30프레임까지 미검출되어도 추적을 유지',
+    ],
+    preview: 'shot',
+    shotLabel: 'draw_tracks 출력 — bbox + track_id',
   },
   {
     number: '04',
-    title: '머리 방향 추정',
-    tech: '6DRepNet',
-    caption:
-      '얼굴 crop에서 yaw(좌우) · pitch(상하) · roll(기울임) 3축 회전각을 추정합니다. 이 값은 다음 시선 추정 모델의 보조 입력으로도 함께 사용됩니다.',
-    shot: 'draw_headpose 출력 — yaw / pitch / roll 벡터',
-    icon: Compass,
+    eyebrow: 'FACE DETECTION',
+    tech: 'OpenVINO face-detection-adas-0001',
+    icon: ScanFace,
+    title: '얼굴 검출',
+    description:
+      '검출된 사람 bbox 안에서 얼굴 위치를 confidence 0.5 이상, 최소 30px 크기 기준으로 찾습니다.',
+    bullets: [
+      '얼굴이 이보다 작으면 이후 단계(나이·성별, 머리 방향 등)는 건너뜀',
+    ],
+    preview: 'shot',
+    shotLabel: 'draw_crop_bbox 출력 — 얼굴 영역 박스',
   },
   {
     number: '05',
-    title: '눈 검출',
-    tech: 'OpenVINO facial-landmarks-35-adas-0002',
-    caption:
-      '얼굴 랜드마크 중 좌 · 우 눈 위치만 골라내 최소 10px 크기 기준으로 crop합니다. 이 눈 영역이 다음 시선 추정 모델의 입력이 됩니다.',
-    shot: '눈 bbox 좌표 오버레이',
-    icon: Eye,
+    eyebrow: 'DEMOGRAPHICS',
+    tech: 'MiVOLO',
+    icon: Fingerprint,
+    title: '나이 · 성별 추정',
+    description:
+      '얼굴 crop뿐 아니라 몸 전체 영역(person crop)까지 함께 활용해 연령대와 성별을 추정합니다.',
+    bullets: [
+      '얼굴이 작거나 가려져도 몸 정보로 보완할 수 있는 게 특징',
+    ],
+    preview: 'shot',
+    shotLabel: 'draw_gender_age 출력 — 성별 / 연령대 라벨',
   },
   {
     number: '06',
-    title: '시선 추정',
-    tech: 'OpenVINO gaze-estimation-adas-0002',
-    caption:
-      '눈 crop과 머리 방향 각도를 함께 입력받아 3차원 시선 방향 벡터 (x, y, z)를 출력합니다. 이 시점까지는 아직 "보고 있는지" 여부를 판단하지 않고, 방향값만 예측합니다.',
-    shot: 'draw_gaze 출력 — 시선 벡터 화살표',
-    icon: Crosshair,
+    eyebrow: 'HEAD POSE',
+    tech: '6DRepNet',
+    icon: Compass,
+    title: '머리 방향 추정',
+    description:
+      '얼굴 crop에서 yaw(좌우) · pitch(상하) · roll(기울임) 3축 회전각을 추정합니다.',
+    bullets: [
+      '이 값은 다음 시선 추정 모델의 보조 입력으로도 함께 사용',
+    ],
+    preview: 'shot',
+    shotLabel: 'draw_headpose 출력 — yaw / pitch / roll 벡터',
   },
   {
     number: '07',
-    title: '시청 판정',
+    eyebrow: 'EYE DETECTION',
+    tech: 'OpenVINO facial-landmarks-35-adas-0002',
+    icon: Eye,
+    title: '눈 검출',
+    description:
+      '얼굴 랜드마크 중 좌 · 우 눈 위치만 골라내 최소 10px 크기 기준으로 crop합니다.',
+    bullets: [
+      '이 눈 영역이 다음 시선 추정 모델의 입력이 됨',
+    ],
+    preview: 'shot',
+    shotLabel: '눈 bbox 좌표 오버레이',
+  },
+  {
+    number: '08',
+    eyebrow: 'GAZE ESTIMATION',
+    tech: 'OpenVINO gaze-estimation-adas-0002',
+    icon: Crosshair,
+    title: '시선 추정',
+    description:
+      '눈 crop과 머리 방향 각도를 함께 입력받아 3차원 시선 방향 벡터 (x, y, z)를 출력합니다.',
+    bullets: [
+      '이 시점까지는 아직 ‘보고 있는지’를 판단하지 않고, 방향값만 예측',
+    ],
+    preview: 'shot',
+    shotLabel: 'draw_gaze 출력 — 시선 벡터 화살표',
+  },
+  {
+    number: '09',
+    eyebrow: 'JUDGMENT',
     tech: '각도 임계값 + 지속시간 누적',
-    caption:
-      '예측된 시선 벡터와 카메라 정면 방향(0,0,-1) 사이의 각도를 계산해 30° 이내면 \'보고 있음\'으로 판정합니다. 이 상태가 0.5초 이상 이어질 때만 유효한 시청 구간으로 기록합니다.',
-    shot: 'draw_look 출력 — Look:True/False, Degree 값',
     icon: CheckCircle2,
+    title: '시청 판정',
+    description:
+      'AI는 방향을 예측할 뿐, ‘봤다’는 별도 규칙(LookJudge)이 판정합니다. 예측된 시선 벡터와 카메라 정면 방향(0,0,-1) 사이의 각도를 계산해 30° 이내면 ‘보고 있음’으로 판정합니다.',
+    bullets: [
+      '이 상태가 0.5초 이상 이어질 때만 유효한 시청 구간으로 기록',
+      '사전에 지정된 화면 가시 영역(ROI) 안에 있을 때만 판정 대상에 포함',
+    ],
+    preview: 'gaze',
   },
 ];
+
+/* ---------- 미리보기 콘텐츠 ---------- */
+
+function WindowFrame({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className={styles.window}>
+      <div className={styles.windowBar}>
+        <div className={styles.windowDots}>
+          <span />
+          <span />
+          <span />
+        </div>
+        <span className={styles.windowLabel}>{label}</span>
+        <span className={styles.windowSpacer} />
+      </div>
+      <div className={styles.windowBody}>{children}</div>
+    </div>
+  );
+}
+
+function Placeholder({ label }: { label: string }) {
+  return <div className={styles.placeholder}>{label}</div>;
+}
 
 /* 예시용 타임라인 데이터 (실데이터 아님, 설명용) */
 const exposureExample = {
@@ -85,30 +191,43 @@ const exposureExample = {
 const totalLookS = exposureExample.lookIntervals.reduce((sum, i) => sum + (i.endS - i.startS), 0);
 const lookRatio = Math.round((totalLookS / exposureExample.totalS) * 100);
 
-function Eyebrow({ children }: { children: React.ReactNode }) {
+function TimelinePreview() {
   return (
-    <span className="font-mono text-xs tracking-[0.16em] text-accent uppercase">
-      {children}
-    </span>
-  );
-}
+    <div>
+      <div style={{ fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--mono-text)', letterSpacing: '0.1em', marginBottom: 16, textAlign: 'right' }}>
+        예시 데이터
+      </div>
+      <div style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 6 }}>
+        노출 (exposure) — 0s ~ {exposureExample.totalS}s
+      </div>
+      <div style={{ position: 'relative', height: 32, borderRadius: 8, background: 'var(--blue-ghost)' }} />
 
-function ImagePlaceholder({ label }: { label: string }) {
-  return (
-    <div
-      className="aspect-[16/9] w-full rounded-2xl border border-dashed flex items-center justify-center"
-      style={{ borderColor: 'var(--line)' }}
-    >
-      <span className="text-xs text-ink4 font-mono tracking-wide text-center px-6">{label}</span>
+      <div style={{ fontSize: 12, color: 'var(--muted)', margin: '18px 0 6px' }}>
+        응시 (look_times) — {totalLookS}s ({lookRatio}%)
+      </div>
+      <div style={{ position: 'relative', height: 32, borderRadius: 8, background: 'var(--blue-ghost)', overflow: 'hidden' }}>
+        {exposureExample.lookIntervals.map((interval, i) => {
+          const left = (interval.startS / exposureExample.totalS) * 100;
+          const width = ((interval.endS - interval.startS) / exposureExample.totalS) * 100;
+          return (
+            <div
+              key={i}
+              style={{ position: 'absolute', top: 0, bottom: 0, left: `${left}%`, width: `${width}%`, background: 'var(--blue)', borderRadius: 8 }}
+            />
+          );
+        })}
+      </div>
+
+      <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'var(--mono)', fontSize: 10, color: 'var(--mono-text)', marginTop: 6 }}>
+        {Array.from({ length: exposureExample.totalS / 2 + 1 }, (_, i) => i * 2).map((s) => (
+          <span key={s}>{s}s</span>
+        ))}
+      </div>
+
+      <p style={{ marginTop: 18, fontSize: 12, color: 'var(--muted)', textAlign: 'center' }}>
+        노출 {exposureExample.totalS}.0s 중 응시 {totalLookS}.0s만 유효 시청으로 집계됩니다 ({lookRatio}%).
+      </p>
     </div>
-  );
-}
-
-function ExampleTag() {
-  return (
-    <span className="font-mono text-[10px] tracking-[0.1em] text-ink4 border rounded-full px-2 py-0.5" style={{ borderColor: 'var(--line)' }}>
-      예시 데이터
-    </span>
   );
 }
 
@@ -131,289 +250,216 @@ function GazeAngleDiagram() {
   const frontEnd = { x: cx + r, y: cy };
   const arcR = 34;
   const arcStart = { x: cx + arcR, y: cy };
-  const arcPoint = { x: cx + arcR * Math.cos((exampleDeg * Math.PI) / 180), y: cy - arcR * Math.sin((exampleDeg * Math.PI) / 180) };
+  const arcPoint = {
+    x: cx + arcR * Math.cos((exampleDeg * Math.PI) / 180),
+    y: cy - arcR * Math.sin((exampleDeg * Math.PI) / 180),
+  };
 
   return (
-    <div className="w-full rounded-2xl border p-6" style={{ borderColor: 'var(--line)' }}>
-      <svg viewBox="0 0 320 240" className="w-full h-auto" role="img" aria-label="시선 벡터와 카메라 정면 벡터 사이의 각도 판정 다이어그램">
-        {/* 임계각 30° 부채꼴 */}
+    <div>
+      <svg viewBox="0 0 320 240" style={{ width: '100%', height: 'auto' }} role="img" aria-label="시선 벡터와 카메라 정면 벡터 사이의 각도 판정 다이어그램">
         <path
           d={`M ${cx},${cy} L ${upperBound.x},${upperBound.y} A ${r},${r} 0 0 1 ${lowerBound.x},${lowerBound.y} Z`}
-          fill="var(--color-accent2)"
-          opacity={0.12}
+          fill="var(--blue-light)"
+          opacity={0.14}
         />
-        {/* 임계각 경계선 */}
-        <line x1={cx} y1={cy} x2={upperBound.x} y2={upperBound.y} stroke="var(--color-ink4)" strokeWidth={1} strokeDasharray="4 4" />
-        <line x1={cx} y1={cy} x2={lowerBound.x} y2={lowerBound.y} stroke="var(--color-ink4)" strokeWidth={1} strokeDasharray="4 4" />
+        <line x1={cx} y1={cy} x2={upperBound.x} y2={upperBound.y} stroke="var(--mono-text)" strokeWidth={1} strokeDasharray="4 4" />
+        <line x1={cx} y1={cy} x2={lowerBound.x} y2={lowerBound.y} stroke="var(--mono-text)" strokeWidth={1} strokeDasharray="4 4" />
 
-        {/* 카메라 정면 벡터 (0,0,-1) */}
-        <line x1={cx} y1={cy} x2={frontEnd.x} y2={frontEnd.y} stroke="var(--color-ink3)" strokeWidth={2} />
-        <text x={frontEnd.x + 6} y={frontEnd.y + 4} fontSize={11} fill="var(--color-ink3)" fontFamily="var(--font-mono)">
+        <line x1={cx} y1={cy} x2={frontEnd.x} y2={frontEnd.y} stroke="var(--muted)" strokeWidth={2} />
+        <text x={frontEnd.x + 6} y={frontEnd.y + 4} fontSize={11} fill="var(--muted)" fontFamily="var(--mono)">
           카메라 정면 (0,0,-1)
         </text>
 
-        {/* 예측된 시선 벡터 */}
-        <line x1={cx} y1={cy} x2={gazeEnd.x} y2={gazeEnd.y} stroke="var(--color-accent)" strokeWidth={2.5} />
-        <circle cx={gazeEnd.x} cy={gazeEnd.y} r={4} fill="var(--color-accent)" />
-        <text x={gazeEnd.x + 8} y={gazeEnd.y - 4} fontSize={11} fill="var(--color-accent)" fontFamily="var(--font-mono)" fontWeight={600}>
+        <line x1={cx} y1={cy} x2={gazeEnd.x} y2={gazeEnd.y} stroke="var(--blue)" strokeWidth={2.5} />
+        <circle cx={gazeEnd.x} cy={gazeEnd.y} r={4} fill="var(--blue)" />
+        <text x={gazeEnd.x + 8} y={gazeEnd.y - 4} fontSize={11} fill="var(--blue)" fontFamily="var(--mono)" fontWeight={600}>
           예측된 시선 벡터
         </text>
 
-        {/* 각도 호 + 라벨 */}
         <path
           d={`M ${arcStart.x},${arcStart.y} A ${arcR},${arcR} 0 0 1 ${arcPoint.x},${arcPoint.y}`}
           fill="none"
-          stroke="var(--color-ink4)"
+          stroke="var(--mono-text)"
           strokeWidth={1.5}
         />
-        <text x={cx + 42} y={cy - 14} fontSize={11} fill="var(--color-ink)" fontFamily="var(--font-mono)" fontWeight={600}>
+        <text x={cx + 42} y={cy - 14} fontSize={11} fill="var(--ink)" fontFamily="var(--mono)" fontWeight={600}>
           {exampleDeg}°
         </text>
 
-        {/* 카메라 위치 */}
-        <circle cx={cx} cy={cy} r={4} fill="var(--color-ink)" />
+        <circle cx={cx} cy={cy} r={4} fill="var(--ink)" />
 
-        {/* 임계값 라벨 */}
-        <text x={upperBound.x - 4} y={upperBound.y - 8} fontSize={10} fill="var(--color-ink4)" fontFamily="var(--font-mono)" textAnchor="end">
+        <text x={upperBound.x - 4} y={upperBound.y - 8} fontSize={10} fill="var(--mono-text)" fontFamily="var(--mono)" textAnchor="end">
           +{thresholdDeg}°
         </text>
-        <text x={lowerBound.x - 4} y={lowerBound.y + 16} fontSize={10} fill="var(--color-ink4)" fontFamily="var(--font-mono)" textAnchor="end">
+        <text x={lowerBound.x - 4} y={lowerBound.y + 16} fontSize={10} fill="var(--mono-text)" fontFamily="var(--mono)" textAnchor="end">
           -{thresholdDeg}°
         </text>
       </svg>
-      <p className="mt-4 text-[13px] text-ink3 text-center">
-        예시: 각도 {exampleDeg}° ≤ 임계값 {thresholdDeg}° → <span className="text-accent font-semibold">is_looking = True</span>
+      <p style={{ marginTop: 12, fontSize: 12, color: 'var(--muted)', textAlign: 'center' }}>
+        예시: 각도 {exampleDeg}° ≤ 임계값 {thresholdDeg}° → <strong style={{ color: 'var(--blue)' }}>is_looking = True</strong>
       </p>
     </div>
   );
 }
 
-/* ---------- 1. 정의 섹션 ---------- */
-function DefinitionSection() {
+function StepPreview({ step }: { step: Step }) {
+  if (step.preview === 'venn') {
+    return (
+      <WindowFrame label="노출 ∩ 응시 = 유효 시청">
+        <Placeholder label="그림 자리 — 노출 ∩ 응시 = 유효 시청 다이어그램" />
+      </WindowFrame>
+    );
+  }
+  if (step.preview === 'timeline') {
+    return (
+      <WindowFrame label="Presence vs. Notice">
+        <TimelinePreview />
+      </WindowFrame>
+    );
+  }
+  if (step.preview === 'gaze') {
+    return (
+      <WindowFrame label="시선각도 판정 기준">
+        <GazeAngleDiagram />
+      </WindowFrame>
+    );
+  }
   return (
-    <section id="definition" className="relative bg-bg py-24 md:py-32">
-      <div className="max-w-[1240px] mx-auto px-[clamp(20px,4vw,48px)] grid md:grid-cols-2 gap-14 items-center">
-        <div>
-          <Eyebrow>Definition</Eyebrow>
-          <h2
-            className="mt-3 font-semibold tracking-[-0.03em] text-ink"
-            style={{ fontSize: 'clamp(28px,4vw,40px)' }}
-          >
-            OAAS가 정의하는
-            <br />
-            &lsquo;유효 시청&rsquo;
-          </h2>
-          <p className="mt-4 text-ink3 leading-relaxed" style={{ maxWidth: '52ch' }}>
-            화면 앞을 지나간 사람 수를 세는 것과, 실제로 광고를 본 사람 수를 세는 것은
-            다릅니다. OAAS는 아래 두 조건을 모두 만족할 때만 &lsquo;유효 시청(Valid
-            View)&rsquo;으로 집계합니다.
-          </p>
-
-          <div className="mt-8 flex flex-col gap-4">
-            <div className="flex gap-4 items-start">
-              <span className="font-mono text-xs text-ink4 mt-1 flex-shrink-0">A</span>
-              <div>
-                <div className="text-[15px] font-semibold text-ink">노출 (Exposure)</div>
-                <p className="text-[13px] text-ink3 leading-relaxed mt-1">
-                  카메라 프레임 안에 사람이 존재하는 시간. 화면을 보고 있는지와
-                  무관하게 &lsquo;그 자리에 있었다&rsquo;는 사실만 기록합니다.
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-4 items-start">
-              <span className="font-mono text-xs text-ink4 mt-1 flex-shrink-0">B</span>
-              <div>
-                <div className="text-[15px] font-semibold text-ink">응시 (Notice)</div>
-                <p className="text-[13px] text-ink3 leading-relaxed mt-1">
-                  시선 벡터가 카메라 정면 기준 30° 이내를 0.5초 이상 유지한 시간.
-                  실제로 화면을 바라본 시간만 기록합니다.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <p className="mt-6 text-[13px] text-ink3">
-            이 두 조건의 교집합(A ∩ B)만이 &lsquo;유효 시청&rsquo;으로 카운트됩니다.
-          </p>
-        </div>
-
-        <ImagePlaceholder label="그림 자리 — 노출 ∩ 응시 = 유효 시청 다이어그램" />
-      </div>
-    </section>
+    <WindowFrame label={`STEP ${step.number}`}>
+      <Placeholder label={`그림 자리 — ${step.shotLabel}`} />
+    </WindowFrame>
   );
 }
 
-/* ---------- 2. Presence vs Notice 비교 ---------- */
-function PresenceNoticeSection() {
+export default function HowItWorksPage() {
   return (
-    <section id="presence-notice" className="relative py-24 md:py-32 border-t" style={{ borderColor: 'var(--line)' }}>
-      <div className="max-w-[1240px] mx-auto px-[clamp(20px,4vw,48px)]">
-        <div className="text-center mb-16">
-          <Eyebrow>Presence vs. Notice</Eyebrow>
-          <h2
-            className="mt-3 font-semibold tracking-[-0.03em] text-ink"
-            style={{ fontSize: 'clamp(28px,4vw,40px)' }}
-          >
-            지나간 사람과
-            <br className="hidden md:block" />
-            실제로 본 사람은 다릅니다
-          </h2>
-          <p
-            className="mt-4 text-ink3 leading-relaxed mx-auto"
-            style={{ fontSize: 'clamp(14px,1.2vw,16px)', maxWidth: '52ch' }}
-          >
-            같은 사람이라도 화면 앞에 머문 시간 전체가 아니라, 실제로 응시한
-            구간만 잘라내어 별도로 기록합니다.
-          </p>
+    <div className={styles.page}>
+      <header className={styles.hero}>
+        <div className={styles.heroGlow} />
+
+        <div className={styles.breadcrumb}>
+          <span>OAAS</span>
+          <i>/</i>
+          <b>HOW IT WORKS</b>
         </div>
 
-        <div className="max-w-[720px] mx-auto">
-          <div className="flex justify-end mb-4">
-            <ExampleTag />
+        <div className={styles.heroContent}>
+          <div>
+            <span className={styles.heroKicker}>MEASUREMENT METHODOLOGY</span>
+
+            <h1>
+              AI가 예측한 값을 어떻게
+              <br />
+              &lsquo;진짜 시청&rsquo;으로 판정할까요?
+            </h1>
+
+            <p>
+              광고 앞을 스쳐 지나간 사람과 실제로 화면을 바라본 사람을 구분하는
+              <br className={styles.desktopBreak} /> OAAS의 판정 기준을 단계별로 소개합니다.
+            </p>
           </div>
 
-          <div className="flex flex-col gap-3">
-            <div>
-              <div className="text-[12px] text-ink3 mb-1.5">노출 (exposure) — 0s ~ {exposureExample.totalS}s</div>
-              <div className="relative h-9 rounded-lg bg-bgsoft" />
+          <div className={styles.heroGraphic}>
+            <div className={styles.orbit}>
+              <Eye size={30} />
             </div>
 
-            <div>
-              <div className="text-[12px] text-ink3 mb-1.5">응시 (look_times) — {totalLookS}s ({lookRatio}%)</div>
-              <div className="relative h-9 rounded-lg bg-bgsoft overflow-hidden">
-                {exposureExample.lookIntervals.map((interval, i) => {
-                  const left = (interval.startS / exposureExample.totalS) * 100;
-                  const width = ((interval.endS - interval.startS) / exposureExample.totalS) * 100;
-                  return (
-                    <div
-                      key={i}
-                      className="absolute top-0 bottom-0 bg-accent rounded-lg"
-                      style={{ left: `${left}%`, width: `${width}%` }}
-                    />
-                  );
-                })}
-              </div>
+            <div className={styles.floatCardA}>
+              <Target size={17} />
+              <span>
+                <b>응시 조건</b>
+                <small>30° 이내 · 0.5초 이상</small>
+              </span>
             </div>
 
-            <div className="flex justify-between text-[11px] font-mono text-ink4 px-0.5">
-              {Array.from({ length: exposureExample.totalS / 2 + 1 }, (_, i) => i * 2).map((s) => (
-                <span key={s}>{s}s</span>
-              ))}
+            <div className={styles.floatCardB}>
+              <Users size={17} />
+              <span>
+                <b>노출 vs 응시</b>
+                <small>구분해서 집계</small>
+              </span>
             </div>
           </div>
-
-          <p className="mt-6 text-[13px] text-ink3 text-center">
-            노출 {exposureExample.totalS}.0s 중 응시 {totalLookS}.0s만 유효 시청으로 집계됩니다 ({lookRatio}%).
-          </p>
         </div>
-      </div>
-    </section>
-  );
-}
+      </header>
 
-/* ---------- 3. 판정 기준 파이프라인 ---------- */
-function CriteriaPipelineSection() {
-  return (
-    <section id="tech-stack" className="relative bg-bg py-24 md:py-32 border-t" style={{ borderColor: 'var(--line)' }}>
-      <div className="max-w-[1240px] mx-auto px-[clamp(20px,4vw,48px)]">
-        <div className="text-center mb-16">
-          <Eyebrow>AI Pipeline</Eyebrow>
-          <h2
-            className="mt-3 font-semibold tracking-[-0.03em] text-ink"
-            style={{ fontSize: 'clamp(28px,4vw,40px)' }}
-          >
-            7단계 컴퓨터비전 파이프라인으로
-            <br className="hidden md:block" />
-            &lsquo;시청&rsquo;을 판정합니다
-          </h2>
-          <p
-            className="mt-4 text-ink3 leading-relaxed mx-auto"
-            style={{ fontSize: 'clamp(14px,1.2vw,16px)', maxWidth: '52ch' }}
-          >
-            단순히 화면 앞을 지나간 사람이 아니라, 실제로 광고를 바라본 사람만
-            관심 인구로 집계합니다.
-          </p>
+      <nav className={styles.quickSteps} aria-label="판정 기준 단계">
+        {steps.map((step) => (
+          <a href={`#step-${step.number}`} key={step.number}>
+            <span>{step.number}</span>
+            <b>{step.eyebrow}</b>
+          </a>
+        ))}
+      </nav>
+
+      <main className={styles.guide}>
+        <div className={styles.sectionIntro}>
+          <span>HOW IT WORKS</span>
+          <h2>단계별 판정 기준</h2>
+          <p>정의부터 7단계 컴퓨터비전 파이프라인까지, OAAS가 시청을 판정하는 전 과정입니다.</p>
         </div>
 
-        {/* 판정 메커니즘 설명 */}
-        <div className="max-w-[720px] mx-auto mb-20">
-          <h3 className="font-semibold text-ink text-[17px] mb-3">
-            AI는 방향을 예측할 뿐, &lsquo;봤다&rsquo;는 별도 규칙이 판정합니다
-          </h3>
-          <p className="text-[13px] text-ink3 leading-relaxed mb-6">
-            시선 추정 모델(06단계)은 &lsquo;보고 있는지&rsquo;를 직접 학습한 값을
-            내놓지 않습니다. 눈 crop으로부터 3차원 방향 벡터 (x, y, z)만 예측합니다.
-            &lsquo;보고 있다&rsquo;는 판정은 이 벡터와 카메라 정면 방향(0, 0, -1)
-            사이의 각도를 계산하는 별도 규칙(LookJudge)이 담당하며, 그 각도가
-            30° 이내일 때만 True로 판정합니다.
-          </p>
-
-          <GazeAngleDiagram />
-
-          <p className="mt-6 text-[12px] text-ink4 leading-relaxed">
-            한계: 카메라가 화면 바로 앞에 있다고 가정하며 실제 화면-카메라 간
-            물리적 오프셋은 보정하지 않습니다. 사람과 화면 사이 거리·화면
-            크기에 따른 시야각 차이도 반영하지 않고, 30°는 개인차 없이
-            고정된 임계값입니다.
-          </p>
-
-          <div className="mt-10">
-            <ImagePlaceholder label="그림 자리 — ROI(화면 가시 영역) 오버레이 다이어그램" />
-          </div>
-        </div>
-
-        <div className="relative max-w-[720px] mx-auto">
-          {pipelineSteps.map((step, i) => {
+        <div className={styles.stepList}>
+          {steps.map((step, index) => {
             const Icon = step.icon;
             return (
-              <div key={step.number} className="relative flex gap-6 pb-12 last:pb-0">
-                {i !== pipelineSteps.length - 1 && (
-                  <div
-                    className="absolute left-[19px] top-10 bottom-0 w-px"
-                    style={{ background: 'var(--line)' }}
-                  />
-                )}
-
-                <div className="relative z-10 flex-shrink-0 w-10 h-10 rounded-full bg-accent/10 border border-accent/20 flex items-center justify-center text-accent">
-                  <Icon size={18} />
+              <section
+                className={`${styles.stepSection} ${index % 2 === 1 ? styles.reverse : ''}`}
+                id={`step-${step.number}`}
+                key={step.number}
+              >
+                <div className={styles.stepRail}>
+                  <span>STEP</span>
+                  <b>{step.number}</b>
                 </div>
 
-                <div className="pt-1 flex-1 min-w-0">
-                  <div className="flex items-baseline gap-2 mb-1">
-                    <span className="font-mono text-xs text-ink4">{step.number}</span>
-                    <h3 className="font-semibold text-ink text-[15px]">{step.title}</h3>
-                  </div>
-                  <div className="font-mono text-[11px] text-ink4 mb-1.5">{step.tech}</div>
-                  <p
-                    className="text-[13px] text-ink3 leading-relaxed"
-                    style={{ maxWidth: '520px' }}
-                  >
-                    {step.caption}
-                  </p>
-                  <div className="mt-4" style={{ maxWidth: '420px' }}>
-                    <ImagePlaceholder label={`그림 자리 — ${step.shot}`} />
-                  </div>
+                <div className={styles.stepCopy}>
+                  <span className={styles.copyEyebrow}>{step.eyebrow}</span>
+                  {step.tech && <div className={styles.techBadge}>{step.tech}</div>}
+                  <h2>{step.title}</h2>
+                  <p>{step.description}</p>
+
+                  <ul>
+                    {step.bullets.map((bullet) => (
+                      <li key={bullet}>
+                        <span>
+                          <Icon size={13} />
+                        </span>
+                        {bullet}
+                      </li>
+                    ))}
+                  </ul>
+                  {step.number === '09' && (
+                    <p className={styles.limitNote}>
+                      한계: 카메라가 화면 바로 앞에 있다고 가정하며 실제 화면-카메라 간
+                      물리적 오프셋은 보정하지 않습니다. 사람과 화면 사이 거리·화면 크기에
+                      따른 시야각 차이도 반영하지 않고, 30°는 개인차 없이 고정된 임계값입니다.
+                    </p>
+                  )}
                 </div>
-              </div>
+
+                <div className={styles.previewWrap}>
+                  <StepPreview step={step} />
+                </div>
+              </section>
             );
           })}
-
-          <div className="pl-16 text-[12px] text-ink3 leading-relaxed">
-            추가로, 사람이 사전에 지정된 화면 가시 영역(ROI) 안에 있을 때만
-            판정 대상에 포함됩니다.
-          </div>
         </div>
-      </div>
-    </section>
-  );
-}
+      </main>
 
-export default function TechStackPage() {
-  return (
-    <div className="bg-bg font-sans text-ink">
-      <DefinitionSection />
-      <PresenceNoticeSection />
-      <CriteriaPipelineSection />
+      <section className={styles.cta}>
+        <div>
+          <span>WANT TO SEE IT LIVE?</span>
+          <h2>실제 판정 결과를 대시보드에서 확인해 보세요.</h2>
+          <p>노출·응시·연령대·성별까지, 캠페인별 시청 데이터를 한눈에 볼 수 있습니다.</p>
+        </div>
+
+        <Link href="/login">
+          회원가입 / 로그인
+          <ArrowRight size={17} />
+        </Link>
+      </section>
     </div>
   );
 }
