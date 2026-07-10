@@ -6,12 +6,12 @@ import { getCampaigns, buildExportUrl, apiCreateChangeRequest, type CampaignItem
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const tk = {
-  ink: "#0A1A35", inkSoft: "#1A2C4F",
-  blue: "#1E5BFF",
-  green: "#0FA968",
-  amber: "#E89B2A",
-  muted: "#5B6786", mono: "#8893AB",
-  line: "#DCE0EB", lineSoft: "#E7EAF2",
+  ink: "var(--color-ink)", inkSoft: "var(--color-ink2)",
+  blue: "var(--color-blue)",
+  green: "var(--color-green)",
+  amber: "var(--color-amber)",
+  muted: "var(--color-ink3)", mono: "var(--color-ink4)",
+  line: "var(--color-line)", lineSoft: "var(--color-line-soft)",
 };
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -20,7 +20,7 @@ type ModalType = "detail" | "change" | "csv" | null;
 
 const STATUS_META: Record<string, { label: string; bg: string; color: string; dot: string }> = {
   RUNNING:  { label: "진행 중",   bg: "#D6F4E5", color: "#0FA968", dot: "#0FA968" },
-  PAUSED:   { label: "일시정지", bg: "#FCEDD0", color: "#B8770F", dot: "#E89B2A" },
+  PAUSED:   { label: "일시정지", bg: "var(--color-amber-soft)", color: "var(--color-amber-dark)", dot: "var(--color-amber)" },
   DRAFT:    { label: "예정",     bg: "#DCE6FF", color: "#1E5BFF", dot: "#1E5BFF" },
   ENDED:    { label: "종료",     bg: "#EEF1F6", color: "#5B6786", dot: "#8893AB" },
 };

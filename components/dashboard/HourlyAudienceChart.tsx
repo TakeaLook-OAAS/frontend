@@ -23,14 +23,14 @@ interface Props {
 }
 
 const C = {
-  ink: "#0A1A35",
-  muted: "#5B6786",
-  mono: "#8893AB",
-  lineSoft: "#E7EAF2",
-  grid: "#F0F2F8",
-  blue: "#1E5BFF",   // 노출
-  green: "#0FA968",  // 관심
-  amber: "#E89B2A",  // 효율/포착관심도
+  ink: "var(--color-ink)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
+  lineSoft: "var(--color-line-soft)",
+  grid: "var(--color-grid)",
+  blue: "var(--color-blue)",   // 노출
+  green: "var(--color-green)",  // 관심
+  amber: "var(--color-amber)",  // 효율/포착관심도
 };
 
 export default function HourlyAudienceChart({ data }: Props) {

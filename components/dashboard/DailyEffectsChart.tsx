@@ -30,13 +30,13 @@ type Props = {
 };
 
 const C = {
-  ink: "#0A1A35",
-  muted: "#5B6786",
-  mono: "#8893AB",
-  lineSoft: "#E7EAF2",
-  grid: "#F0F2F8",
-  amber: "#E89B2A",
-  green: "#0FA968",
+  ink: "var(--color-ink)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
+  lineSoft: "var(--color-line-soft)",
+  grid: "var(--color-grid)",
+  amber: "var(--color-amber)",
+  green: "var(--color-green)",
 };
 
 function aggregate(items: DayPoint[], period: Period): DisplayPoint[] {

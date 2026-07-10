@@ -15,16 +15,16 @@ interface Props {
 }
 
 const t = {
-  ink: "#0A1A35",
-  inkSoft: "#1A2C4F",
-  blue: "#1E5BFF",
-  blueSoft: "#DCE6FF",
-  blueGhost: "#F4F7FF",
-  bgWarm: "#F9FAFD",
-  line: "#DCE0EB",
-  lineSoft: "#E7EAF2",
-  muted: "#5B6786",
-  mono: "#8893AB",
+  ink: "var(--color-ink)",
+  inkSoft: "var(--color-ink2)",
+  blue: "var(--color-blue)",
+  blueSoft: "var(--color-blue-soft)",
+  blueGhost: "var(--color-blue-ghost)",
+  bgWarm: "var(--color-bg-warm)",
+  line: "var(--color-line)",
+  lineSoft: "var(--color-line-soft)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
 };
 
 export default function CampaignSelector({ options, selected, onChange }: Props) {

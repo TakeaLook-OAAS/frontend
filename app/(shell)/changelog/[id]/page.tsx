@@ -3,16 +3,16 @@ import { notFound } from "next/navigation";
 import { changelogData } from "../changelogdata";
 
 const t = {
-  bg: "#F4F6FB",
-  bgWarm: "#F9FAFD",
-  ink: "#0A1A35",
-  inkSoft: "#1A2C4F",
-  blue: "#1E5BFF",
-  blueSoft: "#DCE6FF",
-  line: "#DCE0EB",
-  lineSoft: "#E7EAF2",
-  muted: "#5B6786",
-  mono: "#8893AB",
+  bg: "var(--color-bg)",
+  bgWarm: "var(--color-bg-warm)",
+  ink: "var(--color-ink)",
+  inkSoft: "var(--color-ink2)",
+  blue: "var(--color-blue)",
+  blueSoft: "var(--color-blue-soft)",
+  line: "var(--color-line)",
+  lineSoft: "var(--color-line-soft)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
 };
 
 type ChangelogDetailPageProps = {

@@ -2,19 +2,19 @@ import Link from "next/link";
 
 /* ── design tokens (light) ─────────────────────────────────────── */
 const tk = {
-  ink:     "#0A0A0F",
-  inkSoft: "#3D3D45",
-  muted:   "#6B6B73",
-  mono:    "#9C9CA3",
-  bg:      "#FAFAF7",
-  bgsoft:  "#F3F3EE",
-  line:    "#D8D8D2",
-  accent:  "#7B6FF0",
-  accent2: "#22D3A8",
-  blue:    "#1E5BFF",
-  green:   "#0FA968",
-  amber:   "#E89B2A",
-  pink:    "#EC4899",
+  ink:     "var(--color-ink)",
+  inkSoft: "var(--color-ink2)",
+  muted:   "var(--color-ink3)",
+  mono:    "var(--color-ink4)",
+  bg:      "var(--color-bg)",
+  bgsoft:  "var(--color-bgsoft)",
+  line:    "var(--color-line)",
+  accent:  "var(--color-accent)",
+  accent2: "var(--color-accent2)",
+  blue:    "var(--color-blue)",
+  green:   "var(--color-green)",
+  amber:   "var(--color-amber)",
+  pink:    "var(--color-pink)",
 };
 
 /* ── 6 overview cards ──────────────────────────────────────────── */

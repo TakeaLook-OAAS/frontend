@@ -11,17 +11,17 @@ import {
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const tk = {
-  ink: "#0A1A35", inkSoft: "#1A2C4F",
-  blue: "#1E5BFF",
-  green: "#0FA968",
-  amber: "#E89B2A",
-  red: "#D7563D",
-  muted: "#5B6786", mono: "#8893AB",
-  line: "#DCE0EB", lineSoft: "#E7EAF2",
+  ink: "var(--color-ink)", inkSoft: "var(--color-ink2)",
+  blue: "var(--color-blue)",
+  green: "var(--color-green)",
+  amber: "var(--color-amber)",
+  red: "var(--color-red)",
+  muted: "var(--color-ink3)", mono: "var(--color-ink4)",
+  line: "var(--color-line)", lineSoft: "var(--color-line-soft)",
 };
 
 const STATUS_META: Record<string, { label: string; bg: string; color: string; dot: string }> = {
-  PENDING:  { label: "검토 대기", bg: "#FCEDD0", color: "#B8770F", dot: "#E89B2A" },
+  PENDING:  { label: "검토 대기", bg: "var(--color-amber-soft)", color: "var(--color-amber-dark)", dot: "var(--color-amber)" },
   APPROVED: { label: "승인됨",   bg: "#D6F4E5", color: "#0FA968", dot: "#0FA968" },
   REJECTED: { label: "거절됨",   bg: "#FEE2E2", color: "#D7563D", dot: "#D7563D" },
 };
@@ -147,7 +147,7 @@ export default function AdminRequestsPage() {
           </div>
           {pendingCount > 0 && (
             <div style={{ flexShrink: 0, paddingTop: 6, display: "inline-flex", alignItems: "center", gap: 8, padding: "8px 14px", borderRadius: 10, background: "#FCEDD0", border: "1px solid #F6D89A", fontSize: 13, fontWeight: 700, color: "#B8770F" }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#E89B2A" }} />
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--color-amber)" }} />
               대기 중 {pendingCount}건
             </div>
           )}

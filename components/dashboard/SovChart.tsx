@@ -13,14 +13,14 @@ import {
 } from "recharts";
 
 const C = {
-  ink:      "#0A1A35",
-  muted:    "#5B6786",
-  mono:     "#8893AB",
-  lineSoft: "#E7EAF2",
-  grid:     "#F0F2F8",
-  green:    "#0FA968",
-  blue:     "#1E5BFF",
-  amber:    "#E89B2A",
+  ink:      "var(--color-ink)",
+  muted:    "var(--color-ink3)",
+  mono:     "var(--color-ink4)",
+  lineSoft: "var(--color-line-soft)",
+  grid:     "var(--color-grid)",
+  green:    "var(--color-green)",
+  blue:     "var(--color-blue)",
+  amber:    "var(--color-amber)",
 };
 
 interface DailyTrendItem {

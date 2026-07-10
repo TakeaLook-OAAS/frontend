@@ -4,17 +4,16 @@ type SimpleCardProps = {
   subtitle: string;
   icon: React.ReactNode;
   /** 지표 톤. 카드 좌측 아이콘과 강조 색에 반영됨 */
-  tone?: "blue" | "green" | "amber" | "violet" | "rose" | "ink";
+  tone?: "blue" | "green" | "amber" | "rose" | "ink";
   className?: string;
 };
 
 const TONE_MAP: Record<NonNullable<SimpleCardProps["tone"]>, { fg: string; bg: string }> = {
-  blue:   { fg: "#1E5BFF", bg: "#DCE6FF" },
-  green:  { fg: "#0FA968", bg: "#D6F4E5" },
-  amber:  { fg: "#B8770F", bg: "#FCEDD0" },
-  violet: { fg: "#7C3AED", bg: "#EDE3FF" },
-  rose:   { fg: "#D7563D", bg: "#FBE3DD" },
-  ink:    { fg: "#0A1A35", bg: "#EEF1F8" },
+  blue:   { fg: "var(--color-blue)", bg: "var(--color-blue-soft)" },
+  green:  { fg: "var(--color-green)", bg: "var(--color-green-soft)" },
+  amber:  { fg: "var(--color-amber-dark)", bg: "var(--color-amber-soft)" },
+  rose:   { fg: "var(--color-red)", bg: "#FBE3DD" },
+  ink:    { fg: "var(--color-ink)", bg: "#EEF1F8" },
 };
 
 export default function SimpleCard({
@@ -31,7 +30,7 @@ export default function SimpleCard({
       style={{
         background: "#fff",
         borderRadius: 14,
-        border: "1px solid #E7EAF2",
+        border: "1px solid var(--color-line-soft)",
         boxShadow: "0 1px 2px rgba(13,42,92,0.03)",
         padding: 18,
         position: "relative",
@@ -47,7 +46,7 @@ export default function SimpleCard({
         <div
           style={{
             fontSize: 14,
-            color: "#0A1A35",
+            color: "var(--color-ink)",
             letterSpacing: "-0.015em",
             fontWeight: 700,
             overflow: "hidden",
@@ -79,7 +78,7 @@ export default function SimpleCard({
           fontFamily: "var(--font-sans)",
           fontSize: 26,
           fontWeight: 800,
-          color: "#0A1A35",
+          color: "var(--color-ink)",
           letterSpacing: "-0.025em",
           lineHeight: 1.05,
           fontFeatureSettings: '"tnum" 1',
@@ -90,7 +89,7 @@ export default function SimpleCard({
       <div
         style={{
           fontSize: 11.5,
-          color: "#5B6786",
+          color: "var(--color-ink3)",
           lineHeight: 1.45,
           marginTop: "auto",
         }}

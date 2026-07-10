@@ -1,18 +1,18 @@
 .page {
-  --ink: #0a1a35;
-  --ink-soft: #1a2c4f;
-  --blue: #1e5bff;
-  --blue-light: #5c8bff;
-  --blue-soft: #dce6ff;
-  --blue-ghost: #f4f7ff;
-  --muted: #5b6786;
-  --mono-text: #8893ab;
-  --line: #dce0eb;
-  --line-soft: #e7eaf2;
+  --ink: var(--color-ink);
+  --ink-soft: var(--color-ink2);
+  --blue: var(--color-blue);
+  --blue-light: var(--color-blue-light);
+  --blue-soft: var(--color-blue-soft);
+  --blue-ghost: var(--color-blue-ghost);
+  --muted: var(--color-ink3);
+  --mono-text: var(--color-ink4);
+  --line: var(--color-line);
+  --line-soft: var(--color-line-soft);
   min-height: 100vh;
   padding-bottom: 72px;
   color: var(--ink);
-  background: #f4f6fb;
+  background: var(--color-bg);
   font-family: var(--font-sans);
 }
 
@@ -92,10 +92,10 @@
 .hero h1 {
   max-width: 720px;
   margin: 14px 0 16px;
-  font-size: clamp(36px, 3.2vw, 52px);
+  font-size: clamp(40px, 3.4vw, 58px);
   font-weight: 800;
-  line-height: 1.2;
-  letter-spacing: -.04em;
+  line-height: 1.13;
+  letter-spacing: -.045em;
 }
 
 .hero p {
@@ -182,8 +182,8 @@
   flex: 1 0 auto;
   align-items: center;
   gap: 10px;
-  min-height: 64px;
-  padding: 0 20px;
+  min-height: 82px;
+  padding: 0 28px;
   color: var(--ink);
   text-decoration: none;
   white-space: nowrap;
@@ -193,11 +193,11 @@
 .quickSteps a > span {
   color: var(--blue);
   font-family: var(--font-mono);
-  font-size: 10.5px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: .12em;
 }
-.quickSteps a b { font-size: 13px; font-weight: 700; }
+.quickSteps a b { font-size: 14px; font-weight: 700; }
 
 .guide {
   max-width: 1480px;
@@ -454,11 +454,11 @@
   .page { padding-bottom: 30px; }
   .hero { min-height: 330px; padding: 20px 22px 42px; }
   .heroContent { margin-top: 42px; }
-  .hero h1 { font-size: 32px; }
+  .hero h1 { font-size: 36px; }
   .hero p { font-size: 14px; }
   .desktopBreak { display: none; }
   .quickSteps { margin: -24px 14px 0; }
-  .quickSteps a { min-height: 56px; padding: 0 14px; gap: 8px; }
+  .quickSteps a { min-height: 62px; padding: 0 14px; gap: 8px; }
   .guide { padding: 76px 18px 20px; }
   .sectionIntro h2 { font-size: 29px; }
   .stepList { margin-top: 48px; }

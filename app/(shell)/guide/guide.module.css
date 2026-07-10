@@ -1,18 +1,18 @@
 .page {
-  --ink: #0a1a35;
-  --ink-soft: #1a2c4f;
-  --blue: #1e5bff;
-  --blue-light: #5c8bff;
-  --blue-soft: #dce6ff;
-  --blue-ghost: #f4f7ff;
-  --muted: #5b6786;
-  --mono-text: #8893ab;
-  --line: #dce0eb;
-  --line-soft: #e7eaf2;
+  --ink: var(--color-ink);
+  --ink-soft: var(--color-ink2);
+  --blue: var(--color-blue);
+  --blue-light: var(--color-blue-light);
+  --blue-soft: var(--color-blue-soft);
+  --blue-ghost: var(--color-blue-ghost);
+  --muted: var(--color-ink3);
+  --mono-text: var(--color-ink4);
+  --line: var(--color-line);
+  --line-soft: var(--color-line-soft);
   min-height: 100vh;
   padding-bottom: 72px;
   color: var(--ink);
-  background: #f4f6fb;
+  background: var(--color-bg);
   font-family: var(--font-sans);
 }
 
@@ -24,7 +24,7 @@
   background:
     radial-gradient(circle at 78% 20%, rgba(92, 139, 255, .2), transparent 27%),
     radial-gradient(circle at 95% 80%, rgba(34, 211, 168, .12), transparent 24%),
-    linear-gradient(135deg, #0a1a35 0%, #0d2a5c 58%, #123a7c 100%);
+    linear-gradient(135deg, var(--color-ink) 0%, var(--color-navy) 58%, #123a7c 100%);
   color: white;
 }
 
@@ -665,7 +665,7 @@
   flex: 1;
   min-width: 5px;
   border-radius: 3px 3px 0 0;
-  background: linear-gradient(#5c8bff, #1e5bff);
+  background: linear-gradient(var(--color-blue-light), var(--color-blue));
 }
 
 .cta {
@@ -680,7 +680,7 @@
   color: white;
   background:
     radial-gradient(circle at 85% 20%, rgba(92,139,255,.3), transparent 35%),
-    linear-gradient(135deg, #0a1a35, #0d2a5c);
+    linear-gradient(135deg, var(--color-ink), var(--color-navy));
 }
 .cta h2 { margin: 8px 0 7px; font-size: 28px; font-weight: 800; letter-spacing: -.03em; }
 .cta p { margin: 0; color: #aebdd6; font-size: 14px; }
