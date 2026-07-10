@@ -3,7 +3,7 @@ import Link from 'next/link';
 const NAV_ITEMS = [
   { label: '제품', href: '/product' },
   { label: '지표', href: '/metrics' },
-  { label: '기술 스택', href: '/techstack' },
+  { label: '작동 원리', href: '/how-it-works' },
   { label: '이용방법', href: '/how-to-use' },
 ];
 

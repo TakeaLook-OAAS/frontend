@@ -11,13 +11,13 @@ import {
 } from "recharts";
 
 const C = {
-  ink: "#0A1A35",
-  muted: "#5B6786",
-  mono: "#8893AB",
-  lineSoft: "#E7EAF2",
-  grid: "#F0F2F8",
-  blue: "#1E5BFF",   // 노출(Dwell)
-  green: "#0FA968",  // 관심(Fixation)
+  ink: "var(--color-ink)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
+  lineSoft: "var(--color-line-soft)",
+  grid: "var(--color-grid)",
+  blue: "var(--color-blue)",   // 노출(Dwell)
+  green: "var(--color-green)",  // 관심(Fixation)
 };
 
 export type HistogramBin = { label: string; dwell: number; fixation: number };
@@ -58,7 +58,7 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
       <div style={{ marginBottom: 12 }}>
         <div
           style={{
-            fontFamily: "JetBrains Mono, monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: 10,
             color: C.ink,
             letterSpacing: "0.14em",

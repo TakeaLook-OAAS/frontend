@@ -8,24 +8,24 @@ import { getCampaigns, CampaignItem } from "@/lib/api";
 /* design tokens (mirrors landing page.tsx)                          */
 /* ---------------------------------------------------------------- */
 const t = {
-  bg: "#F4F6FB",
-  bgWarm: "#F9FAFD",
-  ink: "#0A1A35",
-  inkSoft: "#1A2C4F",
-  navy: "#0D2A5C",
-  blue: "#1E5BFF",
-  blueLight: "#5C8BFF",
-  blueSoft: "#DCE6FF",
-  blueMist: "#EEF3FF",
-  blueGhost: "#F4F7FF",
-  green: "#0FA968",
-  greenSoft: "#D6F4E5",
-  amber: "#E89B2A",
-  red: "#D7563D",
-  line: "#DCE0EB",
-  lineSoft: "#E7EAF2",
-  muted: "#5B6786",
-  mono: "#8893AB",
+  bg: "var(--color-bg)",
+  bgWarm: "var(--color-bg-warm)",
+  ink: "var(--color-ink)",
+  inkSoft: "var(--color-ink2)",
+  navy: "var(--color-navy)",
+  blue: "var(--color-blue)",
+  blueLight: "var(--color-blue-light)",
+  blueSoft: "var(--color-blue-soft)",
+  blueMist: "var(--color-blue-mist)",
+  blueGhost: "var(--color-blue-ghost)",
+  green: "var(--color-green)",
+  greenSoft: "var(--color-green-soft)",
+  amber: "var(--color-amber)",
+  red: "var(--color-red)",
+  line: "var(--color-line)",
+  lineSoft: "var(--color-line-soft)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
 };
 
 /* ---------------------------------------------------------------- */
@@ -104,7 +104,7 @@ function StatusPill({ status }: { status: CampaignStatus | DeviceStatus }) {
 
 function Eyebrow({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
   return (
-    <div style={{ fontSize: 11, fontFamily: "JetBrains Mono, monospace", color: light ? t.blueLight : t.blue, letterSpacing: "0.14em", fontWeight: 600, textTransform: "uppercase" }}>
+    <div style={{ fontSize: 11, fontFamily: "var(--font-mono)", color: light ? t.blueLight : t.blue, letterSpacing: "0.14em", fontWeight: 600, textTransform: "uppercase" }}>
       {children}
     </div>
   );
@@ -124,9 +124,9 @@ function TopHeader({ campaigns, userEmail, onRefresh, onNewCampaign }: { campaig
     }}>
       <div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>MAIN</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>MAIN</span>
           <span style={{ color: t.line }}>/</span>
-          <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>OVERVIEW</span>
+          <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>OVERVIEW</span>
         </div>
         <h1 style={{ margin: "6px 0 0", fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", color: t.ink }}>
           안녕하세요, <span style={{ color: t.blue }}>{userEmail || ""}</span>{userEmail ? " 님" : ""}
@@ -187,8 +187,8 @@ function CampaignRow({ c, expanded, onToggle }: { c: Campaign; expanded: boolean
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
-            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9.5, color: t.mono, letterSpacing: "0.12em" }}>DEVICES</div>
-            <div style={{ fontFamily: "Inter, sans-serif", fontSize: 22, fontWeight: 800, color: t.ink, marginTop: 2, letterSpacing: "-0.02em", lineHeight: 1 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: t.mono, letterSpacing: "0.12em" }}>DEVICES</div>
+            <div style={{ fontFamily: "var(--font-sans)", fontSize: 22, fontWeight: 800, color: t.ink, marginTop: 2, letterSpacing: "-0.02em", lineHeight: 1 }}>
               {c.devices}<span style={{ fontSize: 12, color: t.muted, fontWeight: 600, marginLeft: 4 }}>대</span>
             </div>
           </div>
@@ -223,7 +223,7 @@ function CampaignRow({ c, expanded, onToggle }: { c: Campaign; expanded: boolean
               <div style={{
                 display: "grid",
                 gridTemplateColumns: "minmax(0,1.6fr) 1fr 110px 120px",
-                padding: "10px 16px", fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono,
+                padding: "10px 16px", fontFamily: "var(--font-mono)", fontSize: 10, color: t.mono,
                 letterSpacing: "0.12em", background: t.bgWarm,
                 borderBottom: `1px solid ${t.lineSoft}`,
               }}>
@@ -241,9 +241,9 @@ function CampaignRow({ c, expanded, onToggle }: { c: Campaign; expanded: boolean
                   color: t.inkSoft,
                 }}>
                   <span style={{ color: t.ink, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", paddingRight: 12 }}>{d.name}</span>
-                  <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.muted, letterSpacing: "0.06em" }}>{d.type}</span>
+                  <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: t.muted, letterSpacing: "0.06em" }}>{d.type}</span>
                   <span><StatusPill status={d.status} /></span>
-                  <span style={{ fontFamily: "Inter, sans-serif", color: t.muted, fontSize: 11.5, textAlign: "right" }}>{d.sync}</span>
+                  <span style={{ fontFamily: "var(--font-sans)", color: t.muted, fontSize: 11.5, textAlign: "right" }}>{d.sync}</span>
                 </div>
               ))}
             </div>
@@ -312,7 +312,7 @@ function MapCard() {
                 display: "flex", alignItems: "center", justifyContent: "center",
               }}>
                 <span style={{
-                  transform: "rotate(45deg)", fontFamily: "Inter, sans-serif",
+                  transform: "rotate(45deg)", fontFamily: "var(--font-sans)",
                   color: "#fff", fontWeight: 800, fontSize: 12, letterSpacing: "-0.02em",
                 }}>{p.n}</span>
               </div>
@@ -335,7 +335,7 @@ function MapCard() {
           border: `1px solid ${t.lineSoft}`, boxShadow: "0 6px 18px -8px rgba(13,42,92,0.18)",
           fontSize: 11,
         }}>
-          <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 9.5, color: t.mono, letterSpacing: "0.14em", marginBottom: 8 }}>LEGEND</div>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: t.mono, letterSpacing: "0.14em", marginBottom: 8 }}>LEGEND</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, color: t.inkSoft }}>
               <span style={{ width: 10, height: 10, borderRadius: "50%", background: t.blue }} /> 진행 중 디바이스
@@ -362,7 +362,7 @@ function MapCard() {
 
         <div style={{
           position: "absolute", right: 18, bottom: 14,
-          fontFamily: "JetBrains Mono, monospace", fontSize: 9.5, color: t.mono,
+          fontFamily: "var(--font-mono)", fontSize: 9.5, color: t.mono,
           letterSpacing: "0.14em", opacity: 0.7,
         }}>[ MAP · placeholder ]</div>
       </div>
@@ -410,7 +410,7 @@ function CampaignsSection({ campaigns }: { campaigns: Campaign[] }) {
               <div style={{ fontSize: 22, fontWeight: 800, color: t.ink, letterSpacing: "-0.025em" }}>
                 자신이 신청한 광고
               </div>
-              <div style={{ fontFamily: "Inter, sans-serif", fontSize: 13, color: t.muted, fontWeight: 600 }}>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: t.muted, fontWeight: 600 }}>
                 ({campaigns.length}건)
               </div>
             </div>
@@ -432,7 +432,7 @@ function CampaignsSection({ campaigns }: { campaigns: Campaign[] }) {
                 }}>
                   {tb.l}
                   <span style={{
-                    fontFamily: "Inter, sans-serif",
+                    fontFamily: "var(--font-sans)",
                     fontSize: 10.5, fontWeight: 700, padding: "1px 6px", borderRadius: 99,
                     background: active ? "rgba(255,255,255,0.18)" : t.bgWarm,
                     color: active ? "#fff" : t.muted,

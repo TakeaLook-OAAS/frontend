@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&display=swap");
 
 @import "tailwindcss";
 
@@ -19,15 +19,33 @@
 @theme {
   --color-accent:  #7B6FF0;
   --color-accent2: #22D3A8;
-  --color-ink:     #0A0A0F;
-  --color-ink2:    #3D3D45;
-  --color-ink3:    #6B6B73;
-  --color-ink4:    #9C9CA3;
-  --color-bg:      #FAFAF7;
+  --color-ink:     #0A1A35;
+  --color-ink2:    #1A2C4F;
+  --color-ink3:    #5B6786;
+  --color-ink4:    #8893AB;
+  --color-bg:      #F4F6FB;
   --color-bgsoft:  #F3F3EE;
+  --color-bg-warm: #F9FAFD;
+
+  --color-navy:       #0D2A5C;
+  --color-blue:       #1E5BFF;
+  --color-blue-light: #5C8BFF;
+  --color-blue-soft:  #DCE6FF;
+  --color-blue-mist:  #EEF3FF;
+  --color-blue-ghost: #F4F7FF;
+  --color-green:      #0FA968;
+  --color-green-soft: #D6F4E5;
+  --color-amber:      #E89B2A;
+  --color-amber-soft: #FCEDD0;
+  --color-amber-dark: #B8770F;
+  --color-red:        #D7563D;
+  --color-pink:       #EC4899;
+  --color-line:       #DCE0EB;
+  --color-line-soft:  #E7EAF2;
+  --color-grid:       #F0F2F8;
 
   --font-sans: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", system-ui, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
   --font-serif: "Times New Roman", "Noto Serif KR", serif;
 }
 

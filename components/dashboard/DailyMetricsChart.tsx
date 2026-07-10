@@ -28,14 +28,14 @@ interface Props {
 }
 
 const C = {
-  ink: "#0A1A35",
-  muted: "#5B6786",
-  mono: "#8893AB",
-  lineSoft: "#E7EAF2",
-  grid: "#F0F2F8",
-  blue: "#1E5BFF",
-  amber: "#E89B2A",
-  green: "#0FA968",
+  ink: "var(--color-ink)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
+  lineSoft: "var(--color-line-soft)",
+  grid: "var(--color-grid)",
+  blue: "var(--color-blue)",
+  amber: "var(--color-amber)",
+  green: "var(--color-green)",
 };
 
 function aggregate(items: DailyChartPoint[], period: Period): DailyChartPoint[] {
@@ -107,7 +107,7 @@ export default function DailyMetricsChart({ data, loading, hasRange }: Props) {
     >
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
         <div>
-          <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
             {PERIOD_HEADER[period]} · TREND
           </div>
           <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>

@@ -27,15 +27,15 @@ import {
 
 /* ---------- design tokens (synced with main page) ---------- */
 const t = {
-  bg: "#F4F6FB", bgWarm: "#F9FAFD",
-  ink: "#0A1A35", inkSoft: "#1A2C4F", navy: "#0D2A5C",
-  blue: "#1E5BFF", blueLight: "#5C8BFF", blueSoft: "#DCE6FF",
-  blueGhost: "#F4F7FF",
-  green: "#0FA968", greenSoft: "#D6F4E5",
-  amber: "#E89B2A",
-  red: "#D7563D",
-  line: "#DCE0EB", lineSoft: "#E7EAF2",
-  muted: "#5B6786", mono: "#8893AB",
+  bg: "var(--color-bg)", bgWarm: "var(--color-bg-warm)",
+  ink: "var(--color-ink)", inkSoft: "var(--color-ink2)", navy: "var(--color-navy)",
+  blue: "var(--color-blue)", blueLight: "var(--color-blue-light)", blueSoft: "var(--color-blue-soft)",
+  blueGhost: "var(--color-blue-ghost)",
+  green: "var(--color-green)", greenSoft: "var(--color-green-soft)",
+  amber: "var(--color-amber)",
+  red: "var(--color-red)",
+  line: "var(--color-line)", lineSoft: "var(--color-line-soft)",
+  muted: "var(--color-ink3)", mono: "var(--color-ink4)",
 };
 
 import { Suspense } from "react";
@@ -240,9 +240,9 @@ function DashboardInner() {
       >
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>DASHBOARD</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>DASHBOARD</span>
             <span style={{ color: t.line }}>/</span>
-            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>ANALYTICS</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>ANALYTICS</span>
           </div>
           <h1 style={{ margin: "6px 0 0", fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", color: t.ink }}>
             캠페인 성과 분석
@@ -308,7 +308,7 @@ function DashboardInner() {
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
             <div
               style={{
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 10,
                 color: t.mono,
                 letterSpacing: "0.14em",
@@ -355,7 +355,7 @@ function DashboardInner() {
             {dateLabel && (
               <span
                 style={{
-                  fontFamily: "JetBrains Mono, monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 11,
                   color: t.muted,
                   padding: "6px 10px",
@@ -372,7 +372,7 @@ function DashboardInner() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
               style={{
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 11,
                 color: t.muted,
                 padding: "8px 12px",
@@ -406,7 +406,7 @@ function DashboardInner() {
         >
           {/* 성별 */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 58 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 58 }}>
               GENDER
             </div>
             <div style={{ display: "flex", gap: 6 }}>
@@ -440,7 +440,7 @@ function DashboardInner() {
 
           {/* 나이대 */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 38 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 38 }}>
               AGE
             </div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -499,28 +499,28 @@ function DashboardInner() {
             value={interestedCount.toLocaleString()}
             subtitle="Interested"
             icon={<UserCheck className="w-4 h-4" />}
-            tone="green"
+            tone="blue"
           />
           <SimpleCard
             title="포착 관심도"
             value={`${attentionRateTracks}%`}
             subtitle="Attention Rate (Tracks)"
             icon={<Target className="w-4 h-4" />}
-            tone="green"
+            tone="amber"
           />
           <SimpleCard
             title="총 체류 시간"
             value={`${totalDwellTimeSec.toLocaleString()}초`}
             subtitle="Total Dwell Time"
             icon={<Clock className="w-4 h-4" />}
-            tone="violet"
+            tone="green"
           />
           <SimpleCard
             title="총 시청 시간"
             value={`${attentionTimeSec.toLocaleString()}초`}
             subtitle="Total Attention Time"
             icon={<Eye className="w-4 h-4" />}
-            tone="amber"
+            tone="green"
           />
           <SimpleCard
             title="심층 관심도"
