@@ -108,6 +108,8 @@ export default function MyAdsPage() {
   const [crLoading, setCrLoading] = useState(false);
   const [crError, setCrError] = useState<string | null>(null);
 
+  const today = new Date().toISOString().split("T")[0];
+
   // CSV state
   const [csvCampaignId, setCsvCampaignId] = useState("");
   const [csvDeviceId, setCsvDeviceId] = useState("");
@@ -566,10 +568,26 @@ export default function MyAdsPage() {
               <div>
                 <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: tk.inkSoft, marginBottom: 7 }}>광고 게재 기간</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <input type="date" value={crStartDate} onChange={e => setCrStartDate(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
+                  {(() => {
+                    const isPast = crStartDate < today;
+                    return (
+                      <input
+                        type="date"
+                        value={crStartDate}
+                        disabled={isPast}
+                        min={isPast ? undefined : today}
+                        onChange={e => setCrStartDate(e.target.value)}
+                        title={isPast ? "이미 시작된 날짜는 변경할 수 없습니다" : undefined}
+                        style={{ flex: 1, padding: "9px 12px", border: `1px solid ${isPast ? tk.line : tk.line}`, borderRadius: 9, fontSize: 13.5, color: isPast ? tk.muted : tk.ink, background: isPast ? "#F1F4FA" : "#fff", outline: "none", cursor: isPast ? "not-allowed" : "auto" }}
+                      />
+                    );
+                  })()}
                   <span style={{ color: tk.mono, fontSize: 15 }}>→</span>
-                  <input type="date" value={crEndDate} onChange={e => setCrEndDate(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
+                  <input type="date" value={crEndDate} min={today} onChange={e => setCrEndDate(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
                 </div>
+                {crStartDate < today && (
+                  <p style={{ marginTop: 6, fontSize: 11.5, color: tk.muted }}>시작일이 이미 지났습니다. 종료일만 변경할 수 있습니다.</p>
+                )}
               </div>
 
               <div>

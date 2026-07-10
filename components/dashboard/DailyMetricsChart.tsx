@@ -150,7 +150,7 @@ export default function DailyMetricsChart({ data, loading, hasRange }: Props) {
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke={C.grid} vertical={false} />
                     <XAxis dataKey="label" tick={{ fontSize: 9, fill: C.muted }} tickLine={false} axisLine={{ stroke: C.lineSoft }} />
-                    <YAxis yAxisId="left" domain={timesDomain} tick={{ fontSize: 9, fill: C.muted }} tickFormatter={(v: number) => `${v}s`} width={32} axisLine={false} tickLine={false} />
+                    <YAxis yAxisId="left" domain={timesDomain} tick={{ fontSize: 9, fill: C.muted }} tickFormatter={(v: number) => `${v}s`} width={44} axisLine={false} tickLine={false} />
                     <YAxis yAxisId="right" orientation="right" domain={[0, 100]} tick={{ fontSize: 9, fill: C.muted }} tickFormatter={(v: number) => `${v}%`} width={32} axisLine={false} tickLine={false} />
                     <Tooltip
                       contentStyle={tooltipStyle}

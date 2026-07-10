@@ -31,11 +31,13 @@ type Props = {
   bins: HistogramBin[];
   loading: boolean;
   hasRange: boolean;
+  maxBuckets?: number;
 };
 
-export default function FixationHistogram({ bins, loading, hasRange }: Props) {
+export default function FixationHistogram({ bins, loading, hasRange, maxBuckets }: Props) {
   const binMap = Object.fromEntries(bins.map((b) => [b.label, b]));
-  const filledBins: HistogramBin[] = ALL_BUCKETS.map((label) => ({
+  const buckets = maxBuckets ? ALL_BUCKETS.slice(0, maxBuckets) : ALL_BUCKETS;
+  const filledBins: HistogramBin[] = buckets.map((label) => ({
     label,
     dwell:    binMap[label]?.dwell    ?? 0,
     fixation: binMap[label]?.fixation ?? 0,
