@@ -18,8 +18,8 @@
 
 .hero {
   position: relative;
-  min-height: 420px;
-  padding: 22px 36px 54px;
+  min-height: 480px;
+  padding: 72px 36px 54px;
   overflow: hidden;
   background:
     radial-gradient(circle at 12% 20%, rgba(123, 111, 240, .24), transparent 34%),
@@ -47,7 +47,7 @@
   grid-template-columns: minmax(0, 1fr) minmax(420px, .8fr);
   align-items: center;
   max-width: 1440px;
-  margin: 56px auto 0;
+  margin: 40px auto 0;
 }
 
 .heroKicker,
@@ -60,8 +60,8 @@
 }
 
 .heroKicker { color: var(--color-accent2); }
-.sectionIntro > span { color: var(--blue); }
-.cta > div > span { color: var(--blue-light); }
+.sectionIntro > span { color: var(--color-accent); }
+.cta > div > span { color: var(--color-accent2); }
 
 .hero h1 {
   max-width: 720px;
@@ -81,7 +81,7 @@
 
 .heroGraphic {
   position: relative;
-  min-height: 250px;
+  min-height: 300px;
 }
 
 .orbit {
@@ -163,7 +163,7 @@
 
 .quickSteps a:not(:last-child) { border-right: 1px solid var(--line-soft); }
 .quickSteps a > span {
-  color: var(--blue);
+  color: var(--color-accent);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
@@ -651,12 +651,10 @@
   gap: 30px;
   border-radius: 18px;
   color: white;
-  background:
-    radial-gradient(circle at 85% 20%, rgba(92,139,255,.3), transparent 35%),
-    linear-gradient(135deg, var(--color-ink), var(--color-navy));
+  background: var(--ink);
 }
 .cta h2 { margin: 8px 0 7px; font-size: 28px; font-weight: 800; letter-spacing: -.03em; }
-.cta p { margin: 0; color: #aebdd6; font-size: 14px; }
+.cta p { margin: 0; color: rgba(255,255,255,.55); font-size: 14px; }
 .cta > a {
   display: inline-flex;
   min-height: 44px;
