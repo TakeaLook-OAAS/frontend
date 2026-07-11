@@ -242,42 +242,52 @@ export default function MyAdsPage() {
 
   return (
     <div style={{ fontFamily: "var(--font-sans)", color: tk.ink, minHeight: "100vh", background: "#F4F6FB", WebkitFontSmoothing: "antialiased" }}>
-      <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 32px 88px" }}>
-
-        {/* ── Breadcrumb ──────────────────────────────────────────────────────── */}
-        <div style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono, marginBottom: 16 }}>
-          <span>MAIN</span><span style={{ color: "#C7CEDD" }}>/</span><span>CAMPAIGNS</span><span style={{ color: "#C7CEDD" }}>/</span><span style={{ color: tk.blue }}>MANAGE</span>
-        </div>
-
-        {/* ── Title row ───────────────────────────────────────────────────────── */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24 }}>
-          <div style={{ minWidth: 0 }}>
-            <h1 style={{ margin: 0, fontSize: 32, fontWeight: 800, letterSpacing: "-0.025em", lineHeight: 1.1, color: tk.ink }}>내 광고 관리</h1>
-            <p style={{ margin: "12px 0 0", fontSize: 14.5, lineHeight: 1.5, color: tk.muted, maxWidth: 560 }}>
-              신청한 광고의 성과를 확인하고 설정 변경 요청과 데이터 다운로드를 할 수 있습니다.
-            </p>
+      {/* ---------------- top header ---------------- */}
+      <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24, padding: "22px 36px", background: "#F4F6FB", borderBottom: `1px solid ${tk.lineSoft}` }}>
+        <div style={{ minWidth: 0 }}>
+          {/* ── Breadcrumb ──────────────────────────────────────────────────── */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: tk.muted, letterSpacing: "0.14em" }}>CAMPAIGNS</span>
+            <span style={{ color: tk.line }}>/</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: tk.ink, letterSpacing: "0.14em", fontWeight: 600 }}>MANAGE</span>
           </div>
-          <div style={{ display: "flex", gap: 10, flexShrink: 0, paddingTop: 4 }}>
-            <button
-              onClick={() => openCsv()}
-              disabled={campaigns.length === 0}
-              style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "10px 15px", borderRadius: 11, fontSize: 13.5, fontWeight: 600, background: "#fff", color: tk.inkSoft, border: `1px solid ${tk.line}`, cursor: campaigns.length === 0 ? "not-allowed" : "pointer", opacity: campaigns.length === 0 ? 0.5 : 1 }}
-            >
-              <svg {...ic}><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              CSV 다운로드
-            </button>
-            <button
-              onClick={() => router.push("/apply")}
-              style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "10px 16px", borderRadius: 11, fontSize: 13.5, fontWeight: 600, background: tk.ink, color: "#fff", border: `1px solid ${tk.ink}`, cursor: "pointer" }}
-            >
-              <svg {...ic} strokeWidth={2}><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              새 캠페인 신청
-            </button>
-          </div>
+          <h1 style={{ margin: "6px 0 0", fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", color: tk.ink }}>내 광고 관리</h1>
+          <p style={{ margin: "6px 0 0", fontSize: 13, lineHeight: 1.5, color: tk.muted, maxWidth: 560 }}>
+            신청한 광고의 성과를 확인하고 설정 변경 요청과 데이터 다운로드를 할 수 있습니다.
+          </p>
         </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <button
+            onClick={() => openCsv()}
+            disabled={campaigns.length === 0}
+            style={{
+              padding: "9px 16px", borderRadius: 9, border: `1px solid ${tk.line}`,
+              background: "#fff", color: tk.ink, fontWeight: 600, fontFamily: "inherit",
+              fontSize: 13, cursor: campaigns.length === 0 ? "not-allowed" : "pointer", display: "inline-flex", alignItems: "center", gap: 7,
+              opacity: campaigns.length === 0 ? 0.5 : 1,
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            CSV 다운로드
+          </button>
+          <button
+            onClick={() => router.push("/apply")}
+            style={{
+              padding: "9px 18px", borderRadius: 9, border: "none",
+              background: tk.ink, color: "#fff", fontWeight: 700, fontFamily: "inherit",
+              fontSize: 13, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: 7,
+              boxShadow: "0 1px 2px rgba(13,42,92,0.1), 0 8px 18px -8px rgba(13,42,92,0.4)",
+            }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            새 캠페인 신청
+          </button>
+        </div>
+      </header>
 
+      <div style={{ padding: "26px 36px 60px" }}>
         {/* ── Summary cards ───────────────────────────────────────────────────── */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16, marginTop: 28 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 16 }}>
           {/* 진행 중 */}
           <div style={{ background: "#fff", borderRadius: 14, border: `1px solid ${tk.lineSoft}`, boxShadow: "0 1px 2px rgba(13,42,92,0.03)", padding: "18px 18px 16px" }}>
             <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>

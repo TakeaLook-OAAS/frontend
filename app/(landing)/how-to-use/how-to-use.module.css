@@ -22,9 +22,9 @@
   padding: 22px 36px 54px;
   overflow: hidden;
   background:
-    radial-gradient(circle at 78% 20%, rgba(92, 139, 255, .2), transparent 27%),
-    radial-gradient(circle at 95% 80%, rgba(34, 211, 168, .12), transparent 24%),
-    linear-gradient(135deg, var(--color-ink) 0%, var(--color-navy) 58%, #123a7c 100%);
+    radial-gradient(circle at 12% 20%, rgba(123, 111, 240, .24), transparent 34%),
+    radial-gradient(circle at 86% 18%, rgba(34, 211, 168, .18), transparent 30%),
+    #0a0a0f;
   color: white;
 }
 
@@ -35,7 +35,7 @@
   width: 300px;
   height: 300px;
   border-radius: 50%;
-  background: rgba(30, 91, 255, .26);
+  background: rgba(123, 111, 240, .18);
   filter: blur(70px);
   pointer-events: none;
 }
@@ -59,7 +59,7 @@
   letter-spacing: .14em;
 }
 
-.heroKicker { color: var(--blue-light); }
+.heroKicker { color: var(--color-accent2); }
 .sectionIntro > span { color: var(--blue); }
 .cta > div > span { color: var(--blue-light); }
 
@@ -74,7 +74,7 @@
 
 .hero p {
   margin: 0;
-  color: #becae0;
+  color: rgba(255, 255, 255, .65);
   font-size: 16px;
   line-height: 1.75;
 }
@@ -96,8 +96,8 @@
   border: 1px solid rgba(255,255,255,.23);
   border-radius: 28px;
   color: white;
-  background: linear-gradient(145deg, rgba(92,139,255,.92), rgba(30,91,255,.62));
-  box-shadow: 0 24px 60px rgba(0,0,0,.25);
+  background: linear-gradient(145deg, rgba(123,111,240,.92), rgba(34,211,168,.55));
+  box-shadow: 0 24px 60px rgba(0,0,0,.35);
 }
 
 .orbit::before,
@@ -120,22 +120,21 @@
   gap: 10px;
   min-width: 196px;
   padding: 14px 16px;
-  border: 1px solid rgba(255,255,255,.18);
+  border: 1px solid rgba(255,255,255,.12);
   border-radius: 13px;
-  color: #b9ccff;
-  background: rgba(9, 29, 65, .82);
-  box-shadow: 0 18px 38px rgba(2, 10, 28, .28);
+  background: rgba(255,255,255,.06);
+  box-shadow: 0 18px 38px rgba(0,0,0,.35);
   backdrop-filter: blur(12px);
 }
 
-.floatCardA { right: 1%; top: 15%; }
-.floatCardB { left: 3%; bottom: 5%; color: #54ddb7; }
+.floatCardA { right: 1%; top: 15%; color: var(--color-accent); }
+.floatCardB { left: 3%; bottom: 5%; color: var(--color-accent2); }
 .floatCardA span,
 .floatCardB span { display: flex; flex-direction: column; }
 .floatCardA b,
 .floatCardB b { color: white; font-size: 13.5px; font-weight: 700; }
 .floatCardA small,
-.floatCardB small { margin-top: 3px; color: var(--mono-text); font-size: 10px; }
+.floatCardB small { margin-top: 3px; color: rgba(255,255,255,.55); font-size: 10px; }
 
 .quickSteps {
   position: relative;
@@ -200,7 +199,7 @@
   left: 44px;
   width: 1px;
   content: "";
-  background: linear-gradient(var(--blue-soft), var(--line), var(--blue-soft));
+  background: linear-gradient(rgba(123,111,240,.4), var(--line), rgba(123,111,240,.4));
 }
 
 .stepSection {
@@ -227,9 +226,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--blue-soft);
+  border: 1px solid rgba(123,111,240,.35);
   border-radius: 50%;
-  color: var(--blue);
+  color: var(--color-accent);
   background: #f4f6fb;
   box-shadow: 0 0 0 8px #f4f6fb;
 }
@@ -247,7 +246,7 @@
 
 .stepCopy { max-width: 460px; }
 .copyEyebrow {
-  color: var(--blue);
+  color: var(--color-accent);
   font-family: var(--font-mono);
   font-size: 11px;
   font-weight: 600;
@@ -291,15 +290,15 @@
   margin-top: -1px;
   place-items: center;
   border-radius: 50%;
-  color: var(--blue);
-  background: var(--blue-soft);
+  color: var(--color-accent);
+  background: rgba(123,111,240,.14);
 }
 .textLink {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   margin-top: 24px;
-  color: var(--blue);
+  color: var(--color-accent);
   font-size: 14px;
   font-weight: 700;
   text-decoration: none;
