@@ -132,7 +132,7 @@ export default function FaqPage() {
       style={{
         width: "100%",
         minHeight: "100vh",
-        padding: "26px 36px 100px",
+        padding: "22px 36px 100px",
         background: t.bg,
       }}
     >
