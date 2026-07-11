@@ -3,16 +3,16 @@ import { notFound } from "next/navigation";
 import { changelogData } from "../changelogdata";
 
 const t = {
-  bg: "#F4F6FB",
-  bgWarm: "#F9FAFD",
-  ink: "#0A1A35",
-  inkSoft: "#1A2C4F",
-  blue: "#1E5BFF",
-  blueSoft: "#DCE6FF",
-  line: "#DCE0EB",
-  lineSoft: "#E7EAF2",
-  muted: "#5B6786",
-  mono: "#8893AB",
+  bg: "var(--color-bg)",
+  bgWarm: "var(--color-bg-warm)",
+  ink: "var(--color-ink)",
+  inkSoft: "var(--color-ink2)",
+  blue: "var(--color-blue)",
+  blueSoft: "var(--color-blue-soft)",
+  line: "var(--color-line)",
+  lineSoft: "var(--color-line-soft)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
 };
 
 type ChangelogDetailPageProps = {
@@ -51,7 +51,7 @@ export default async function ChangelogDetailPage({
           alignItems: "center",
           gap: 10,
           marginBottom: 28,
-          fontFamily: "JetBrains Mono, monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: 10.5,
           letterSpacing: "0.14em",
         }}
@@ -104,7 +104,7 @@ export default async function ChangelogDetailPage({
                 borderRadius: 7,
                 background: t.blueSoft,
                 color: t.blue,
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 11,
                 fontWeight: 700,
               }}
@@ -115,7 +115,7 @@ export default async function ChangelogDetailPage({
             <span
               style={{
                 color: t.mono,
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 10.5,
                 letterSpacing: "0.1em",
               }}
@@ -182,7 +182,7 @@ export default async function ChangelogDetailPage({
                 display: "block",
                 marginBottom: 10,
                 color: t.blue,
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 10.5,
                 fontWeight: 700,
                 letterSpacing: "0.12em",

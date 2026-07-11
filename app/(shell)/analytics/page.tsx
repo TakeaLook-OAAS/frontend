@@ -6,12 +6,12 @@ import { getCampaigns, buildExportUrl, apiCreateChangeRequest, type CampaignItem
 
 // ─── Design tokens ────────────────────────────────────────────────────────────
 const tk = {
-  ink: "#0A1A35", inkSoft: "#1A2C4F",
-  blue: "#1E5BFF",
-  green: "#0FA968",
-  amber: "#E89B2A",
-  muted: "#5B6786", mono: "#8893AB",
-  line: "#DCE0EB", lineSoft: "#E7EAF2",
+  ink: "var(--color-ink)", inkSoft: "var(--color-ink2)",
+  blue: "var(--color-blue)",
+  green: "var(--color-green)",
+  amber: "var(--color-amber)",
+  muted: "var(--color-ink3)", mono: "var(--color-ink4)",
+  line: "var(--color-line)", lineSoft: "var(--color-line-soft)",
 };
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
@@ -20,7 +20,7 @@ type ModalType = "detail" | "change" | "csv" | null;
 
 const STATUS_META: Record<string, { label: string; bg: string; color: string; dot: string }> = {
   RUNNING:  { label: "진행 중",   bg: "#D6F4E5", color: "#0FA968", dot: "#0FA968" },
-  PAUSED:   { label: "일시정지", bg: "#FCEDD0", color: "#B8770F", dot: "#E89B2A" },
+  PAUSED:   { label: "일시정지", bg: "var(--color-amber-soft)", color: "var(--color-amber-dark)", dot: "var(--color-amber)" },
   DRAFT:    { label: "예정",     bg: "#DCE6FF", color: "#1E5BFF", dot: "#1E5BFF" },
   ENDED:    { label: "종료",     bg: "#EEF1F6", color: "#5B6786", dot: "#8893AB" },
 };
@@ -71,7 +71,7 @@ function ModalShell({ zIndex, onClose, children }: { zIndex: number; onClose: ()
       onClick={onClose}
       style={{ position: "fixed", inset: 0, background: "rgba(10,26,53,0.42)", display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "48px 20px", zIndex, overflowY: "auto" }}
     >
-      <div onClick={e => e.stopPropagation()} style={{ fontFamily: "'Pretendard',-apple-system,sans-serif", background: "#fff", borderRadius: 16, width: 580, maxWidth: "100%", boxShadow: "0 24px 64px rgba(13,42,92,0.24)" }}>
+      <div onClick={e => e.stopPropagation()} style={{ fontFamily: "var(--font-sans)", background: "#fff", borderRadius: 16, width: 580, maxWidth: "100%", boxShadow: "0 24px 64px rgba(13,42,92,0.24)" }}>
         {children}
       </div>
     </div>
@@ -80,7 +80,7 @@ function ModalShell({ zIndex, onClose, children }: { zIndex: number; onClose: ()
 
 function SectionLabel({ label }: { label: string }) {
   return (
-    <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.blue, borderBottom: `1px solid ${tk.lineSoft}`, paddingBottom: 9, marginBottom: 15 }}>
+    <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.blue, borderBottom: `1px solid ${tk.lineSoft}`, paddingBottom: 9, marginBottom: 15 }}>
       {label}
     </div>
   );
@@ -107,6 +107,8 @@ export default function MyAdsPage() {
   const [crReason, setCrReason] = useState("");
   const [crLoading, setCrLoading] = useState(false);
   const [crError, setCrError] = useState<string | null>(null);
+
+  const today = new Date().toISOString().split("T")[0];
 
   // CSV state
   const [csvCampaignId, setCsvCampaignId] = useState("");
@@ -239,11 +241,11 @@ export default function MyAdsPage() {
   ];
 
   return (
-    <div style={{ fontFamily: "'Pretendard',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif", color: tk.ink, minHeight: "100vh", background: "#F4F6FB", WebkitFontSmoothing: "antialiased" }}>
+    <div style={{ fontFamily: "var(--font-sans)", color: tk.ink, minHeight: "100vh", background: "#F4F6FB", WebkitFontSmoothing: "antialiased" }}>
       <div style={{ maxWidth: 1080, margin: "0 auto", padding: "40px 32px 88px" }}>
 
         {/* ── Breadcrumb ──────────────────────────────────────────────────────── */}
-        <div style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono, marginBottom: 16 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 7, fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono, marginBottom: 16 }}>
           <span>MAIN</span><span style={{ color: "#C7CEDD" }}>/</span><span>CAMPAIGNS</span><span style={{ color: "#C7CEDD" }}>/</span><span style={{ color: tk.blue }}>MANAGE</span>
         </div>
 
@@ -285,7 +287,7 @@ export default function MyAdsPage() {
               </span>
             </div>
             <div style={{ marginTop: 14, display: "flex", alignItems: "baseline", gap: 3 }}>
-              <span style={{ fontFamily: "'Inter',sans-serif", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 30, color: tk.ink }}>{counts.RUNNING}</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 30, color: tk.ink }}>{counts.RUNNING}</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: tk.muted }}>건</span>
             </div>
             <div style={{ marginTop: 9, fontSize: 12, fontWeight: 600, color: counts.RUNNING > 0 ? "#0FA968" : tk.mono }}>
@@ -302,7 +304,7 @@ export default function MyAdsPage() {
               </span>
             </div>
             <div style={{ marginTop: 14, display: "flex", alignItems: "baseline", gap: 3 }}>
-              <span style={{ fontFamily: "'Inter',sans-serif", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 30, color: tk.ink }}>{counts.PAUSED}</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 30, color: tk.ink }}>{counts.PAUSED}</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: tk.muted }}>건</span>
             </div>
             <div style={{ marginTop: 9, fontSize: 12, fontWeight: 600, color: counts.PAUSED > 0 ? "#B8770F" : tk.mono }}>
@@ -319,8 +321,8 @@ export default function MyAdsPage() {
               </span>
             </div>
             <div style={{ marginTop: 14, display: "flex", alignItems: "baseline", gap: 4 }}>
-              <span style={{ fontFamily: "'Inter',sans-serif", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 30, color: tk.ink }}>{activeDevices}</span>
-              <span style={{ fontFamily: "'Inter',sans-serif", fontVariantNumeric: "tabular-nums", fontWeight: 700, fontSize: 18, color: "#8893AB" }}>/ {totalDevices}</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 30, color: tk.ink }}>{activeDevices}</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", fontWeight: 700, fontSize: 18, color: "#8893AB" }}>/ {totalDevices}</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: tk.muted }}>대</span>
             </div>
             <div style={{ marginTop: 9, fontSize: 12, fontWeight: 600, color: activeDevices < totalDevices ? "#B8770F" : "#0FA968" }}>
@@ -337,7 +339,7 @@ export default function MyAdsPage() {
               </span>
             </div>
             <div style={{ marginTop: 14, display: "flex", alignItems: "baseline", gap: 3 }}>
-              <span style={{ fontFamily: "'Inter',sans-serif", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 30, color: tk.ink }}>{campaigns.length}</span>
+              <span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 30, color: tk.ink }}>{campaigns.length}</span>
               <span style={{ fontSize: 14, fontWeight: 700, color: tk.muted }}>건</span>
             </div>
             <div style={{ marginTop: 9, fontSize: 12, fontWeight: 500, color: tk.mono }}>종료 광고 포함 전체</div>
@@ -350,7 +352,7 @@ export default function MyAdsPage() {
           {/* Card header */}
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24, padding: "22px 22px 18px" }}>
             <div style={{ minWidth: 0 }}>
-              <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.blue }}>MY CAMPAIGNS</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.blue }}>MY CAMPAIGNS</div>
               <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginTop: 8 }}>
                 <h2 style={{ margin: 0, fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: tk.ink }}>내가 신청한 광고</h2>
                 <span style={{ fontSize: 14, fontWeight: 600, color: tk.mono }}>({campaigns.length}건)</span>
@@ -367,7 +369,7 @@ export default function MyAdsPage() {
                     style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "7px 12px", borderRadius: 10, fontSize: 13, fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap", background: active ? tk.ink : "#fff", color: active ? "#fff" : tk.inkSoft, border: active ? `1px solid ${tk.ink}` : `1px solid ${tk.lineSoft}` }}
                   >
                     {f.label}
-                    <span style={{ fontFamily: "'Inter',sans-serif", fontVariantNumeric: "tabular-nums", fontSize: 11, fontWeight: 700, padding: "1px 6px", borderRadius: 999, background: active ? "rgba(255,255,255,0.16)" : "#F1F4FA", color: active ? "#fff" : tk.muted }}>
+                    <span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", fontSize: 11, fontWeight: 700, padding: "1px 6px", borderRadius: 999, background: active ? "rgba(255,255,255,0.16)" : "#F1F4FA", color: active ? "#fff" : tk.muted }}>
                       {counts[f.key]}
                     </span>
                   </button>
@@ -410,15 +412,15 @@ export default function MyAdsPage() {
 
                     {/* Period */}
                     <div>
-                      <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono }}>PERIOD</div>
-                      <div style={{ marginTop: 5, fontFamily: "'Inter',sans-serif", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.01em", fontSize: 13, fontWeight: 600, color: tk.inkSoft }}>{formatPeriod(c.start_date, c.end_date)}</div>
+                      <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono }}>PERIOD</div>
+                      <div style={{ marginTop: 5, fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.01em", fontSize: 13, fontWeight: 600, color: tk.inkSoft }}>{formatPeriod(c.start_date, c.end_date)}</div>
                     </div>
 
                     {/* Device count */}
                     <div>
                       <div style={{ fontSize: 11, fontWeight: 600, color: tk.mono }}>활성 디바이스</div>
                       <div style={{ marginTop: 4, display: "flex", alignItems: "baseline", gap: 2 }}>
-                        <span style={{ fontFamily: "'Inter',sans-serif", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 17, color: tk.ink }}>{c.devices.filter(d => d.status === "ENABLE").length}</span>
+                        <span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", letterSpacing: "-0.025em", fontWeight: 800, fontSize: 17, color: tk.ink }}>{c.devices.filter(d => d.status === "ENABLE").length}</span>
                         <span style={{ fontSize: 12, fontWeight: 600, color: tk.muted }}>/ {c.devices.length}대</span>
                       </div>
                     </div>
@@ -451,7 +453,7 @@ export default function MyAdsPage() {
         <ModalShell zIndex={50} onClose={closeModal}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, padding: "24px 24px 18px", borderBottom: `1px solid ${tk.lineSoft}` }}>
             <div>
-              <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono }}>CAMPAIGN DETAIL</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono }}>CAMPAIGN DETAIL</div>
               <h2 style={{ margin: "8px 0 0", fontSize: 20, fontWeight: 800, letterSpacing: "-0.02em", color: tk.ink }}>{selected.name}</h2>
             </div>
             <button onClick={closeModal} style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${tk.lineSoft}`, background: "#fff", color: tk.muted, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, cursor: "pointer" }}>
@@ -468,7 +470,7 @@ export default function MyAdsPage() {
                 <span style={{ fontSize: 12.5, color: tk.mono, fontWeight: 500 }}>캠페인명</span>
                 <span style={{ fontSize: 14, fontWeight: 600, color: tk.ink }}>{selected.name}</span>
                 <span style={{ fontSize: 12.5, color: tk.mono, fontWeight: 500 }}>캠페인 ID</span>
-                <span style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 12, color: tk.muted }}>{selected.id}</span>
+                <span style={{ fontFamily: "var(--font-mono)", fontSize: 12, color: tk.muted }}>{selected.id}</span>
               </div>
             </div>
 
@@ -476,7 +478,7 @@ export default function MyAdsPage() {
               <SectionLabel label="SECTION · CAMPAIGN" />
               <div style={{ display: "grid", gridTemplateColumns: "110px 1fr", rowGap: 13, columnGap: 16, alignItems: "start" }}>
                 <span style={{ fontSize: 12.5, color: tk.mono, fontWeight: 500 }}>게재 기간</span>
-                <span style={{ fontFamily: "'Inter',sans-serif", fontVariantNumeric: "tabular-nums", fontSize: 14, fontWeight: 500, color: tk.ink }}>
+                <span style={{ fontFamily: "var(--font-sans)", fontVariantNumeric: "tabular-nums", fontSize: 14, fontWeight: 500, color: tk.ink }}>
                   {formatPeriod(selected.start_date, selected.end_date)}
                 </span>
               </div>
@@ -495,7 +497,7 @@ export default function MyAdsPage() {
                         </span>
                         <div style={{ minWidth: 0 }}>
                           <div style={{ fontSize: 13.5, fontWeight: 600, color: tk.ink, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{dv.name}</div>
-                          <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 10, color: tk.mono, marginTop: 2 }}>{dv.id}</div>
+                          <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: tk.mono, marginTop: 2 }}>{dv.id}</div>
                         </div>
                       </div>
                       <div style={{ display: "inline-flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
@@ -521,7 +523,7 @@ export default function MyAdsPage() {
         <ModalShell zIndex={55} onClose={closeModal}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "22px 24px 18px", borderBottom: `1px solid ${tk.lineSoft}` }}>
             <div>
-              <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono }}>CHANGE REQUEST</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono }}>CHANGE REQUEST</div>
               <h2 style={{ margin: "8px 0 0", fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: tk.ink }}>설정 변경 요청</h2>
             </div>
             <button onClick={closeModal} style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${tk.lineSoft}`, background: "#fff", color: tk.muted, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
@@ -566,10 +568,26 @@ export default function MyAdsPage() {
               <div>
                 <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: tk.inkSoft, marginBottom: 7 }}>광고 게재 기간</label>
                 <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <input type="date" value={crStartDate} onChange={e => setCrStartDate(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
+                  {(() => {
+                    const isPast = crStartDate < today;
+                    return (
+                      <input
+                        type="date"
+                        value={crStartDate}
+                        disabled={isPast}
+                        min={isPast ? undefined : today}
+                        onChange={e => setCrStartDate(e.target.value)}
+                        title={isPast ? "이미 시작된 날짜는 변경할 수 없습니다" : undefined}
+                        style={{ flex: 1, padding: "9px 12px", border: `1px solid ${isPast ? tk.line : tk.line}`, borderRadius: 9, fontSize: 13.5, color: isPast ? tk.muted : tk.ink, background: isPast ? "#F1F4FA" : "#fff", outline: "none", cursor: isPast ? "not-allowed" : "auto" }}
+                      />
+                    );
+                  })()}
                   <span style={{ color: tk.mono, fontSize: 15 }}>→</span>
-                  <input type="date" value={crEndDate} onChange={e => setCrEndDate(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
+                  <input type="date" value={crEndDate} min={today} onChange={e => setCrEndDate(e.target.value)} style={{ flex: 1, padding: "9px 12px", border: `1px solid ${tk.line}`, borderRadius: 9, fontSize: 13.5, color: tk.ink, background: "#fff", outline: "none" }} />
                 </div>
+                {crStartDate < today && (
+                  <p style={{ marginTop: 6, fontSize: 11.5, color: tk.muted }}>시작일이 이미 지났습니다. 종료일만 변경할 수 있습니다.</p>
+                )}
               </div>
 
               <div>
@@ -608,7 +626,7 @@ export default function MyAdsPage() {
         <ModalShell zIndex={55} onClose={closeModal}>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, padding: "22px 24px 18px", borderBottom: `1px solid ${tk.lineSoft}` }}>
             <div>
-              <div style={{ fontFamily: "'JetBrains Mono',monospace", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono }}>EXPORT</div>
+              <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, fontWeight: 600, letterSpacing: "0.13em", color: tk.mono }}>EXPORT</div>
               <h2 style={{ margin: "8px 0 0", fontSize: 19, fontWeight: 800, letterSpacing: "-0.02em", color: tk.ink }}>CSV 다운로드</h2>
             </div>
             <button onClick={closeModal} style={{ width: 34, height: 34, borderRadius: 9, border: `1px solid ${tk.lineSoft}`, background: "#fff", color: tk.muted, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>

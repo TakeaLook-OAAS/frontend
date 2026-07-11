@@ -6,8 +6,7 @@ import { format, eachDayOfInterval, parseISO, subDays } from "date-fns";
 import { DateRange } from "react-day-picker";
 import { Users, Clock, Eye, TrendingUp, Target, Download, UserCheck } from "lucide-react";
 
-import GenderChart from "@/components/dashboard/GenderChart";
-import AgeChart from "@/components/dashboard/AgeChart";
+import AgeGenderChart from "@/components/dashboard/AgeGenderChart";
 import DateRangePicker from "@/components/dashboard/DateRangePicker";
 import SimpleCard from "@/components/dashboard/Simplecard";
 import DailyMetricsChart, { DailyChartPoint } from "@/components/dashboard/DailyMetricsChart";
@@ -16,6 +15,7 @@ import DailyEffectsChart, { DayPoint } from "@/components/dashboard/DailyEffects
 import FixationHistogram from "@/components/dashboard/FixationHistogram";
 import CampaignSelector from "@/components/dashboard/CampaignSelector";
 import type { SelectorValue } from "@/components/dashboard/CampaignSelector";
+import SovChart from "@/components/dashboard/SovChart";
 
 import {
   getCampaigns,
@@ -27,15 +27,15 @@ import {
 
 /* ---------- design tokens (synced with main page) ---------- */
 const t = {
-  bg: "#F4F6FB", bgWarm: "#F9FAFD",
-  ink: "#0A1A35", inkSoft: "#1A2C4F", navy: "#0D2A5C",
-  blue: "#1E5BFF", blueLight: "#5C8BFF", blueSoft: "#DCE6FF",
-  blueGhost: "#F4F7FF",
-  green: "#0FA968", greenSoft: "#D6F4E5",
-  amber: "#E89B2A",
-  red: "#D7563D",
-  line: "#DCE0EB", lineSoft: "#E7EAF2",
-  muted: "#5B6786", mono: "#8893AB",
+  bg: "var(--color-bg)", bgWarm: "var(--color-bg-warm)",
+  ink: "var(--color-ink)", inkSoft: "var(--color-ink2)", navy: "var(--color-navy)",
+  blue: "var(--color-blue)", blueLight: "var(--color-blue-light)", blueSoft: "var(--color-blue-soft)",
+  blueGhost: "var(--color-blue-ghost)",
+  green: "var(--color-green)", greenSoft: "var(--color-green-soft)",
+  amber: "var(--color-amber)",
+  red: "var(--color-red)",
+  line: "var(--color-line)", lineSoft: "var(--color-line-soft)",
+  muted: "var(--color-ink3)", mono: "var(--color-ink4)",
 };
 
 import { Suspense } from "react";
@@ -143,51 +143,21 @@ function DashboardInner() {
 
   const totalMale = rangeStats?.count_male ?? 0;
   const totalFemale = rangeStats?.count_female ?? 0;
-  const totalGender = totalMale + totalFemale;
-  const genderData = hasRange && rangeStats ? [
-    { name: "남성", value: totalGender > 0 ? Math.round((totalMale / totalGender) * 100) : 0, color: t.blue },
-    { name: "여성", value: totalGender > 0 ? Math.round((totalFemale / totalGender) * 100) : 0, color: "#EC4899" },
-  ] : undefined;
-
   const count10 = rangeStats?.count_10s ?? 0;
   const count20 = rangeStats?.count_20s ?? 0;
   const count30 = rangeStats?.count_30s ?? 0;
   const count40 = rangeStats?.count_40s ?? 0;
   const count50 = rangeStats?.count_50s_plus ?? 0;
   const count60 = rangeStats?.count_60s_plus ?? 0;
-  const totalAge = count10 + count20 + count30 + count40 + count50 + count60;
-  const ageData = hasRange && rangeStats ? [
-    { age: "10대", value: totalAge > 0 ? Math.round((count10 / totalAge) * 100) : 0 },
-    { age: "20대", value: totalAge > 0 ? Math.round((count20 / totalAge) * 100) : 0 },
-    { age: "30대", value: totalAge > 0 ? Math.round((count30 / totalAge) * 100) : 0 },
-    { age: "40대", value: totalAge > 0 ? Math.round((count40 / totalAge) * 100) : 0 },
-    { age: "50대", value: totalAge > 0 ? Math.round((count50 / totalAge) * 100) : 0 },
-    { age: "60대+", value: totalAge > 0 ? Math.round((count60 / totalAge) * 100) : 0 },
-  ] : undefined;
 
   const intMale = rangeStats?.interested_count_male ?? 0;
   const intFemale = rangeStats?.interested_count_female ?? 0;
-  const totalIntGender = intMale + intFemale;
-  const interestedGenderData = hasRange && rangeStats ? [
-    { name: "남성", value: totalIntGender > 0 ? Math.round((intMale / totalIntGender) * 100) : 0, color: t.blue },
-    { name: "여성", value: totalIntGender > 0 ? Math.round((intFemale / totalIntGender) * 100) : 0, color: "#EC4899" },
-  ] : undefined;
-
   const int10 = rangeStats?.interested_count_10s ?? 0;
   const int20 = rangeStats?.interested_count_20s ?? 0;
   const int30 = rangeStats?.interested_count_30s ?? 0;
   const int40 = rangeStats?.interested_count_40s ?? 0;
   const int50 = rangeStats?.interested_count_50s_plus ?? 0;
   const int60 = rangeStats?.interested_count_60s_plus ?? 0;
-  const totalIntAge = int10 + int20 + int30 + int40 + int50 + int60;
-  const interestedAgeData = hasRange && rangeStats ? [
-    { age: "10대", value: totalIntAge > 0 ? Math.round((int10 / totalIntAge) * 100) : 0 },
-    { age: "20대", value: totalIntAge > 0 ? Math.round((int20 / totalIntAge) * 100) : 0 },
-    { age: "30대", value: totalIntAge > 0 ? Math.round((int30 / totalIntAge) * 100) : 0 },
-    { age: "40대", value: totalIntAge > 0 ? Math.round((int40 / totalIntAge) * 100) : 0 },
-    { age: "50대", value: totalIntAge > 0 ? Math.round((int50 / totalIntAge) * 100) : 0 },
-    { age: "60대+", value: totalIntAge > 0 ? Math.round((int60 / totalIntAge) * 100) : 0 },
-  ] : undefined;
 
   const dailyMetricsData: DailyChartPoint[] = (() => {
     if (!startDate || !rangeStats) return [];
@@ -270,9 +240,9 @@ function DashboardInner() {
       >
         <div>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>DASHBOARD</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: t.muted, letterSpacing: "0.14em" }}>DASHBOARD</span>
             <span style={{ color: t.line }}>/</span>
-            <span style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>ANALYTICS</span>
+            <span style={{ fontFamily: "var(--font-mono)", fontSize: 10.5, color: t.ink, letterSpacing: "0.14em", fontWeight: 600 }}>ANALYTICS</span>
           </div>
           <h1 style={{ margin: "6px 0 0", fontSize: 26, fontWeight: 800, letterSpacing: "-0.03em", color: t.ink }}>
             캠페인 성과 분석
@@ -338,7 +308,7 @@ function DashboardInner() {
           <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
             <div
               style={{
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 10,
                 color: t.mono,
                 letterSpacing: "0.14em",
@@ -385,7 +355,7 @@ function DashboardInner() {
             {dateLabel && (
               <span
                 style={{
-                  fontFamily: "JetBrains Mono, monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 11,
                   color: t.muted,
                   padding: "6px 10px",
@@ -402,7 +372,7 @@ function DashboardInner() {
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <span
               style={{
-                fontFamily: "JetBrains Mono, monospace",
+                fontFamily: "var(--font-mono)",
                 fontSize: 11,
                 color: t.muted,
                 padding: "8px 12px",
@@ -436,7 +406,7 @@ function DashboardInner() {
         >
           {/* 성별 */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 58 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 58 }}>
               GENDER
             </div>
             <div style={{ display: "flex", gap: 6 }}>
@@ -470,7 +440,7 @@ function DashboardInner() {
 
           {/* 나이대 */}
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 38 }}>
+            <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: t.mono, letterSpacing: "0.14em", fontWeight: 600, width: 38 }}>
               AGE
             </div>
             <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -529,28 +499,28 @@ function DashboardInner() {
             value={interestedCount.toLocaleString()}
             subtitle="Interested"
             icon={<UserCheck className="w-4 h-4" />}
-            tone="green"
+            tone="blue"
           />
           <SimpleCard
             title="포착 관심도"
             value={`${attentionRateTracks}%`}
             subtitle="Attention Rate (Tracks)"
             icon={<Target className="w-4 h-4" />}
-            tone="green"
+            tone="amber"
           />
           <SimpleCard
             title="총 체류 시간"
             value={`${totalDwellTimeSec.toLocaleString()}초`}
             subtitle="Total Dwell Time"
             icon={<Clock className="w-4 h-4" />}
-            tone="violet"
+            tone="green"
           />
           <SimpleCard
             title="총 시청 시간"
             value={`${attentionTimeSec.toLocaleString()}초`}
             subtitle="Total Attention Time"
             icon={<Eye className="w-4 h-4" />}
-            tone="amber"
+            tone="green"
           />
           <SimpleCard
             title="심층 관심도"
@@ -561,53 +531,46 @@ function DashboardInner() {
           />
         </section>
 
-        {/* ---------------- Row 1: Gender / Age × 노출·관심 4박스 ---------------- */}
+        {/* ---------------- Row 1: 성별·연령 통합 파이차트 (노출·관심) / Fixation ---------------- */}
         <section
           style={{
             display: "grid",
-            gridTemplateColumns: "repeat(4, minmax(0, 1fr))",
+            gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
             gap: 16,
           }}
         >
-          <GenderChart
-            data={genderData}
-            title="노출 인구 성별 분포"
-            subtitle="POPULATION · GENDER SPLIT"
+          <AgeGenderChart
+            male={totalMale}
+            female={totalFemale}
+            age10={count10}
+            age20={count20}
+            age30={count30}
+            age40={count40}
+            age50={count50}
+            age60={count60}
+            title="노출 인구 성별·연령 분포"
+            subtitle="POPULATION · GENDER × AGE"
           />
-          <AgeChart
-            data={ageData}
-            title="노출 인구 연령대 분포"
-            subtitle="POPULATION · AGE"
+          <AgeGenderChart
+            male={intMale}
+            female={intFemale}
+            age10={int10}
+            age20={int20}
+            age30={int30}
+            age40={int40}
+            age50={int50}
+            age60={int60}
+            title="관심 인구 성별·연령 분포"
+            subtitle="INTERESTED · GENDER × AGE"
           />
-          <GenderChart
-            data={interestedGenderData}
-            title="관심 인구 성별 분포"
-            subtitle="INTERESTED · GENDER SPLIT"
-          />
-          <AgeChart
-            data={interestedAgeData}
-            title="관심 인구 연령대 분포"
-            subtitle="INTERESTED · AGE"
-          />
-        </section>
-
-        {/* ---------------- Row 2: Fixation / Hourly ---------------- */}
-        <section
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
-            gap: 16,
-          }}
-        >
           <FixationHistogram
             bins={(rangeStats?.distribution ?? []).map((b) => ({ label: b.bucket, dwell: b.dwell_count, fixation: b.fixation_count }))}
             loading={perDayLoading}
             hasRange={hasRange}
           />
-          <HourlyAudienceChart data={hourlyAudienceData} />
         </section>
 
-        {/* ---------------- Row 3: Daily Metrics / Daily Effects ---------------- */}
+        {/* ---------------- Row 2: Daily Metrics / Hourly ---------------- */}
         <section
           style={{
             display: "grid",
@@ -615,12 +578,33 @@ function DashboardInner() {
             gap: 16,
           }}
         >
+          <HourlyAudienceChart data={hourlyAudienceData}
+          />
           <DailyMetricsChart
             data={dailyMetricsData}
             loading={hasRange && !rangeStats}
             hasRange={hasRange}
           />
-          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} />
+        </section>
+
+        {/* ---------------- Row 3: Daily Effects / SOV ---------------- */}
+        <section
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(2, minmax(0, 1fr))",
+            gap: 16,
+          }}
+        >
+          <DailyEffectsChart data={advChartData} loading={perDayLoading} hasRange={hasRange} 
+          />
+          <SovChart
+            sov={rangeStats?.sov ?? null}
+            dailyTrend={rangeStats?.daily_trend ?? []}
+            startDate={startDate}
+            endDate={endDate}
+            hasRange={hasRange}
+            loading={hasRange && !rangeStats}
+          />
         </section>
       </div>
     </>

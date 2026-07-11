@@ -55,16 +55,18 @@ export function SignupForm() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col px-6 py-6 bg-[rgba(10,10,15,0.9)] text-white">
+    <div className="min-h-screen flex flex-col px-6 py-6 bg-[var(--color-bg-auth)] text-white">
       <div>
-        <Image
-          src="/images/oaas-logo.png"
-          alt="OAAS Logo"
-          width={800}
-          height={240}
-          className="h-10 w-auto"
-          priority
-        />
+        <Link href="/">
+          <Image
+            src="/images/oaas-logo.png"
+            alt="OAAS Logo"
+            width={800}
+            height={240}
+            className="h-10 w-auto"
+            priority
+          />
+        </Link>
       </div>
 
       <div className="flex-1 flex flex-col items-center justify-center">
@@ -94,7 +96,7 @@ export function SignupForm() {
                       placeholder="이메일을 입력하세요"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="pl-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue-500 focus:ring-blue-500"
+                      className="pl-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue focus:ring-blue"
                       required
                     />
                   </div>
@@ -102,7 +104,7 @@ export function SignupForm() {
                     type="button"
                     onClick={handleSendCode}
                     disabled={isSendingCode}
-                    className="h-11 px-3 bg-blue-600 hover:bg-blue-700 text-white text-sm whitespace-nowrap disabled:opacity-50"
+                    className="h-11 px-3 bg-blue hover:bg-blue/85 text-white text-sm whitespace-nowrap disabled:opacity-50"
                   >
                     {isSendingCode ? "발송 중..." : codeSent ? "재발송" : "인증 코드 발송"}
                   </Button>
@@ -122,7 +124,7 @@ export function SignupForm() {
                   placeholder="이메일로 받은 6자리 코드"
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
-                  className="h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue-500 focus:ring-blue-500 tracking-widest"
+                  className="h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue focus:ring-blue tracking-widest"
                   maxLength={6}
                   required
                 />
@@ -141,7 +143,7 @@ export function SignupForm() {
                     placeholder="8자 이상 입력하세요"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 pr-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10 pr-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue focus:ring-blue"
                     required
                     minLength={8}
                   />
@@ -168,7 +170,7 @@ export function SignupForm() {
                     placeholder="비밀번호를 다시 입력하세요"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="pl-10 pr-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue-500 focus:ring-blue-500"
+                    className="pl-10 pr-10 h-11 bg-white/10 border-white/10 text-white placeholder:text-white/40 focus:border-blue focus:ring-blue"
                     required
                   />
                   <button
@@ -186,7 +188,7 @@ export function SignupForm() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-11 mt-2 bg-blue-600 hover:bg-blue-700 text-white font-medium disabled:opacity-50"
+                className="w-full h-11 mt-2 bg-blue hover:bg-blue/85 text-white font-medium disabled:opacity-50"
               >
                 {isLoading ? "가입 중..." : "회원가입"}
               </Button>
@@ -194,7 +196,7 @@ export function SignupForm() {
 
             <div className="mt-6 text-center text-sm text-white/50">
               이미 계정이 있으신가요?{" "}
-              <Link href="/login" className="text-blue-400 font-medium hover:text-blue-300 hover:underline">
+              <Link href="/login" className="text-blue-light font-medium hover:text-blue-light/80 hover:underline">
                 로그인
               </Link>
             </div>

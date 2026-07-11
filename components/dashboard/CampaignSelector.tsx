@@ -15,16 +15,16 @@ interface Props {
 }
 
 const t = {
-  ink: "#0A1A35",
-  inkSoft: "#1A2C4F",
-  blue: "#1E5BFF",
-  blueSoft: "#DCE6FF",
-  blueGhost: "#F4F7FF",
-  bgWarm: "#F9FAFD",
-  line: "#DCE0EB",
-  lineSoft: "#E7EAF2",
-  muted: "#5B6786",
-  mono: "#8893AB",
+  ink: "var(--color-ink)",
+  inkSoft: "var(--color-ink2)",
+  blue: "var(--color-blue)",
+  blueSoft: "var(--color-blue-soft)",
+  blueGhost: "var(--color-blue-ghost)",
+  bgWarm: "var(--color-bg-warm)",
+  line: "var(--color-line)",
+  lineSoft: "var(--color-line-soft)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
 };
 
 export default function CampaignSelector({ options, selected, onChange }: Props) {
@@ -83,7 +83,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
             >
               <span
                 style={{
-                  fontFamily: "JetBrains Mono, monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 10.5,
                   color: active ? "rgba(255,255,255,0.7)" : t.mono,
                   letterSpacing: "0.06em",
@@ -96,7 +96,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
               </span>
               <span
                 style={{
-                  fontFamily: "Inter, sans-serif",
+                  fontFamily: "var(--font-sans)",
                   fontSize: 10.5,
                   padding: "1px 7px",
                   borderRadius: 99,
@@ -140,7 +140,7 @@ export default function CampaignSelector({ options, selected, onChange }: Props)
               />
               <span
                 style={{
-                  fontFamily: "JetBrains Mono, monospace",
+                  fontFamily: "var(--font-mono)",
                   fontSize: 11.5,
                   fontWeight: 600,
                 }}
@@ -181,7 +181,7 @@ function Row({
         style={{
           width: 78,
           flexShrink: 0,
-          fontFamily: "JetBrains Mono, monospace",
+          fontFamily: "var(--font-mono)",
           fontSize: 10,
           color: t.mono,
           letterSpacing: "0.14em",

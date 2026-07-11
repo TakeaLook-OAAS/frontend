@@ -84,6 +84,10 @@ export interface RangeStatsResponse {
   avg_attention_time_ms:   number;
   peak_hour:               number | null;
   target_match_rate:       number | null;
+  // SOV 지표
+  sov:                        number | null;
+  attention_track_efficiency: number | null;
+  attention_time_efficiency:  number | null;
 }
 
 

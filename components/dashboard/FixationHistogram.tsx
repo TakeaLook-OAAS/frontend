@@ -11,24 +11,38 @@ import {
 } from "recharts";
 
 const C = {
-  ink: "#0A1A35",
-  muted: "#5B6786",
-  mono: "#8893AB",
-  lineSoft: "#E7EAF2",
-  grid: "#F0F2F8",
-  blue: "#1E5BFF",   // 노출(Dwell)
-  green: "#0FA968",  // 관심(Fixation)
+  ink: "var(--color-ink)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
+  lineSoft: "var(--color-line-soft)",
+  grid: "var(--color-grid)",
+  blue: "var(--color-blue)",   // 노출(Dwell)
+  green: "var(--color-green)",  // 관심(Fixation)
 };
 
 export type HistogramBin = { label: string; dwell: number; fixation: number };
+
+const ALL_BUCKETS: string[] = [
+  ...Array.from({ length: 25 }, (_, i) => `${i}~${i + 1}s`),
+  "25s+",
+];
 
 type Props = {
   bins: HistogramBin[];
   loading: boolean;
   hasRange: boolean;
+  maxBuckets?: number;
 };
 
-export default function FixationHistogram({ bins, loading, hasRange }: Props) {
+export default function FixationHistogram({ bins, loading, hasRange, maxBuckets }: Props) {
+  const binMap = Object.fromEntries(bins.map((b) => [b.label, b]));
+  const buckets = maxBuckets ? ALL_BUCKETS.slice(0, maxBuckets) : ALL_BUCKETS;
+  const filledBins: HistogramBin[] = buckets.map((label) => ({
+    label,
+    dwell:    binMap[label]?.dwell    ?? 0,
+    fixation: binMap[label]?.fixation ?? 0,
+  }));
+
   const isEmpty = bins.length === 0 || bins.every((b) => b.dwell === 0 && b.fixation === 0);
 
   return (
@@ -46,7 +60,7 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
       <div style={{ marginBottom: 12 }}>
         <div
           style={{
-            fontFamily: "JetBrains Mono, monospace",
+            fontFamily: "var(--font-mono)",
             fontSize: 10,
             color: C.ink,
             letterSpacing: "0.14em",
@@ -78,7 +92,7 @@ export default function FixationHistogram({ bins, loading, hasRange }: Props) {
         <>
           <div style={{ height: 400, width: "100%" }}>
           <ResponsiveContainer width="100%" height="100%">
-            <ComposedChart data={bins} margin={{ top: 6, right: 12, left: 0, bottom: 5 }}>
+            <ComposedChart data={filledBins} margin={{ top: 6, right: 12, left: 0, bottom: 5 }}>
               <defs>
                 <linearGradient id="dwellGrad" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor={C.blue} stopOpacity={0.55} />

@@ -23,14 +23,14 @@ interface Props {
 }
 
 const C = {
-  ink: "#0A1A35",
-  muted: "#5B6786",
-  mono: "#8893AB",
-  lineSoft: "#E7EAF2",
-  grid: "#F0F2F8",
-  blue: "#1E5BFF",   // 노출
-  green: "#0FA968",  // 관심
-  amber: "#E89B2A",  // 효율/포착관심도
+  ink: "var(--color-ink)",
+  muted: "var(--color-ink3)",
+  mono: "var(--color-ink4)",
+  lineSoft: "var(--color-line-soft)",
+  grid: "var(--color-grid)",
+  blue: "var(--color-blue)",   // 노출
+  green: "var(--color-green)",  // 관심
+  amber: "var(--color-amber)",  // 효율/포착관심도
 };
 
 export default function HourlyAudienceChart({ data }: Props) {
@@ -47,7 +47,7 @@ export default function HourlyAudienceChart({ data }: Props) {
       }}
     >
       <div style={{ marginBottom: 12 }}>
-        <div style={{ fontFamily: "JetBrains Mono, monospace", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 10, color: C.ink, letterSpacing: "0.14em", fontWeight: 700 }}>
           HOURLY · AUDIENCE
         </div>
         <h3 style={{ margin: "4px 0 0", fontSize: 14, fontWeight: 700, color: C.ink, letterSpacing: "-0.015em" }}>
@@ -97,8 +97,8 @@ export default function HourlyAudienceChart({ data }: Props) {
                     return [`${n.toLocaleString()}명`, String(name)];
                   }}
                 />
-                <Bar yAxisId="left" dataKey="exposure" name="노출인구" fill={C.blue} radius={[4, 4, 0, 0]} barSize={9} />
-                <Bar yAxisId="left" dataKey="interested" name="관심인구" fill={C.green} radius={[4, 4, 0, 0]} barSize={9} />
+                <Bar yAxisId="left" dataKey="exposure" name="노출인구" fill={C.blue} radius={0} barSize={16} />
+                <Bar yAxisId="left" dataKey="interested" name="관심인구" fill={C.green} radius={0} barSize={16} />
                 <Line yAxisId="right" type="monotone" dataKey="attentionRate" name="포착관심도" stroke={C.amber} strokeWidth={2.2} dot={false} activeDot={{ r: 6, fill: C.amber }} />
               </ComposedChart>
             </ResponsiveContainer>
