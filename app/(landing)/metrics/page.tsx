@@ -239,10 +239,10 @@ function SectionCopy({ index }: { index: number }) {
       <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent">
         {section.tag}
       </span>
-      <h3 className="mt-4 text-2xl font-extrabold tracking-[-0.03em] text-ink">
+      <h2 className="mt-5 text-[clamp(28px,3.6vw,42px)] font-extrabold leading-[1.15] tracking-[-0.04em] text-ink">
         {section.title}
-      </h3>
-      <p className="mt-4 text-[15px] leading-7 text-ink3">
+      </h2>
+      <p className="mt-5 text-[16px] leading-8 text-ink3">
         {section.description}
       </p>
     </div>
@@ -260,8 +260,17 @@ function ChartFrame({ children }: { children: ReactNode }) {
 export default function MetricsPage() {
   return (
     <main className="min-h-screen bg-bg font-sans text-ink">
-      <section className="relative overflow-hidden bg-[#0a0a0f] px-5 pb-20 pt-32 text-white lg:px-12 lg:pb-28 lg:pt-40">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(123,111,240,0.24),transparent_34%),radial-gradient(circle_at_86%_18%,rgba(34,211,168,0.18),transparent_30%)]" />
+      <section
+        className="relative overflow-hidden px-5 pb-24 pt-32 text-white lg:px-12 lg:pb-32 lg:pt-40"
+        style={{ backgroundColor: '#0a0a0f' }}
+      >
+        <div
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(circle at 12% 20%, rgba(123, 111, 240, 0.24), transparent 34%), radial-gradient(circle at 86% 18%, rgba(34, 211, 168, 0.18), transparent 30%)',
+          }}
+        />
 
         <div className="relative mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-14 lg:grid-cols-2">
           <div>
@@ -279,6 +288,23 @@ export default function MetricsPage() {
               OAAS는 카메라 한 대로 노출부터 관심도까지 6가지 핵심 지표를 실시간으로
               측정합니다.
             </p>
+
+            <div className="mt-9 flex flex-wrap gap-3">
+              <Link
+                href="/guide"
+                className="inline-flex h-12 items-center gap-2 rounded-xl bg-white px-6 text-sm font-bold text-[#0a1a35] transition hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                이용 방법 보기
+                <ArrowRight size={17} />
+              </Link>
+
+              <Link
+                href="/dashboard"
+                className="inline-flex h-12 items-center rounded-xl border border-white/15 bg-white/5 px-6 text-sm font-semibold text-white/85 transition hover:bg-white/10 hover:text-white"
+              >
+                대시보드 보기
+              </Link>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 gap-3">
@@ -315,112 +341,110 @@ export default function MetricsPage() {
         </div>
       </section>
 
-      <section className="border-y border-line bg-white px-5 py-20 lg:px-12 lg:py-28">
+      <section className="border-y border-line bg-white px-5 py-6 lg:px-12 lg:py-8">
         <div className="mx-auto max-w-[1240px]">
           <SectionHeading
             eyebrow="DASHBOARD PREVIEW"
             title="대시보드 구성"
             description="측정된 데이터가 실제 대시보드에서 어떻게 표시되는지 확인해보세요."
           />
+        </div>
+      </section>
 
-          <div className="mt-16 space-y-20">
-            <article className="grid grid-cols-1 gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-              <SectionCopy index={0} />
-              <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
-                <AgeGenderChart
-                  male={5400}
-                  female={4600}
-                  age10={850}
-                  age20={2200}
-                  age30={2900}
-                  age40={2300}
-                  age50={1300}
-                  age60={450}
-                  title="노출 인구"
-                  subtitle="EXPOSURE DEMOGRAPHICS"
-                />
-                <AgeGenderChart
-                  male={1620}
-                  female={1380}
-                  age10={220}
-                  age20={730}
-                  age30={1050}
-                  age40={720}
-                  age50={220}
-                  age60={60}
-                  title="관심 인구"
-                  subtitle="INTEREST DEMOGRAPHICS"
-                />
-              </div>
-            </article>
-
-            <article className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 lg:order-1">
-                <ChartFrame>
-                  <HourlyAudienceChart data={HOURLY_DATA} />
-                </ChartFrame>
-              </div>
-              <div className="order-1 lg:order-2">
-                <SectionCopy index={1} />
-              </div>
-            </article>
-
-            <article className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-              <SectionCopy index={2} />
-              <ChartFrame>
-                <FixationHistogram
-                  bins={FIXATION_BINS}
-                  loading={false}
-                  hasRange={true}
-                  maxBuckets={17}
-                />
-              </ChartFrame>
-            </article>
-
-            <article className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 lg:order-1">
-                <ChartFrame>
-                  <DailyMetricsChart
-                    data={DAILY_METRICS_DATA}
-                    loading={false}
-                    hasRange={true}
-                  />
-                </ChartFrame>
-              </div>
-              <div className="order-1 lg:order-2">
-                <SectionCopy index={3} />
-              </div>
-            </article>
-
-            <article className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-              <SectionCopy index={4} />
-              <ChartFrame>
-                <DailyEffectsChart
-                  data={DAILY_EFFECTS_DATA}
-                  loading={false}
-                  hasRange={true}
-                />
-              </ChartFrame>
-            </article>
-
-            <article className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 lg:order-1">
-                <ChartFrame>
-                  <SovChart
-                    sov={0.342}
-                    dailyTrend={SOV_DAILY_TREND}
-                    startDate="2025-06-28"
-                    endDate="2025-07-11"
-                    hasRange={true}
-                    loading={false}
-                  />
-                </ChartFrame>
-              </div>
-              <div className="order-1 lg:order-2">
-                <SectionCopy index={5} />
-              </div>
-            </article>
+      <section className="border-b border-line bg-bg px-5 py-20 lg:px-12 lg:py-28">
+        <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <SectionCopy index={0} />
+          <div className="grid grid-cols-1 gap-5 xl:grid-cols-2">
+            <AgeGenderChart
+              male={5400}
+              female={4600}
+              age10={850}
+              age20={2200}
+              age30={2900}
+              age40={2300}
+              age50={1300}
+              age60={450}
+              title="노출 인구"
+              subtitle="EXPOSURE DEMOGRAPHICS"
+            />
+            <AgeGenderChart
+              male={1620}
+              female={1380}
+              age10={220}
+              age20={730}
+              age30={1050}
+              age40={720}
+              age50={220}
+              age60={60}
+              title="관심 인구"
+              subtitle="INTEREST DEMOGRAPHICS"
+            />
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-line bg-white px-5 py-20 lg:px-12 lg:py-28">
+        <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          <SectionCopy index={1} />
+          <ChartFrame>
+            <HourlyAudienceChart data={HOURLY_DATA} />
+          </ChartFrame>
+        </div>
+      </section>
+
+      <section className="border-b border-line bg-bg px-5 py-20 lg:px-12 lg:py-28">
+        <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          <SectionCopy index={2} />
+          <ChartFrame>
+            <FixationHistogram
+              bins={FIXATION_BINS}
+              loading={false}
+              hasRange={true}
+              maxBuckets={17}
+            />
+          </ChartFrame>
+        </div>
+      </section>
+
+      <section className="border-b border-line bg-white px-5 py-20 lg:px-12 lg:py-28">
+        <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          <SectionCopy index={3} />
+          <ChartFrame>
+            <DailyMetricsChart
+              data={DAILY_METRICS_DATA}
+              loading={false}
+              hasRange={true}
+            />
+          </ChartFrame>
+        </div>
+      </section>
+
+      <section className="border-b border-line bg-bg px-5 py-20 lg:px-12 lg:py-28">
+        <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          <SectionCopy index={4} />
+          <ChartFrame>
+            <DailyEffectsChart
+              data={DAILY_EFFECTS_DATA}
+              loading={false}
+              hasRange={true}
+            />
+          </ChartFrame>
+        </div>
+      </section>
+
+      <section className="border-b border-line bg-white px-5 py-20 lg:px-12 lg:py-28">
+        <div className="mx-auto grid max-w-[1240px] grid-cols-1 items-center gap-10 lg:grid-cols-2">
+          <SectionCopy index={5} />
+          <ChartFrame>
+            <SovChart
+              sov={0.342}
+              dailyTrend={SOV_DAILY_TREND}
+              startDate="2025-06-28"
+              endDate="2025-07-11"
+              hasRange={true}
+              loading={false}
+            />
+          </ChartFrame>
         </div>
       </section>
 
