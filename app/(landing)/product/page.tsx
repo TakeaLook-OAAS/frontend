@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -319,44 +320,16 @@ export default function ProductPage() {
           </div>
 
           <BrowserFrame label="OAAS · LIVE CAMPAIGN">
-            <div className="bg-[#0d1220] p-5">
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  ['EXPOSURE', '12,840', '+12.8%'],
-                  ['INTEREST', '4,118', '32.1%'],
-                  ['AVG. VIEW', '2.9s', '+0.4s'],
-                ].map(([label, value, delta]) => (
-                  <div
-                    key={label}
-                    className="rounded-2xl border border-white/8 bg-white/[0.04] p-4"
-                  >
-                    <small className="font-mono text-[9px] tracking-[0.12em] text-white/40">
-                      {label}
-                    </small>
-                    <b className="mt-2 block text-xl text-white">{value}</b>
-                    <span className="mt-1 block text-xs text-accent2">{delta}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 flex h-[240px] items-end gap-2 rounded-2xl border border-white/8 bg-white/[0.025] px-5 pb-5 pt-8">
-                {[32, 44, 52, 61, 58, 72, 84, 77, 91, 86, 96, 89].map(
-                  (height, index) => (
-                    <i
-                      key={index}
-                      className="flex-1 rounded-t bg-gradient-to-t from-accent to-accent2"
-                      style={{ height: `${height}%` }}
-                    />
-                  ),
-                )}
-              </div>
-
-              <div className="mt-4 flex items-center justify-between font-mono text-[10px] tracking-[0.12em] text-white/40">
-                <span>CAMPAIGN PERFORMANCE</span>
-                <b className="rounded-full bg-accent2/15 px-3 py-1 text-accent2">
-                  LIVE
-                </b>
-              </div>
+            <div className="bg-[#0d1220] p-3">
+              <Image
+                src="/images/dashboard-guide-with-charts.png"
+                alt="OAAS 대시보드 실제 화면"
+                width={1280}
+                height={1064}
+                sizes="(max-width: 860px) 100vw, 54vw"
+                className="h-auto w-full rounded-xl"
+                priority
+              />
             </div>
           </BrowserFrame>
         </div>

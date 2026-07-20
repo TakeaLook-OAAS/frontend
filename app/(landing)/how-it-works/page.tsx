@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -147,22 +148,6 @@ const STEPS: Step[] = [
   },
 ];
 
-const EXPOSURE_EXAMPLE = {
-  totalS: 8,
-  lookIntervals: [
-    { startS: 1, endS: 3 },
-    { startS: 5, endS: 7.5 },
-  ],
-};
-
-const TOTAL_LOOK_S = EXPOSURE_EXAMPLE.lookIntervals.reduce(
-  (sum, interval) => sum + interval.endS - interval.startS,
-  0,
-);
-const LOOK_RATIO = Math.round(
-  (TOTAL_LOOK_S / EXPOSURE_EXAMPLE.totalS) * 100,
-);
-
 function SectionHeading({
   eyebrow,
   title,
@@ -228,230 +213,19 @@ function BrowserFrame({
   );
 }
 
-function VennPreview() {
-  return (
-    <div className="relative min-h-[360px] overflow-hidden bg-bg-warm p-6">
-      <div className="absolute left-[12%] top-[22%] grid h-48 w-48 place-items-center rounded-full border border-accent/30 bg-accent/10 text-center">
-        <div>
-          <span className="font-mono text-[10px] font-bold tracking-[0.12em] text-accent">
-            EXPOSURE
-          </span>
-          <b className="mt-2 block text-lg">노출</b>
-        </div>
-      </div>
-      <div className="absolute right-[12%] top-[22%] grid h-48 w-48 place-items-center rounded-full border border-accent2/30 bg-accent2/10 text-center">
-        <div>
-          <span className="font-mono text-[10px] font-bold tracking-[0.12em] text-[#14856d]">
-            NOTICE
-          </span>
-          <b className="mt-2 block text-lg">응시</b>
-        </div>
-      </div>
-      <div className="absolute left-1/2 top-1/2 z-10 w-36 -translate-x-1/2 -translate-y-1/2 rounded-2xl border border-line bg-white p-4 text-center shadow-lg">
-        <span className="font-mono text-[9px] font-bold tracking-[0.12em] text-accent">
-          VALID VIEW
-        </span>
-        <b className="mt-2 block">유효 시청</b>
-        <small className="mt-1 block text-ink4">A ∩ B</small>
-      </div>
-    </div>
-  );
-}
-
-function TimelinePreview() {
-  return (
-    <div className="bg-bg-warm p-6">
-      <div className="text-right font-mono text-[10px] tracking-[0.1em] text-ink4">
-        EXAMPLE DATA
-      </div>
-
-      <div className="mt-5">
-        <div className="mb-2 flex items-center justify-between text-xs text-ink3">
-          <span>노출 구간</span>
-          <b>{EXPOSURE_EXAMPLE.totalS}.0s</b>
-        </div>
-        <div className="h-8 rounded-lg bg-accent/10" />
-      </div>
-
-      <div className="mt-6">
-        <div className="mb-2 flex items-center justify-between text-xs text-ink3">
-          <span>응시 구간</span>
-          <b>
-            {TOTAL_LOOK_S.toFixed(1)}s · {LOOK_RATIO}%
-          </b>
-        </div>
-        <div className="relative h-8 overflow-hidden rounded-lg bg-accent/10">
-          {EXPOSURE_EXAMPLE.lookIntervals.map((interval) => {
-            const left =
-              (interval.startS / EXPOSURE_EXAMPLE.totalS) * 100;
-            const width =
-              ((interval.endS - interval.startS) /
-                EXPOSURE_EXAMPLE.totalS) *
-              100;
-
-            return (
-              <i
-                key={`${interval.startS}-${interval.endS}`}
-                className="absolute bottom-0 top-0 rounded-lg bg-gradient-to-r from-accent to-accent2"
-                style={{ left: `${left}%`, width: `${width}%` }}
-              />
-            );
-          })}
-        </div>
-
-        <div className="mt-2 flex justify-between font-mono text-[10px] text-ink4">
-          {[0, 2, 4, 6, 8].map((second) => (
-            <span key={second}>{second}s</span>
-          ))}
-        </div>
-      </div>
-
-      <p className="mt-7 rounded-xl border border-line bg-white px-4 py-3 text-center text-xs leading-6 text-ink3">
-        노출 8.0초 중 응시 4.5초만 유효 시청으로 집계됩니다.
-      </p>
-    </div>
-  );
-}
-
-function ShotPreview({ step }: { step: Step }) {
-  const Icon = step.icon;
-
-  return (
-    <div className="relative min-h-[360px] overflow-hidden bg-[radial-gradient(circle_at_30%_25%,rgba(123,111,240,0.22),transparent_30%),radial-gradient(circle_at_75%_40%,rgba(34,211,168,0.16),transparent_30%),linear-gradient(145deg,#111726,#090c14)]">
-      <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:42px_42px]" />
-
-      <div className="absolute left-[17%] top-[22%] h-[210px] w-[115px] rounded-xl border-2 border-accent2 shadow-[0_0_30px_rgba(34,211,168,0.18)]">
-        <span className="absolute -top-7 left-0 rounded bg-accent2 px-2 py-1 font-mono text-[9px] font-bold text-[#07110e]">
-          TRACK 07
-        </span>
-      </div>
-
-      <div className="absolute right-[15%] top-[31%] h-[170px] w-[95px] rounded-xl border-2 border-accent shadow-[0_0_30px_rgba(123,111,240,0.18)]">
-        <span className="absolute -top-7 left-0 rounded bg-accent px-2 py-1 font-mono text-[9px] font-bold text-white">
-          TRACK 12
-        </span>
-      </div>
-
-      <div className="absolute right-5 top-5 grid h-10 w-10 place-items-center rounded-xl border border-white/10 bg-white/5 text-accent2">
-        <Icon size={19} />
-      </div>
-
-      <div className="absolute bottom-5 left-5 right-5 rounded-2xl border border-white/10 bg-black/35 px-4 py-4 backdrop-blur-md">
-        <span className="font-mono text-[9px] font-bold tracking-[0.12em] text-accent2">
-          STEP {step.number} · {step.eyebrow}
-        </span>
-        <b className="mt-2 block text-sm text-white">{step.shotLabel}</b>
-      </div>
-    </div>
-  );
-}
-
-function GazePreview() {
-  const threshold = 30;
-  const example = 18;
-
-  return (
-    <div className="bg-bg-warm p-6">
-      <svg
-        viewBox="0 0 340 240"
-        className="h-auto w-full"
-        role="img"
-        aria-label="시선 벡터와 카메라 정면 벡터 사이의 각도 판정"
-      >
-        <path
-          d="M 62 120 L 174.6 55 A 130 130 0 0 1 174.6 185 Z"
-          fill="rgba(123,111,240,0.12)"
-        />
-        <line
-          x1="62"
-          y1="120"
-          x2="174.6"
-          y2="55"
-          stroke="#98a2b3"
-          strokeWidth="1"
-          strokeDasharray="4 4"
-        />
-        <line
-          x1="62"
-          y1="120"
-          x2="174.6"
-          y2="185"
-          stroke="#98a2b3"
-          strokeWidth="1"
-          strokeDasharray="4 4"
-        />
-        <line
-          x1="62"
-          y1="120"
-          x2="192"
-          y2="120"
-          stroke="#667085"
-          strokeWidth="2"
-        />
-        <line
-          x1="62"
-          y1="120"
-          x2="185.6"
-          y2="79.8"
-          stroke="#7b6ff0"
-          strokeWidth="3"
-        />
-        <circle cx="185.6" cy="79.8" r="4" fill="#7b6ff0" />
-        <circle cx="62" cy="120" r="4" fill="#101828" />
-
-        <text x="199" y="124" fontSize="11" fill="#667085">
-          카메라 정면
-        </text>
-        <text x="195" y="76" fontSize="11" fill="#7b6ff0">
-          예측 시선
-        </text>
-        <text x="102" y="102" fontSize="12" fill="#101828" fontWeight="700">
-          {example}°
-        </text>
-        <text x="165" y="46" fontSize="10" fill="#98a2b3">
-          +{threshold}°
-        </text>
-        <text x="165" y="202" fontSize="10" fill="#98a2b3">
-          -{threshold}°
-        </text>
-      </svg>
-
-      <p className="mt-3 rounded-xl border border-line bg-white px-4 py-3 text-center text-xs leading-6 text-ink3">
-        각도 {example}° ≤ 임계값 {threshold}°이므로{' '}
-        <strong className="text-accent">is_looking = True</strong>
-      </p>
-    </div>
-  );
-}
-
 function StepPreview({ step }: { step: Step }) {
-  if (step.preview === 'venn') {
-    return (
-      <BrowserFrame label="노출 ∩ 응시 = 유효 시청">
-        <VennPreview />
-      </BrowserFrame>
-    );
-  }
-
-  if (step.preview === 'timeline') {
-    return (
-      <BrowserFrame label="PRESENCE VS. NOTICE">
-        <TimelinePreview />
-      </BrowserFrame>
-    );
-  }
-
-  if (step.preview === 'gaze') {
-    return (
-      <BrowserFrame label="GAZE ANGLE JUDGMENT">
-        <GazePreview />
-      </BrowserFrame>
-    );
-  }
+  const label =
+    step.preview === 'venn'
+      ? '노출 ∩ 응시 = 유효 시청'
+      : step.preview === 'timeline'
+        ? 'PRESENCE VS. NOTICE'
+        : step.preview === 'gaze'
+          ? 'GAZE ANGLE JUDGMENT'
+          : `STEP ${step.number} · ${step.eyebrow}`;
 
   return (
-    <BrowserFrame label={`STEP ${step.number} · ${step.eyebrow}`}>
-      <ShotPreview step={step} />
+    <BrowserFrame label={label}>
+      <div className="min-h-[360px] bg-bg-warm" />
     </BrowserFrame>
   );
 }
@@ -522,56 +296,16 @@ export default function HowItWorksPage() {
           </div>
 
           <BrowserFrame label="OAAS · VALID VIEW PIPELINE" dark>
-            <div className="bg-[#0d1220] p-5">
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  ['01', 'DETECT', Users],
-                  ['02', 'ESTIMATE', Eye],
-                  ['03', 'JUDGE', Target],
-                ].map(([number, label, Icon]) => {
-                  const PipelineIcon = Icon as LucideIcon;
-
-                  return (
-                    <div
-                      key={number as string}
-                      className="rounded-2xl border border-white/10 bg-white/[0.04] p-4"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono text-[9px] text-white/40">
-                          {number as string}
-                        </span>
-                        <PipelineIcon size={16} className="text-[#22d3a8]" />
-                      </div>
-                      <b className="mt-5 block text-sm text-white">
-                        {label as string}
-                      </b>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="relative mt-5 min-h-[245px] overflow-hidden rounded-2xl border border-white/10 bg-white/[0.025]">
-                <div className="absolute inset-0 opacity-20 [background-image:linear-gradient(rgba(255,255,255,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.08)_1px,transparent_1px)] [background-size:38px_38px]" />
-                <div className="absolute left-[16%] top-[25%] h-32 w-20 rounded-xl border-2 border-[#22d3a8]">
-                  <span className="absolute -top-6 left-0 rounded bg-[#22d3a8] px-2 py-1 font-mono text-[8px] font-bold text-[#07110e]">
-                    TRACK 07
-                  </span>
-                </div>
-                <div className="absolute right-[17%] top-[36%] h-28 w-16 rounded-xl border-2 border-[#7b6ff0]">
-                  <span className="absolute -top-6 left-0 rounded bg-[#7b6ff0] px-2 py-1 font-mono text-[8px] font-bold text-white">
-                    TRACK 12
-                  </span>
-                </div>
-                <div className="absolute left-[37%] top-[42%] h-px w-28 origin-left rotate-[-10deg] bg-[#22d3a8] shadow-[0_0_12px_rgba(34,211,168,0.7)]" />
-                <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-xl border border-white/10 bg-black/35 px-4 py-3 backdrop-blur-md">
-                  <span className="font-mono text-[9px] text-white/45">
-                    GAZE ANGLE 18°
-                  </span>
-                  <b className="rounded-full bg-[rgba(34,211,168,0.15)] px-3 py-1 font-mono text-[9px] text-[#22d3a8]">
-                    VALID VIEW
-                  </b>
-                </div>
-              </div>
+            <div className="bg-[#0d1220] p-3">
+              <Image
+                src="/images/dashboard-guide-with-charts.png"
+                alt="OAAS 대시보드 실제 화면"
+                width={1280}
+                height={1064}
+                sizes="(max-width: 860px) 100vw, 54vw"
+                className="h-auto w-full rounded-xl"
+                priority
+              />
             </div>
           </BrowserFrame>
         </div>
