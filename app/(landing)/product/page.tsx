@@ -497,10 +497,10 @@ export default function ProductPage() {
                 <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent">
                   01 · AUDIENCE INSIGHT
                 </span>
-                <h3 className="mt-4 text-2xl font-extrabold tracking-[-0.03em]">
+                <h2 className="mt-5 text-[clamp(28px,3.6vw,42px)] font-extrabold leading-[1.15] tracking-[-0.04em]">
                   타겟 오디언스 도달을 비교합니다.
-                </h3>
-                <p className="mt-4 text-[15px] leading-7 text-ink3">
+                </h2>
+                <p className="mt-5 text-[16px] leading-8 text-ink3">
                   노출 인구와 관심 인구의 성별·연령 분포를 나란히 비교해,
                   캠페인이 의도한 타겟에게 실제로 도달했는지 확인합니다.
                 </p>
@@ -547,21 +547,21 @@ export default function ProductPage() {
             </article>
 
             <article className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 overflow-hidden rounded-[22px] border border-line bg-bg-warm p-4 lg:order-1">
-                <HourlyAudienceChart data={HOURLY_DATA} />
-              </div>
-
-              <div className="order-1 lg:order-2">
+              <div>
                 <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent">
                   02 · PEAK TIME
                 </span>
-                <h3 className="mt-4 text-2xl font-extrabold tracking-[-0.03em]">
+                <h2 className="mt-5 text-[clamp(28px,3.6vw,42px)] font-extrabold leading-[1.15] tracking-[-0.04em]">
                   성과가 가장 높은 송출 시간을 찾습니다.
-                </h3>
-                <p className="mt-4 text-[15px] leading-7 text-ink3">
+                </h2>
+                <p className="mt-5 text-[16px] leading-8 text-ink3">
                   시간대별 노출 인원과 관심률을 동시에 비교해 단순히 사람이
                   많은 시간과 광고 반응이 높은 시간을 구분합니다.
                 </p>
+              </div>
+
+              <div className="overflow-hidden rounded-[22px] border border-line bg-bg-warm p-4">
+                <HourlyAudienceChart data={HOURLY_DATA} />
               </div>
             </article>
 
@@ -570,10 +570,10 @@ export default function ProductPage() {
                 <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent">
                   03 · CAMPAIGN TREND
                 </span>
-                <h3 className="mt-4 text-2xl font-extrabold tracking-[-0.03em]">
+                <h2 className="mt-5 text-[clamp(28px,3.6vw,42px)] font-extrabold leading-[1.15] tracking-[-0.04em]">
                   캠페인 성과의 변화를 추적합니다.
-                </h3>
-                <p className="mt-4 text-[15px] leading-7 text-ink3">
+                </h2>
+                <p className="mt-5 text-[16px] leading-8 text-ink3">
                   일별 노출·시청 추이를 비교해 요일, 행사, 위치 변화에 따라
                   광고 반응이 어떻게 달라졌는지 확인합니다.
                 </p>
