@@ -2,6 +2,17 @@
 // 클라이언트 컴포넌트(브라우저): NEXT_PUBLIC_API_URL (호스트에서 접근 가능한 주소)
 const BASE = process.env.API_URL ?? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
+async function authFetch(url: string | URL, options?: RequestInit): Promise<Response> {
+  const res = await fetch(url.toString(), options);
+  if (res.status === 401 && typeof window !== "undefined") {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("user_email");
+    localStorage.removeItem("user_role");
+    window.location.href = "/login";
+  }
+  return res;
+}
+
 // ── 공통 집계 타입 ─────────────────────────────────────────────────────────────
 
 export interface AggResult {
@@ -108,7 +119,7 @@ export async function getRangeStats(params: {
   url.searchParams.set("campaign_id", params.campaign_id);
   if (params.gender)    url.searchParams.set("gender",    params.gender);
   if (params.age_group) url.searchParams.set("age_group", params.age_group);
-  const res = await fetch(url.toString(), {
+  const res = await authFetch(url.toString(), {
     cache: "no-store",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
@@ -123,7 +134,7 @@ export async function getCampaignAggs(params?: {
   const url = new URL(`${BASE}/stats/campaign/`);
   if (params?.device_id)   url.searchParams.set("device_id",   params.device_id);
   if (params?.campaign_id) url.searchParams.set("campaign_id", params.campaign_id);
-  const res = await fetch(url.toString(), {
+  const res = await authFetch(url.toString(), {
     cache: "no-store",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
@@ -154,7 +165,7 @@ export interface CampaignListResponse {
 }
 
 export async function getCampaigns(token?: string): Promise<CampaignListResponse> {
-  const res = await fetch(`${BASE}/campaigns/`, {
+  const res = await authFetch(`${BASE}/campaigns/`, {
     cache: "no-store",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
@@ -214,7 +225,7 @@ export interface UserInfo {
 }
 
 export async function apiGetMe(token: string): Promise<UserInfo> {
-  const res = await fetch(`${BASE}/auth/me`, {
+  const res = await authFetch(`${BASE}/auth/me`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json().catch(() => ({}));
@@ -223,7 +234,7 @@ export async function apiGetMe(token: string): Promise<UserInfo> {
 }
 
 export async function apiGetAdminUsers(token: string): Promise<UserInfo[]> {
-  const res = await fetch(`${BASE}/admin/users`, {
+  const res = await authFetch(`${BASE}/admin/users`, {
     headers: { Authorization: `Bearer ${token}` },
   });
   const data = await res.json().catch(() => ({}));
@@ -232,7 +243,7 @@ export async function apiGetAdminUsers(token: string): Promise<UserInfo[]> {
 }
 
 export async function apiDeleteUser(token: string, userId: string): Promise<void> {
-  const res = await fetch(`${BASE}/admin/users/${userId}`, {
+  const res = await authFetch(`${BASE}/admin/users/${userId}`, {
     method: "DELETE",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -243,7 +254,7 @@ export async function apiDeleteUser(token: string, userId: string): Promise<void
 }
 
 export async function apiSuspendUser(token: string, userId: string): Promise<UserInfo> {
-  const res = await fetch(`${BASE}/admin/users/${userId}/suspend`, {
+  const res = await authFetch(`${BASE}/admin/users/${userId}/suspend`, {
     method: "PATCH",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -291,7 +302,7 @@ export async function getEvents(params: {
   if (params.device_id)   url.searchParams.set("device_id",   params.device_id);
   if (params.campaign_id) url.searchParams.set("campaign_id", params.campaign_id);
   url.searchParams.set("limit", String(params.limit ?? 1000));
-  const res = await fetch(url.toString(), {
+  const res = await authFetch(url.toString(), {
     cache: "no-store",
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
@@ -349,7 +360,7 @@ export async function apiCreateChangeRequest(body: {
   broadcast_end?:   string;
   reason?:          string;
 }, token: string): Promise<ChangeRequestItem> {
-  const res = await fetch(`${BASE}/change-requests/`, {
+  const res = await authFetch(`${BASE}/change-requests/`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify(body),
@@ -361,7 +372,7 @@ export async function apiCreateChangeRequest(body: {
 }
 
 export async function apiGetChangeRequests(token: string): Promise<ChangeRequestListResponse> {
-  const res = await fetch(`${BASE}/change-requests/`, {
+  const res = await authFetch(`${BASE}/change-requests/`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
@@ -371,7 +382,7 @@ export async function apiGetChangeRequests(token: string): Promise<ChangeRequest
 }
 
 export async function apiApproveChangeRequest(token: string, id: string): Promise<ChangeRequestItem> {
-  const res = await fetch(`${BASE}/change-requests/${id}/approve`, {
+  const res = await authFetch(`${BASE}/change-requests/${id}/approve`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -381,7 +392,7 @@ export async function apiApproveChangeRequest(token: string, id: string): Promis
 }
 
 export async function apiRejectChangeRequest(token: string, id: string): Promise<ChangeRequestItem> {
-  const res = await fetch(`${BASE}/change-requests/${id}/reject`, {
+  const res = await authFetch(`${BASE}/change-requests/${id}/reject`, {
     method: "POST",
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -421,7 +432,7 @@ export async function submitApplication(
   body: ApplicationCreateBody,
   token: string,
 ): Promise<ApplicationResponse> {
-  const res = await fetch(`${BASE}/applications/`, {
+  const res = await authFetch(`${BASE}/applications/`, {
     method: "POST",
     headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
     body: JSON.stringify(body),
