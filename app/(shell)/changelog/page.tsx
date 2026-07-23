@@ -85,7 +85,7 @@ export default function ChangelogPage() {
       style={{
         width: "100%",
         minHeight: "100vh",
-        padding: "26px 36px 60px",
+        padding: "22px 36px 60px",
         background: t.bg,
       }}
     >

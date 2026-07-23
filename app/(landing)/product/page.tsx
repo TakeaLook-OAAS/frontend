@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
@@ -319,44 +320,16 @@ export default function ProductPage() {
           </div>
 
           <BrowserFrame label="OAAS · LIVE CAMPAIGN">
-            <div className="bg-[#0d1220] p-5">
-              <div className="grid grid-cols-3 gap-3">
-                {[
-                  ['EXPOSURE', '12,840', '+12.8%'],
-                  ['INTEREST', '4,118', '32.1%'],
-                  ['AVG. VIEW', '2.9s', '+0.4s'],
-                ].map(([label, value, delta]) => (
-                  <div
-                    key={label}
-                    className="rounded-2xl border border-white/8 bg-white/[0.04] p-4"
-                  >
-                    <small className="font-mono text-[9px] tracking-[0.12em] text-white/40">
-                      {label}
-                    </small>
-                    <b className="mt-2 block text-xl text-white">{value}</b>
-                    <span className="mt-1 block text-xs text-accent2">{delta}</span>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-5 flex h-[240px] items-end gap-2 rounded-2xl border border-white/8 bg-white/[0.025] px-5 pb-5 pt-8">
-                {[32, 44, 52, 61, 58, 72, 84, 77, 91, 86, 96, 89].map(
-                  (height, index) => (
-                    <i
-                      key={index}
-                      className="flex-1 rounded-t bg-gradient-to-t from-accent to-accent2"
-                      style={{ height: `${height}%` }}
-                    />
-                  ),
-                )}
-              </div>
-
-              <div className="mt-4 flex items-center justify-between font-mono text-[10px] tracking-[0.12em] text-white/40">
-                <span>CAMPAIGN PERFORMANCE</span>
-                <b className="rounded-full bg-accent2/15 px-3 py-1 text-accent2">
-                  LIVE
-                </b>
-              </div>
+            <div className="bg-[#0d1220] p-3">
+              <Image
+                src="/images/dashboard-guide-with-charts.png"
+                alt="OAAS 대시보드 실제 화면"
+                width={1280}
+                height={1064}
+                sizes="(max-width: 860px) 100vw, 54vw"
+                className="h-auto w-full rounded-xl"
+                priority
+              />
             </div>
           </BrowserFrame>
         </div>
@@ -497,10 +470,10 @@ export default function ProductPage() {
                 <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent">
                   01 · AUDIENCE INSIGHT
                 </span>
-                <h3 className="mt-4 text-2xl font-extrabold tracking-[-0.03em]">
+                <h2 className="mt-5 text-[clamp(28px,3.6vw,42px)] font-extrabold leading-[1.15] tracking-[-0.04em]">
                   타겟 오디언스 도달을 비교합니다.
-                </h3>
-                <p className="mt-4 text-[15px] leading-7 text-ink3">
+                </h2>
+                <p className="mt-5 text-[16px] leading-8 text-ink3">
                   노출 인구와 관심 인구의 성별·연령 분포를 나란히 비교해,
                   캠페인이 의도한 타겟에게 실제로 도달했는지 확인합니다.
                 </p>
@@ -547,21 +520,21 @@ export default function ProductPage() {
             </article>
 
             <article className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-              <div className="order-2 overflow-hidden rounded-[22px] border border-line bg-bg-warm p-4 lg:order-1">
-                <HourlyAudienceChart data={HOURLY_DATA} />
-              </div>
-
-              <div className="order-1 lg:order-2">
+              <div>
                 <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent">
                   02 · PEAK TIME
                 </span>
-                <h3 className="mt-4 text-2xl font-extrabold tracking-[-0.03em]">
+                <h2 className="mt-5 text-[clamp(28px,3.6vw,42px)] font-extrabold leading-[1.15] tracking-[-0.04em]">
                   성과가 가장 높은 송출 시간을 찾습니다.
-                </h3>
-                <p className="mt-4 text-[15px] leading-7 text-ink3">
+                </h2>
+                <p className="mt-5 text-[16px] leading-8 text-ink3">
                   시간대별 노출 인원과 관심률을 동시에 비교해 단순히 사람이
                   많은 시간과 광고 반응이 높은 시간을 구분합니다.
                 </p>
+              </div>
+
+              <div className="overflow-hidden rounded-[22px] border border-line bg-bg-warm p-4">
+                <HourlyAudienceChart data={HOURLY_DATA} />
               </div>
             </article>
 
@@ -570,10 +543,10 @@ export default function ProductPage() {
                 <span className="font-mono text-[10px] font-bold tracking-[0.14em] text-accent">
                   03 · CAMPAIGN TREND
                 </span>
-                <h3 className="mt-4 text-2xl font-extrabold tracking-[-0.03em]">
+                <h2 className="mt-5 text-[clamp(28px,3.6vw,42px)] font-extrabold leading-[1.15] tracking-[-0.04em]">
                   캠페인 성과의 변화를 추적합니다.
-                </h3>
-                <p className="mt-4 text-[15px] leading-7 text-ink3">
+                </h2>
+                <p className="mt-5 text-[16px] leading-8 text-ink3">
                   일별 노출·시청 추이를 비교해 요일, 행사, 위치 변화에 따라
                   광고 반응이 어떻게 달라졌는지 확인합니다.
                 </p>
