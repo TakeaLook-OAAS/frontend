@@ -305,12 +305,15 @@ function MapCard() {
 
   // 3. 마커 목록이 바뀔 때마다 지도/마커 그리기
   useEffect(() => {
-    if (!NCP_CLIENT_ID || filtered.length === 0) return;
+    if (!NCP_CLIENT_ID) return;
+
+    // 지도가 아직 생성 안 됐고 그릴 마커도 없으면 할 일이 없음 (최초 로딩 등)
+    if (!mapInstanceRef.current && filtered.length === 0) return;
 
     function draw() {
       if (!mapElRef.current || !window.naver) return;
 
-      if (!mapInstanceRef.current) {
+      if (!mapInstanceRef.current && filtered.length > 0) {
         mapInstanceRef.current = new window.naver.maps.Map(mapElRef.current, {
           center: new window.naver.maps.LatLng(filtered[0].latitude, filtered[0].longitude),
           zoom: 11,
@@ -323,27 +326,41 @@ function MapCard() {
 
       filtered.forEach(marker => {
         const color = marker.status === "active" ? t.green : t.amber;
+
+        // marker.name/address는 광고주가 입력한 값을 그대로 담고 있을 수 있어
+        // innerHTML 문자열 삽입 대신 DOM 요소를 만들고 textContent로 채운다 (XSS 방지)
+        const pinEl = document.createElement("div");
+        pinEl.style.cssText = `
+          background:#fff; border:3px solid ${color}; color:${t.ink};
+          padding:4px 9px; border-radius:7px; font-size:12px; font-weight:700;
+          white-space:nowrap; box-shadow:0 4px 10px -4px rgba(13,42,92,0.25);
+        `;
+        pinEl.textContent = marker.name;
+
         const naverMarker = new window.naver.maps.Marker({
           position: new window.naver.maps.LatLng(marker.latitude, marker.longitude),
           map: mapInstanceRef.current,
           title: marker.name,
           icon: {
-            content: `<div style="
-              background:#fff; border:3px solid ${color}; color:${t.ink};
-              padding:4px 9px; border-radius:7px; font-size:12px; font-weight:700;
-              white-space:nowrap; box-shadow:0 4px 10px -4px rgba(13,42,92,0.25);
-            ">${marker.name}</div>`,
+            content: pinEl,
             anchor: new window.naver.maps.Point(20, 20),
           },
         });
 
-        const infoWindow = new window.naver.maps.InfoWindow({
-          content: `<div style="padding:10px 12px; font-size:12.5px; min-width:160px;">
-            <strong>${marker.name}</strong><br/>
-            ${marker.address}<br/>
-            상태: ${marker.status === "active" ? "송출 중" : "심사/대기 중"}
-          </div>`,
-        });
+        // 인포윈도우도 동일하게 DOM 요소 + textContent로 구성
+        const infoEl = document.createElement("div");
+        infoEl.style.cssText = "padding:10px 12px; font-size:12.5px; min-width:160px;";
+        const nameEl = document.createElement("strong");
+        nameEl.textContent = marker.name;
+        const addrEl = document.createElement("div");
+        addrEl.textContent = marker.address;
+        const statusEl = document.createElement("div");
+        statusEl.textContent = `상태: ${marker.status === "active" ? "송출 중" : "심사/대기 중"}`;
+        infoEl.appendChild(nameEl);
+        infoEl.appendChild(addrEl);
+        infoEl.appendChild(statusEl);
+
+        const infoWindow = new window.naver.maps.InfoWindow({ content: infoEl });
         window.naver.maps.Event.addListener(naverMarker, "click", () => {
           if (infoWindow.getMap()) infoWindow.close();
           else infoWindow.open(mapInstanceRef.current, naverMarker);
@@ -386,4 +403,171 @@ function MapCard() {
             { id: "pending" as const, l: "대기", n: pendingCount },
           ].map((p) => (
             <button key={p.id} onClick={() => setFilter(p.id)} style={{
-              padding: "7px
+              padding: "7px 13px", borderRadius: 8,
+              border: filter === p.id ? "none" : `1px solid ${t.line}`,
+              background: filter === p.id ? t.ink : "#fff",
+              color: filter === p.id ? "#fff" : t.inkSoft,
+              fontSize: 12, fontFamily: "inherit", fontWeight: 600, cursor: "pointer",
+            }}>{p.l} {p.n}</button>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ position: "relative", height: 420, background: "#F0F2F5" }}>
+        {error && (
+          <div style={{
+            position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+            color: t.muted, fontSize: 13, textAlign: "center", padding: 24,
+          }}>
+            {error}
+          </div>
+        )}
+
+        {!error && filtered.length === 0 && (
+          <div style={{
+            position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center",
+            color: t.muted, fontSize: 13,
+          }}>
+            아직 신청한 캠페인의 디바이스 위치가 없습니다.
+          </div>
+        )}
+
+        <div ref={mapElRef} style={{ width: "100%", height: "100%" }} />
+
+        <div style={{
+          position: "absolute", left: 18, bottom: 18,
+          background: "rgba(255,255,255,0.95)", backdropFilter: "blur(8px)",
+          padding: "12px 14px", borderRadius: 10,
+          border: `1px solid ${t.lineSoft}`, boxShadow: "0 6px 18px -8px rgba(13,42,92,0.18)",
+          fontSize: 11, pointerEvents: "none",
+        }}>
+          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: t.mono, letterSpacing: "0.14em", marginBottom: 8 }}>LEGEND</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, color: t.inkSoft }}>
+              <span style={{ width: 10, height: 10, borderRadius: "50%", background: t.green }} /> 광고 송출 중 (RUNNING)
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, color: t.inkSoft }}>
+              <span style={{ width: 10, height: 10, borderRadius: "50%", background: t.amber }} /> 심사/대기 중
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------- */
+/* campaign section                                                   */
+/* ---------------------------------------------------------------- */
+function CampaignsSection({ campaigns }: { campaigns: Campaign[] }) {
+  const [openId, setOpenId] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"all" | CampaignStatus>("all");
+
+  const filtered = useMemo(() => {
+    if (filter === "all") return campaigns;
+    return campaigns.filter(c => c.status === filter);
+  }, [filter, campaigns]);
+
+  const tabs: { id: "all" | CampaignStatus; l: string; n: number }[] = [
+    { id: "all", l: "전체", n: campaigns.length },
+    { id: "live", l: "진행 중", n: campaigns.filter(c => c.status === "live").length },
+    { id: "scheduled", l: "예정", n: campaigns.filter(c => c.status === "scheduled").length },
+    { id: "ended", l: "종료", n: campaigns.filter(c => c.status === "ended").length },
+  ];
+
+  return (
+    <div style={{
+      background: "#fff", borderRadius: 14, border: `1px solid ${t.lineSoft}`,
+      boxShadow: "0 1px 2px rgba(13,42,92,0.03)",
+    }}>
+      <div style={{ padding: "20px 22px 14px", borderBottom: `1px solid ${t.lineSoft}` }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24 }}>
+          <div>
+            <Eyebrow>MY CAMPAIGNS</Eyebrow>
+            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 6 }}>
+              <div style={{ fontSize: 22, fontWeight: 800, color: t.ink, letterSpacing: "-0.025em" }}>
+                자신이 신청한 광고
+              </div>
+              <div style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: t.muted, fontWeight: 600 }}>
+                ({campaigns.length}건)
+              </div>
+            </div>
+            <div style={{ fontSize: 12.5, color: t.muted, marginTop: 4 }}>
+              항목을 클릭하면 해당 캠페인이 송출되는 디바이스 목록이 펼쳐집니다.
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 6 }}>
+            {tabs.map(tb => {
+              const active = filter === tb.id;
+              return (
+                <button key={tb.id} onClick={() => setFilter(tb.id)} style={{
+                  padding: "8px 13px", borderRadius: 8,
+                  border: active ? "none" : `1px solid ${t.line}`,
+                  background: active ? t.ink : "#fff",
+                  color: active ? "#fff" : t.inkSoft,
+                  fontSize: 12.5, fontFamily: "inherit", fontWeight: 600, cursor: "pointer",
+                  display: "inline-flex", alignItems: "center", gap: 7,
+                }}>
+                  {tb.l}
+                  <span style={{
+                    fontFamily: "var(--font-sans)",
+                    fontSize: 10.5, fontWeight: 700, padding: "1px 6px", borderRadius: 99,
+                    background: active ? "rgba(255,255,255,0.18)" : t.bgWarm,
+                    color: active ? "#fff" : t.muted,
+                  }}>{tb.n}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      <div style={{ padding: "14px 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
+        {filtered.map(c => (
+          <CampaignRow
+            key={c.id}
+            c={c}
+            expanded={openId === c.id}
+            onToggle={() => setOpenId(openId === c.id ? null : c.id)}
+          />
+        ))}
+        {filtered.length === 0 && (
+          <div style={{ padding: "60px 0", textAlign: "center", color: t.muted, fontSize: 13 }}>
+            해당 상태의 캠페인이 없습니다.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------------------------------------------------------------- */
+/* page                                                               */
+/* ---------------------------------------------------------------- */
+export default function MainPage() {
+  const router = useRouter();
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
+  const [userEmail, setUserEmail] = useState("");
+
+  function fetchCampaigns() {
+    const token = localStorage.getItem("access_token") ?? undefined;
+    getCampaigns(token)
+      .then(res => setCampaigns(res.results.map(fromApi)))
+      .catch(() => { });
+  }
+
+  useEffect(() => {
+    setUserEmail(localStorage.getItem("user_email") ?? "");
+    fetchCampaigns();
+  }, []);
+
+  return (
+    <>
+      <TopHeader campaigns={campaigns} userEmail={userEmail} onRefresh={fetchCampaigns} onNewCampaign={() => router.push("/apply")} />
+      <div style={{ padding: "26px 36px 60px", display: "flex", flexDirection: "column", gap: 22 }}>
+        <CampaignsSection campaigns={campaigns} />
+        <MapCard />
+      </div>
+    </>
+  );
+}
