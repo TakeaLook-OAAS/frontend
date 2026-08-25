@@ -1,8 +1,15 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { getCampaigns, CampaignItem } from "@/lib/api";
+import { getCampaigns, CampaignItem, getDeviceMap, DeviceMapMarker } from "@/lib/api";
+
+// 네이버 지도 JS SDK는 window.naver로 전역 노출됩니다.
+declare global {
+  interface Window {
+    naver: any;
+  }
+}
 
 /* ---------------------------------------------------------------- */
 /* design tokens (mirrors landing page.tsx)                          */
@@ -78,9 +85,6 @@ function fromApi(item: CampaignItem): Campaign {
     })),
   };
 }
-
-type MapPin = { id: string; left: string; top: string; n: number; label: string; tone: "blue" | "amber" | "mono" };
-const MAP_PINS: MapPin[] = [];
 
 /* ---------------------------------------------------------------- */
 /* small UI atoms                                                     */
@@ -255,10 +259,113 @@ function CampaignRow({ c, expanded, onToggle }: { c: Campaign; expanded: boolean
 }
 
 /* ---------------------------------------------------------------- */
-/* map placeholder                                                    */
+/* device map (네이버 지도 + /campaigns/map)                          */
 /* ---------------------------------------------------------------- */
+const NCP_CLIENT_ID = process.env.NEXT_PUBLIC_NCP_MAP_CLIENT_ID;
+
 function MapCard() {
-  const pinColor = (tone: MapPin["tone"]) => tone === "amber" ? t.amber : tone === "mono" ? t.mono : t.blue;
+  const mapElRef = useRef<HTMLDivElement>(null);
+  const mapInstanceRef = useRef<any>(null);
+  const markersRef = useRef<any[]>([]);
+  const [markers, setMarkers] = useState<DeviceMapMarker[]>([]);
+  const [filter, setFilter] = useState<"all" | "active" | "pending">("all");
+  const [error, setError] = useState<string | null>(null);
+
+  // 1. 내 캠페인 기기 위치 목록 조회
+  useEffect(() => {
+    const token = localStorage.getItem("access_token") ?? undefined;
+    getDeviceMap(token)
+      .then(res => setMarkers(res.markers))
+      .catch(() => setError("디바이스 위치를 불러오지 못했습니다."));
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (filter === "all") return markers;
+    return markers.filter(m => m.status === filter);
+  }, [filter, markers]);
+
+  const activeCount = markers.filter(m => m.status === "active").length;
+  const pendingCount = markers.filter(m => m.status === "pending").length;
+
+  // 2. 네이버 지도 SDK 로드 (한 번만)
+  useEffect(() => {
+    if (!NCP_CLIENT_ID) {
+      setError("NEXT_PUBLIC_NCP_MAP_CLIENT_ID 환경변수가 설정되지 않았습니다.");
+      return;
+    }
+    if (document.getElementById("naver-map-sdk")) return;
+
+    const script = document.createElement("script");
+    script.id = "naver-map-sdk";
+    script.src = `https://oapi.map.naver.com/openapi/v3/maps.js?ncpKeyId=${NCP_CLIENT_ID}`;
+    script.async = true;
+    script.onerror = () => setError("네이버 지도 SDK 로드에 실패했습니다.");
+    document.head.appendChild(script);
+  }, []);
+
+  // 3. 마커 목록이 바뀔 때마다 지도/마커 그리기
+  useEffect(() => {
+    if (!NCP_CLIENT_ID || filtered.length === 0) return;
+
+    function draw() {
+      if (!mapElRef.current || !window.naver) return;
+
+      if (!mapInstanceRef.current) {
+        mapInstanceRef.current = new window.naver.maps.Map(mapElRef.current, {
+          center: new window.naver.maps.LatLng(filtered[0].latitude, filtered[0].longitude),
+          zoom: 11,
+        });
+      }
+
+      // 기존 마커 정리 후 새로 그림 (filter 바뀔 때마다)
+      markersRef.current.forEach(m => m.setMap(null));
+      markersRef.current = [];
+
+      filtered.forEach(marker => {
+        const color = marker.status === "active" ? t.green : t.amber;
+        const naverMarker = new window.naver.maps.Marker({
+          position: new window.naver.maps.LatLng(marker.latitude, marker.longitude),
+          map: mapInstanceRef.current,
+          title: marker.name,
+          icon: {
+            content: `<div style="
+              background:#fff; border:3px solid ${color}; color:${t.ink};
+              padding:4px 9px; border-radius:7px; font-size:12px; font-weight:700;
+              white-space:nowrap; box-shadow:0 4px 10px -4px rgba(13,42,92,0.25);
+            ">${marker.name}</div>`,
+            anchor: new window.naver.maps.Point(20, 20),
+          },
+        });
+
+        const infoWindow = new window.naver.maps.InfoWindow({
+          content: `<div style="padding:10px 12px; font-size:12.5px; min-width:160px;">
+            <strong>${marker.name}</strong><br/>
+            ${marker.address}<br/>
+            상태: ${marker.status === "active" ? "송출 중" : "심사/대기 중"}
+          </div>`,
+        });
+        window.naver.maps.Event.addListener(naverMarker, "click", () => {
+          if (infoWindow.getMap()) infoWindow.close();
+          else infoWindow.open(mapInstanceRef.current, naverMarker);
+        });
+
+        markersRef.current.push(naverMarker);
+      });
+    }
+
+    if (window.naver) {
+      draw();
+    } else {
+      const check = setInterval(() => {
+        if (window.naver) {
+          clearInterval(check);
+          draw();
+        }
+      }, 200);
+      return () => clearInterval(check);
+    }
+  }, [filtered]);
+
   return (
     <div style={{
       background: "#fff", borderRadius: 14, border: `1px solid ${t.lineSoft}`,
@@ -269,227 +376,14 @@ function MapCard() {
           <Eyebrow>DEVICE MAP</Eyebrow>
           <div style={{ fontSize: 17, fontWeight: 700, color: t.ink, marginTop: 6, letterSpacing: "-0.02em" }}>디바이스 분포 지도</div>
           <div style={{ fontSize: 12, color: t.muted, marginTop: 4 }}>
-            현재 신청 중인 캠페인의 디바이스 위치입니다. 핀을 클릭하면 해당 매체의 실시간 상태를 볼 수 있습니다.
+            내가 신청한 캠페인의 디바이스 위치입니다. 핀을 클릭하면 상세 정보를 볼 수 있습니다.
           </div>
         </div>
         <div style={{ display: "flex", gap: 6 }}>
           {[
-            { l: "전체", active: true },
-            { l: "진행 중", active: false },
-            { l: "예정", active: false },
-          ].map((p, i) => (
-            <button key={i} style={{
-              padding: "7px 13px", borderRadius: 8,
-              border: p.active ? "none" : `1px solid ${t.line}`,
-              background: p.active ? t.ink : "#fff",
-              color: p.active ? "#fff" : t.inkSoft,
-              fontSize: 12, fontFamily: "inherit", fontWeight: 600, cursor: "pointer",
-            }}>{p.l}</button>
-          ))}
-        </div>
-      </div>
-
-      <div style={{ position: "relative", height: 420, background: "#F0F2F5" }}>
-
-
-        {MAP_PINS.map(p => {
-          const color = pinColor(p.tone);
-          return (
-            <div key={p.id} style={{ position: "absolute", left: p.left, top: p.top, transform: "translate(-50%,-100%)" }}>
-              <div style={{
-                position: "absolute", left: "50%", top: "calc(100% - 8px)",
-                transform: "translate(-50%,-50%)",
-                width: 38 + p.n * 6, height: 38 + p.n * 6, borderRadius: "50%",
-                background: color, opacity: 0.14, filter: "blur(2px)",
-              }} />
-              <div style={{
-                position: "relative",
-                width: 30 + Math.min(p.n * 4, 12), height: 30 + Math.min(p.n * 4, 12),
-                borderRadius: "50% 50% 50% 4px",
-                transform: "rotate(-45deg)",
-                background: color,
-                boxShadow: `0 8px 18px -6px ${color}99, 0 0 0 3px #fff`,
-                display: "flex", alignItems: "center", justifyContent: "center",
-              }}>
-                <span style={{
-                  transform: "rotate(45deg)", fontFamily: "var(--font-sans)",
-                  color: "#fff", fontWeight: 800, fontSize: 12, letterSpacing: "-0.02em",
-                }}>{p.n}</span>
-              </div>
-              <div style={{
-                position: "absolute", left: "50%", top: "calc(100% + 6px)",
-                transform: "translateX(-50%)",
-                background: "#fff", padding: "3px 8px", borderRadius: 6,
-                border: `1px solid ${t.lineSoft}`,
-                fontSize: 10.5, fontWeight: 600, color: t.inkSoft, whiteSpace: "nowrap",
-                boxShadow: "0 4px 10px -4px rgba(13,42,92,0.18)",
-              }}>{p.label}</div>
-            </div>
-          );
-        })}
-
-        <div style={{
-          position: "absolute", left: 18, bottom: 18,
-          background: "rgba(255,255,255,0.95)", backdropFilter: "blur(8px)",
-          padding: "12px 14px", borderRadius: 10,
-          border: `1px solid ${t.lineSoft}`, boxShadow: "0 6px 18px -8px rgba(13,42,92,0.18)",
-          fontSize: 11,
-        }}>
-          <div style={{ fontFamily: "var(--font-mono)", fontSize: 9.5, color: t.mono, letterSpacing: "0.14em", marginBottom: 8 }}>LEGEND</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: t.inkSoft }}>
-              <span style={{ width: 10, height: 10, borderRadius: "50%", background: t.blue }} /> 진행 중 디바이스
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: t.inkSoft }}>
-              <span style={{ width: 10, height: 10, borderRadius: "50%", background: t.amber }} /> 송출 점검 필요
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, color: t.inkSoft }}>
-              <span style={{ width: 10, height: 10, borderRadius: "50%", background: t.mono }} /> 종료된 매체
-            </div>
-          </div>
-        </div>
-
-        <div style={{ position: "absolute", right: 18, top: 18, display: "flex", flexDirection: "column", gap: 6 }}>
-          {["+", "−", "⛶"].map((s, i) => (
-            <button key={i} style={{
-              width: 34, height: 34, borderRadius: 8,
-              background: "#fff", border: `1px solid ${t.lineSoft}`,
-              fontSize: 16, color: t.inkSoft, cursor: "pointer", fontFamily: "inherit",
-              boxShadow: "0 4px 10px -6px rgba(13,42,92,0.2)",
-            }}>{s}</button>
-          ))}
-        </div>
-
-        <div style={{
-          position: "absolute", right: 18, bottom: 14,
-          fontFamily: "var(--font-mono)", fontSize: 9.5, color: t.mono,
-          letterSpacing: "0.14em", opacity: 0.7,
-        }}>[ MAP · placeholder ]</div>
-      </div>
-
-      <div style={{ padding: "14px 22px", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: `1px solid ${t.lineSoft}`, background: t.bgWarm }}>
-        <div style={{ display: "flex", gap: 28 }}>
-        </div>
-        <a href="#" style={{ fontSize: 12, color: t.blue, fontWeight: 700, textDecoration: "none" }}>
-          전체 지도에서 보기 →
-        </a>
-      </div>
-    </div>
-  );
-}
-
-/* ---------------------------------------------------------------- */
-/* campaign section                                                   */
-/* ---------------------------------------------------------------- */
-function CampaignsSection({ campaigns }: { campaigns: Campaign[] }) {
-  const [openId, setOpenId] = useState<string | null>(null);
-  const [filter, setFilter] = useState<"all" | CampaignStatus>("all");
-
-  const filtered = useMemo(() => {
-    if (filter === "all") return campaigns;
-    return campaigns.filter(c => c.status === filter);
-  }, [filter, campaigns]);
-
-  const tabs: { id: "all" | CampaignStatus; l: string; n: number }[] = [
-    { id: "all", l: "전체", n: campaigns.length },
-    { id: "live", l: "진행 중", n: campaigns.filter(c => c.status === "live").length },
-    { id: "scheduled", l: "예정", n: campaigns.filter(c => c.status === "scheduled").length },
-    { id: "ended", l: "종료", n: campaigns.filter(c => c.status === "ended").length },
-  ];
-
-  return (
-    <div style={{
-      background: "#fff", borderRadius: 14, border: `1px solid ${t.lineSoft}`,
-      boxShadow: "0 1px 2px rgba(13,42,92,0.03)",
-    }}>
-      <div style={{ padding: "20px 22px 14px", borderBottom: `1px solid ${t.lineSoft}` }}>
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 24 }}>
-          <div>
-            <Eyebrow>MY CAMPAIGNS</Eyebrow>
-            <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginTop: 6 }}>
-              <div style={{ fontSize: 22, fontWeight: 800, color: t.ink, letterSpacing: "-0.025em" }}>
-                자신이 신청한 광고
-              </div>
-              <div style={{ fontFamily: "var(--font-sans)", fontSize: 13, color: t.muted, fontWeight: 600 }}>
-                ({campaigns.length}건)
-              </div>
-            </div>
-            <div style={{ fontSize: 12.5, color: t.muted, marginTop: 4 }}>
-              항목을 클릭하면 해당 캠페인이 송출되는 디바이스 목록이 펼쳐집니다.
-            </div>
-          </div>
-          <div style={{ display: "flex", gap: 6 }}>
-            {tabs.map(tb => {
-              const active = filter === tb.id;
-              return (
-                <button key={tb.id} onClick={() => setFilter(tb.id)} style={{
-                  padding: "8px 13px", borderRadius: 8,
-                  border: active ? "none" : `1px solid ${t.line}`,
-                  background: active ? t.ink : "#fff",
-                  color: active ? "#fff" : t.inkSoft,
-                  fontSize: 12.5, fontFamily: "inherit", fontWeight: 600, cursor: "pointer",
-                  display: "inline-flex", alignItems: "center", gap: 7,
-                }}>
-                  {tb.l}
-                  <span style={{
-                    fontFamily: "var(--font-sans)",
-                    fontSize: 10.5, fontWeight: 700, padding: "1px 6px", borderRadius: 99,
-                    background: active ? "rgba(255,255,255,0.18)" : t.bgWarm,
-                    color: active ? "#fff" : t.muted,
-                  }}>{tb.n}</span>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      <div style={{ padding: "14px 16px 16px", display: "flex", flexDirection: "column", gap: 10 }}>
-        {filtered.map(c => (
-          <CampaignRow
-            key={c.id}
-            c={c}
-            expanded={openId === c.id}
-            onToggle={() => setOpenId(openId === c.id ? null : c.id)}
-          />
-        ))}
-        {filtered.length === 0 && (
-          <div style={{ padding: "60px 0", textAlign: "center", color: t.muted, fontSize: 13 }}>
-            해당 상태의 캠페인이 없습니다.
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-/* ---------------------------------------------------------------- */
-/* page                                                               */
-/* ---------------------------------------------------------------- */
-export default function MainPage() {
-  const router = useRouter();
-  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [userEmail, setUserEmail] = useState("");
-
-  function fetchCampaigns() {
-    const token = localStorage.getItem("access_token") ?? undefined;
-    getCampaigns(token)
-      .then(res => setCampaigns(res.results.map(fromApi)))
-      .catch(() => { });
-  }
-
-  useEffect(() => {
-    setUserEmail(localStorage.getItem("user_email") ?? "");
-    fetchCampaigns();
-  }, []);
-
-  return (
-    <>
-      <TopHeader campaigns={campaigns} userEmail={userEmail} onRefresh={fetchCampaigns} onNewCampaign={() => router.push("/apply")} />
-      <div style={{ padding: "26px 36px 60px", display: "flex", flexDirection: "column", gap: 22 }}>
-        <CampaignsSection campaigns={campaigns} />
-        <MapCard />
-      </div>
-    </>
-  );
-}
+            { id: "all" as const, l: "전체", n: markers.length },
+            { id: "active" as const, l: "송출 중", n: activeCount },
+            { id: "pending" as const, l: "대기", n: pendingCount },
+          ].map((p) => (
+            <button key={p.id} onClick={() => setFilter(p.id)} style={{
+              padding: "7px

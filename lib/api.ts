@@ -173,6 +173,30 @@ export async function getCampaigns(token?: string): Promise<CampaignListResponse
   return res.json();
 }
 
+// ── 메인 페이지 지도 (내 캠페인 기기 위치) ────────────────────────────────────
+
+export interface DeviceMapMarker {
+  device_id: string;
+  name:      string;
+  address:   string;
+  latitude:  number;
+  longitude: number;
+  status:    "active" | "pending"; // active=RUNNING 캠페인 있음(초록), pending=없음(노랑)
+}
+
+export interface DeviceMapResponse {
+  markers: DeviceMapMarker[];
+}
+
+export async function getDeviceMap(token?: string): Promise<DeviceMapResponse> {
+  const res = await authFetch(`${BASE}/campaigns/map`, {
+    cache: "no-store",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!res.ok) throw new Error(`/campaigns/map 오류: ${res.status}`);
+  return res.json();
+}
+
 // ── 인증 ──────────────────────────────────────────────────────────────────────
 
 
